@@ -1,0 +1,11 @@
+{
+  "apiKeys": {
+    "deepseek": "",
+    "openai": ""
+  },
+  "defaultModel": "deepseek-chat",
+  "parameters": {
+    "temperature": 0.7,
+    "maxTokens": 2048
+  }
+}

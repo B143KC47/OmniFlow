@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
 import os
 import json
 import time
@@ -19,8 +19,8 @@ os.makedirs('data/config', exist_ok=True)  # 为配置文件添加目录
 
 @app.route('/')
 def index():
-    """渲染主页"""
-    return render_template('index.html')
+    """直接渲染节点编辑器页面，不再重定向"""
+    return render_template('node_editor.html')
 
 @app.route('/node-editor')
 def node_editor():
@@ -36,6 +36,11 @@ def chat():
 def settings():
     """渲染配置页面"""
     return render_template('settings.html')
+
+@app.route('/faq')
+def faq():
+    """渲染常见问题页面"""
+    return render_template('faq.html')
 
 @app.route('/api/send-message', methods=['POST'])
 def send_message():
