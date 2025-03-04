@@ -42,6 +42,9 @@ export const FlowEditor = {
         // 初始化核心模块
         this.Core.init(canvas);
         
+        // 创建节点容器
+        this.Nodes.createNodesContainer();
+        
         // 初始化其他模块
         this.Nodes.init();
         this.Connections.init();

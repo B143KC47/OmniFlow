@@ -34,7 +34,73 @@ export const FlowCore = {
     init(canvas) {
         console.log('初始化流程编辑器核心');
         this.state.canvas = canvas;
+        
+        // 设置缩放等级事件监听
+        canvas.addEventListener('wheel', this.handleWheel.bind(this));
+        
+        // 设置画布拖动事件
+        canvas.addEventListener('mousedown', this.handleCanvasMouseDown.bind(this));
+        document.addEventListener('mousemove', this.handleCanvasMouseMove.bind(this));
+        document.addEventListener('mouseup', this.handleCanvasMouseUp.bind(this));
+        
         return this;
+    },
+    
+    /**
+     * 处理滚轮事件
+     */
+    handleWheel(e) {
+        // 如果按住Ctrl，则进行缩放
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            this.zoom(delta, e.clientX, e.clientY);
+        }
+    },
+    
+    /**
+     * 处理画布鼠标按下
+     */
+    handleCanvasMouseDown(e) {
+        // 仅当点击的是画布本身，而不是其中的节点时
+        if (e.target === this.state.canvas) {
+            this.state.isPanning = true;
+            this.state.lastMouseX = e.clientX;
+            this.state.lastMouseY = e.clientY;
+            this.state.canvas.style.cursor = 'grabbing';
+            
+            // 取消所有选择
+            this.deselectAll();
+        }
+    },
+    
+    /**
+     * 处理画布鼠标移动
+     */
+    handleCanvasMouseMove(e) {
+        if (this.state.isPanning) {
+            const dx = e.clientX - this.state.lastMouseX;
+            const dy = e.clientY - this.state.lastMouseY;
+            this.state.lastMouseX = e.clientX;
+            this.state.lastMouseY = e.clientY;
+            
+            this.state.offsetX += dx / this.state.scale;
+            this.state.offsetY += dy / this.state.scale;
+            this.applyTransform();
+            
+            // 更新zoom level显示
+            document.getElementById('zoomLevel').textContent = `${Math.round(this.state.scale * 100)}%`;
+        }
+    },
+    
+    /**
+     * 处理画布鼠标抬起
+     */
+    handleCanvasMouseUp() {
+        if (this.state.isPanning) {
+            this.state.isPanning = false;
+            this.state.canvas.style.cursor = 'default';
+        }
     },
     
     /**
@@ -60,18 +126,37 @@ export const FlowCore = {
         const connectionsContainer = document.getElementById('connectionsContainer');
         
         if (nodesContainer && connectionsContainer) {
-            nodesContainer.style.transform = `scale(${this.state.scale}) translate(${this.state.offsetX}px, ${this.state.offsetY}px)`;
-            connectionsContainer.style.transform = `scale(${this.state.scale}) translate(${this.state.offsetX}px, ${this.state.offsetY}px)`;
+            const transform = `scale(${this.state.scale}) translate(${this.state.offsetX}px, ${this.state.offsetY}px)`;
+            nodesContainer.style.transform = transform;
+            connectionsContainer.style.transform = transform;
         }
     },
     
     /**
      * 缩放流程图
      */
-    zoom(delta) {
-        const newScale = Math.max(0.5, Math.min(2, this.state.scale + delta));
-        this.state.scale = newScale;
-        this.applyTransform();
+    zoom(delta, clientX, clientY) {
+        const oldScale = this.state.scale;
+        const newScale = Math.max(0.1, Math.min(2, oldScale + delta));
+        
+        if (newScale !== oldScale) {
+            this.state.scale = newScale;
+            
+            // 调整偏移量，使缩放以鼠标位置为中心
+            if (clientX !== undefined && clientY !== undefined) {
+                const canvasRect = this.state.canvas.getBoundingClientRect();
+                const mouseX = (clientX - canvasRect.left) / oldScale - this.state.offsetX;
+                const mouseY = (clientY - canvasRect.top) / oldScale - this.state.offsetY;
+                
+                this.state.offsetX -= mouseX * (1 / oldScale - 1 / newScale);
+                this.state.offsetY -= mouseY * (1 / oldScale - 1 / newScale);
+            }
+            
+            this.applyTransform();
+            
+            // 更新zoom level显示
+            document.getElementById('zoomLevel').textContent = `${Math.round(this.state.scale * 100)}%`;
+        }
     },
     
     /**
@@ -82,6 +167,9 @@ export const FlowCore = {
         this.state.offsetX = 0;
         this.state.offsetY = 0;
         this.applyTransform();
+        
+        // 更新zoom level显示
+        document.getElementById('zoomLevel').textContent = '100%';
     },
     
     /**
@@ -157,6 +245,9 @@ export const FlowCore = {
         this.state.offsetX = offsetX;
         this.state.offsetY = offsetY;
         this.applyTransform();
+        
+        // 更新zoom level显示
+        document.getElementById('zoomLevel').textContent = `${Math.round(this.state.scale * 100)}%`;
     },
 
     /**
@@ -205,6 +296,11 @@ export const FlowCore = {
                     }
                 }
             });
+            
+            // 绑定工具栏按钮事件
+            document.getElementById('zoomIn').addEventListener('click', () => this.zoom(0.1));
+            document.getElementById('zoomOut').addEventListener('click', () => this.zoom(-0.1));
+            document.getElementById('resetView').addEventListener('click', () => this.resetView());
         }
         
         return this;

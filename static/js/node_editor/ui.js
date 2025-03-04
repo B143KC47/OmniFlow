@@ -35,19 +35,28 @@ export const FlowUI = {
      */
     initModalEvents() {
         // 加载流程模态框事件
-        document.getElementById('loadFlowModal').addEventListener('show.bs.modal', () => {
-            FlowIO.loadFlowsList();
-        });
+        const loadFlowModal = document.getElementById('loadFlowModal');
+        if (loadFlowModal) {
+            loadFlowModal.addEventListener('show.bs.modal', () => {
+                FlowIO.loadFlowsList();
+            });
+        }
         
         // 执行流程模态框事件
-        document.getElementById('executeFlowModal').addEventListener('show.bs.modal', () => {
-            FlowIO.prepareFlowExecution();
-        });
+        const executeFlowModal = document.getElementById('executeFlowModal');
+        if (executeFlowModal) {
+            executeFlowModal.addEventListener('show.bs.modal', () => {
+                FlowIO.prepareFlowExecution();
+            });
+        }
         
         // 启动执行按钮
-        document.getElementById('startExecution').addEventListener('click', () => {
-            FlowIO.startFlowExecution();
-        });
+        const startExecution = document.getElementById('startExecution');
+        if (startExecution) {
+            startExecution.addEventListener('click', () => {
+                FlowIO.startFlowExecution();
+            });
+        }
     },
     
     /**
@@ -55,60 +64,99 @@ export const FlowUI = {
      */
     setupToolbarEvents() {
         // 新建流程
-        document.getElementById('newFlow').addEventListener('click', () => {
-            if (confirm('确定要创建新流程吗？当前未保存的内容将丢失。')) {
-                FlowCore.resetState();
-                FlowIO.clearCanvas();
-            }
-        });
+        const newFlow = document.getElementById('newFlow');
+        if (newFlow) {
+            newFlow.addEventListener('click', () => {
+                if (confirm('确定要创建新流程吗？当前未保存的内容将丢失。')) {
+                    FlowCore.resetState();
+                    FlowIO.clearCanvas();
+                }
+            });
+        }
         
         // 保存流程
-        document.getElementById('saveFlow').addEventListener('click', () => {
-            const modal = new bootstrap.Modal(document.getElementById('saveFlowModal'));
-            // 将当前流程名填入模态框
-            document.getElementById('saveFlowName').value = document.getElementById('flowName').value;
-            modal.show();
-        });
+        const saveFlow = document.getElementById('saveFlow');
+        if (saveFlow) {
+            saveFlow.addEventListener('click', () => {
+                const modalElement = document.getElementById('saveFlowModal');
+                if (!modalElement) return;
+                
+                const modal = new bootstrap.Modal(modalElement);
+                
+                // 将当前流程名填入模态框
+                const flowNameInput = document.getElementById('flowName');
+                const saveFlowNameInput = document.getElementById('saveFlowName');
+                if (flowNameInput && saveFlowNameInput) {
+                    saveFlowNameInput.value = flowNameInput.value;
+                }
+                
+                modal.show();
+            });
+        }
         
         // 确认保存
-        document.getElementById('confirmSave').addEventListener('click', () => {
-            FlowIO.saveFlow();
-        });
+        const confirmSave = document.getElementById('confirmSave');
+        if (confirmSave) {
+            confirmSave.addEventListener('click', () => {
+                FlowIO.saveFlow();
+            });
+        }
         
         // 加载流程
-        document.getElementById('loadFlow').addEventListener('click', () => {
-            FlowIO.showLoadFlowDialog();
-        });
+        const loadFlow = document.getElementById('loadFlow');
+        if (loadFlow) {
+            loadFlow.addEventListener('click', () => {
+                FlowIO.showLoadFlowDialog();
+            });
+        }
         
         // 删除选中节点
-        document.getElementById('deleteSelected').addEventListener('click', () => {
-            FlowNodes.deleteSelected();
-        });
+        const deleteSelected = document.getElementById('deleteSelected');
+        if (deleteSelected) {
+            deleteSelected.addEventListener('click', () => {
+                FlowNodes.deleteSelected();
+            });
+        }
         
         // 复制选中节点
-        document.getElementById('duplicateSelected').addEventListener('click', () => {
-            FlowNodes.duplicateSelected();
-        });
+        const duplicateSelected = document.getElementById('duplicateSelected');
+        if (duplicateSelected) {
+            duplicateSelected.addEventListener('click', () => {
+                FlowNodes.duplicateSelected();
+            });
+        }
         
         // 执行流程
-        document.getElementById('executeFlow').addEventListener('click', () => {
-            FlowIO.executeFlow();
-        });
+        const executeFlow = document.getElementById('executeFlow');
+        if (executeFlow) {
+            executeFlow.addEventListener('click', () => {
+                FlowIO.executeFlow();
+            });
+        }
         
         // 验证流程
-        document.getElementById('validateFlow').addEventListener('click', () => {
-            FlowIO.validateFlow();
-        });
+        const validateFlow = document.getElementById('validateFlow');
+        if (validateFlow) {
+            validateFlow.addEventListener('click', () => {
+                FlowIO.validateFlow();
+            });
+        }
         
         // 自适应视图按钮
-        document.getElementById('fitContent').addEventListener('click', () => {
-            FlowCore.fitContent();
-        });
+        const fitContent = document.getElementById('fitContent');
+        if (fitContent) {
+            fitContent.addEventListener('click', () => {
+                FlowCore.fitContent();
+            });
+        }
         
         // 流程名称更改
-        document.getElementById('flowName').addEventListener('change', (e) => {
-            FlowCore.state.flowName = e.target.value;
-        });
+        const flowName = document.getElementById('flowName');
+        if (flowName) {
+            flowName.addEventListener('change', (e) => {
+                FlowCore.state.flowName = e.target.value;
+            });
+        }
     },
     
     /**
@@ -184,7 +232,7 @@ export const FlowUI = {
                 
                 // 设置节点颜色
                 const nodeType = node.getAttribute('data-node-type');
-                const { nodeTypes } = require('./nodes.js');
+                const nodeTypes = require('./nodes.js').nodeTypes;
                 const nodeConfig = nodeTypes[nodeType];
                 if (nodeConfig) {
                     miniNode.style.backgroundColor = nodeConfig.color;
@@ -220,8 +268,17 @@ export const FlowUI = {
             // Ctrl+S - 保存流程
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
-                const modal = new bootstrap.Modal(document.getElementById('saveFlowModal'));
-                document.getElementById('saveFlowName').value = document.getElementById('flowName').value;
+                const modalElement = document.getElementById('saveFlowModal');
+                if (!modalElement) return;
+                
+                const modal = new bootstrap.Modal(modalElement);
+                const flowNameInput = document.getElementById('flowName');
+                const saveFlowNameInput = document.getElementById('saveFlowName');
+                
+                if (flowNameInput && saveFlowNameInput) {
+                    saveFlowNameInput.value = flowNameInput.value;
+                }
+                
                 modal.show();
             }
             
@@ -258,8 +315,8 @@ export const FlowUI = {
                 e.preventDefault();
             }
             
-            // Ctrl+F - 适应内容
-            if (e.ctrlKey && e.key === 'f') {
+            // Ctrl+F 或 F - 适应内容
+            if ((e.ctrlKey && e.key === 'f') || (!e.ctrlKey && e.key === 'f')) {
                 FlowCore.fitContent();
                 e.preventDefault();
             }
@@ -345,25 +402,18 @@ export const FlowUI = {
      */
     showStatusMessage(message, type = 'info', duration = 3000) {
         const statusBar = document.querySelector('.status-bar');
-        if (!statusBar) return;
+        const statusMsg = document.querySelector('.status-message');
+        if (!statusBar || !statusMsg) return;
         
-        // 创建消息元素
-        const messageEl = document.createElement('div');
-        messageEl.className = `status-message alert alert-${type} alert-dismissible fade show py-1 px-2 m-0`;
-        messageEl.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close btn-sm py-1" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
+        // 更新状态栏消息
+        statusMsg.innerHTML = message;
+        statusMsg.className = `status-message text-${type} small`;
         
-        statusBar.appendChild(messageEl);
-        
-        // 设置自动消失
+        // 如果设定了自动消失
         if (duration > 0) {
             setTimeout(() => {
-                messageEl.classList.remove('show');
-                setTimeout(() => {
-                    messageEl.remove();
-                }, 300);
+                statusMsg.textContent = '准备就绪';
+                statusMsg.className = 'status-message text-muted small';
             }, duration);
         }
     },
