@@ -81,3 +81,115 @@
         right: 20px;
     }
 }
+
+.setting-section {
+    margin-bottom: 30px;
+}
+
+.setting-title {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* API 密钥输入框样式 */
+.api-status {
+    font-size: 0.85rem;
+    margin-top: 5px;
+}
+
+.api-status.success {
+    color: #198754;
+}
+
+.api-status.error {
+    color: #dc3545;
+}
+
+.api-status.pending {
+    color: #6c757d;
+}
+
+/* 模型选择项样式 */
+.model-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.model-card {
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 15px;
+    width: calc(33.33% - 10px);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+@media (max-width: 992px) {
+    .model-card {
+        width: calc(50% - 10px);
+    }
+}
+
+@media (max-width: 576px) {
+    .model-card {
+        width: 100%;
+    }
+}
+
+.model-card.selected {
+    border-color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.model-card:hover {
+    border-color: #0d6efd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.model-card .model-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.model-card .model-description {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* 范围滑块样式 */
+input[type="range"] {
+    width: 100%;
+}
+
+input[type="range"] + span {
+    min-width: 30px;
+    text-align: center;
+}
+
+/* 提示消息样式 */
+.settings-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    max-width: 350px;
+    z-index: 1050;
+    animation: fadeInOut 0.3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 加载指示器 */
+.spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 2px;
+    margin-right: 5px;
+    vertical-align: middle;
+}

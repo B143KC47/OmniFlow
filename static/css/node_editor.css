@@ -271,3 +271,277 @@
         width: 150px;
     }
 }
+
+/**
+ * OmniFlow 节点编辑器样式
+ */
+
+/* 编辑器整体布局 */
+.editor-container {
+    height: calc(100vh - 56px);
+    overflow: hidden;
+}
+
+/* 节点面板样式 */
+.nodes-panel {
+    width: 230px;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.node-group {
+    margin-bottom: 15px;
+}
+
+.node-group-title {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+    padding-left: 5px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.node-template {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    cursor: grab;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.node-template:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.node-template i {
+    margin-right: 8px;
+}
+
+/* 属性面板样式 */
+.properties-panel {
+    width: 280px;
+    overflow-y: auto;
+}
+
+/* 流程画布样式 */
+.canvas-container {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.flow-canvas {
+    flex-grow: 1;
+    overflow: auto;
+    position: relative;
+    background-color: #f8f9fa;
+    background-image: 
+        linear-gradient(#e9ecef 1px, transparent 1px),
+        linear-gradient(90deg, #e9ecef 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* 节点样式 */
+.node {
+    position: absolute;
+    width: 180px;
+    background-color: white;
+    border: 2px solid #6c757d;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    user-select: none;
+}
+
+.node.selected {
+    box-shadow: 0 0 0 2px #0d6efd, 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.node-header {
+    background-color: #6c757d;
+    color: white;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 3px 3px 0 0;
+}
+
+.node-header i {
+    margin-right: 8px;
+}
+
+.node-title {
+    flex-grow: 1;
+    font-weight: 500;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.node-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.node-controls i {
+    cursor: pointer;
+    margin-right: 0;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.node-controls i:hover {
+    opacity: 1;
+}
+
+.node-body {
+    padding: 8px 10px;
+}
+
+.node-type {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-bottom: 4px;
+}
+
+.node-description {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* 节点连接点样式 */
+.node-handle {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 2px solid #6c757d;
+    z-index: 11;
+    cursor: pointer;
+}
+
+.handle-input {
+    left: -7px;
+}
+
+.handle-output {
+    right: -7px;
+}
+
+.handle-highlight {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    box-shadow: 0 0 5px rgba(13, 110, 253, 0.5);
+}
+
+/* 迷你地图样式 */
+.mini-map {
+    width: 100%;
+    height: 150px;
+    position: relative;
+    overflow: hidden;
+    background-color: #f8f9fa;
+}
+
+.mini-map-label {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 0.7rem;
+    color: #6c757d;
+    z-index: 1;
+}
+
+.mini-map-viewport {
+    position: absolute;
+    border: 1px solid #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+    pointer-events: none;
+}
+
+.mini-map-node {
+    position: absolute;
+    background-color: #6c757d;
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+/* 工具栏样式 */
+.toolbar {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+}
+
+.flow-name-container {
+    max-width: 300px;
+}
+
+/* 状态栏样式 */
+.status-bar {
+    min-height: 28px;
+}
+
+/* 上下文菜单样式 */
+.context-menu {
+    min-width: 200px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+}
+
+/* 拖放提示样式 */
+.flow-canvas.drag-over {
+    background-color: #e9ecef;
+    outline: 2px dashed #0d6efd;
+    outline-offset: -2px;
+}
+
+/* 各种节点类型的颜色 */
+.node[data-node-type="input"] {
+    border-color: #3498db;
+}
+.node[data-node-type="input"] .node-header {
+    background-color: #3498db;
+}
+
+.node[data-node-type="process"] {
+    border-color: #2ecc71;
+}
+.node[data-node-type="process"] .node-header {
+    background-color: #2ecc71;
+}
+
+.node[data-node-type="decision"] {
+    border-color: #f39c12;
+}
+.node[data-node-type="decision"] .node-header {
+    background-color: #f39c12;
+}
+
+.node[data-node-type="output"] {
+    border-color: #e74c3c;
+}
+.node[data-node-type="output"] .node-header {
+    background-color: #e74c3c;
+}
+
+.node[data-node-type="api"] {
+    border-color: #9b59b6;
+}
+.node[data-node-type="api"] .node-header {
+    background-color: #9b59b6;
+}
+
+.node[data-node-type="llm"] {
+    border-color: #1abc9c;
+}
+.node[data-node-type="llm"] .node-header {
+    background-color: #1abc9c;
+}
