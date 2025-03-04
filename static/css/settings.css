@@ -1,0 +1,83 @@
+/**
+ * OmniFlow 系统设置页面样式
+ */
+
+/* 卡片样式 */
+.card {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.card-header {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+/* 模型卡片样式 */
+.model-card {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.model-card:hover {
+    background-color: #f8f9fa;
+}
+
+.model-card.selected {
+    border-color: #3498db;
+    background-color: #ecf7ff;
+}
+
+.model-status {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+/* 密码输入框样式 */
+.toggle-password {
+    cursor: pointer;
+}
+
+.form-range {
+    width: 80%;
+    display: inline-block;
+}
+
+/* 表单组样式 */
+.form-group label {
+    font-weight: 500;
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+/* 模型选项容器 */
+.model-options {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* 提示信息样式 */
+#settingsAlerts {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    z-index: 1050;
+}
+
+#settingsAlerts .alert {
+    margin-bottom: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    #settingsAlerts {
+        width: calc(100% - 40px);
+        right: 20px;
+    }
+}

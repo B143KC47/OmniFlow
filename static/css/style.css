@@ -1,0 +1,253 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/**
+ * OmniFlow 全局样式
+ */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+/* 导航栏样式 */
+.navbar {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+/* 卡片样式 */
+.card {
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    font-weight: 500;
+}
+
+/* 按钮样式 */
+.btn {
+    display: inline-block;
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 15px;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+.btn:hover {
+    background: #2980b9;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.nav-buttons {
+    margin-top: 30px;
+}
+
+/* 节点编辑器样式 */
+.editor-container {
+    display: flex;
+    height: calc(100vh - 80px);
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #ecf0f1;
+    padding: 15px;
+    border-right: 1px solid #bdc3c7;
+}
+
+.canvas {
+    flex-grow: 1;
+    background-color: #fff;
+    position: relative;
+    overflow: auto;
+    background-image: linear-gradient(#e0e0e0 1px, transparent 1px), 
+                      linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.node-template {
+    background-color: #3498db;
+    color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    cursor: grab;
+    text-align: center;
+}
+
+.node {
+    position: absolute;
+    background-color: #3498db;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    cursor: move;
+    min-width: 100px;
+    text-align: center;
+}
+
+.node.process { background-color: #3498db; }
+.node.decision { background-color: #e74c3c; }
+.node.input { background-color: #2ecc71; }
+.node.output { background-color: #f39c12; }
+
+.endpoint {
+    width: 10px;
+    height: 10px;
+    background-color: #95a5a6;
+    border-radius: 50%;
+    position: absolute;
+    cursor: pointer;
+}
+
+/* 聊天界面样式 */
+.chat-container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    max-width: 80%;
+}
+
+.message.user {
+    background-color: #3498db;
+    color: white;
+    margin-left: auto;
+}
+
+.message.system {
+    background-color: #ecf0f1;
+    color: #333;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ecf0f1;
+}
+
+.chat-input textarea {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+    resize: none;
+    height: 60px;
+}
+
+.chat-input button {
+    align-self: flex-end;
+}
+
+/* 标题样式 */
+h1, h2, h3, h4, h5, h6 {
+    color: #2c3e50;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+header h1 {
+    color: white;
+    margin-bottom: 0;
+}
+
+/* 页脚样式 */
+footer {
+    border-top: 1px solid #eee;
+    margin-top: 30px;
+}
+
+/* 输入框焦点样式 */
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+}
+
+/* 工具提示样式 */
+.tooltip {
+    font-size: 0.9rem;
+}
+
+/* 表单标签样式 */
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* 禁用状态样式 */
+.disabled, .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 超链接样式 */
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+}
