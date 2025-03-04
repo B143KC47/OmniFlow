@@ -1,9 +1,15 @@
 from flask import Flask, render_template, request, jsonify
 import os
 import json
+import requests
+import openai
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'omniflow-secret-key'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'omniflow-secret-key')
 
 # 保存流程图的目录
 FLOWS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'flows')
@@ -45,6 +51,31 @@ def list_flows():
     """列出所有保存的流程"""
     flows = [f.replace('.json', '') for f in os.listdir(FLOWS_DIR) if f.endswith('.json')]
     return jsonify({"flows": flows})
+
+@app.route('/api/llm', methods=['POST'])
+def llm_api():
+    """代理大语言模型API请求"""
+    try:
+        data = request.json
+        api_key = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not api_key:
+            return jsonify({"error": "缺少API密钥"}), 401
+        
+        # 设置OpenAI API密钥
+        openai.api_key = api_key
+        
+        # 调用OpenAI API
+        response = openai.ChatCompletion.create(
+            model=data.get('model', 'gpt-3.5-turbo'),
+            messages=data.get('messages', []),
+            temperature=data.get('temperature', 0.7),
+            max_tokens=data.get('max_tokens', 1000)
+        )
+        
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

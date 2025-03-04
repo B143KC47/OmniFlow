@@ -1,0 +1,328 @@
+/* OmniFlow节点美化样式 */
+
+/* 节点基础样式增强 */
+.drawflow .drawflow-node {
+    background-color: var(--surface-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-color);
+    min-width: 200px;
+    backdrop-filter: blur(5px);
+    overflow: hidden;
+}
+
+/* 节点悬停效果 */
+.drawflow .drawflow-node:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 节点选中状态 */
+.drawflow .drawflow-node.selected {
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3), 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 节点标题栏美化 */
+.drawflow-node .title {
+    padding: 10px 12px;
+    font-weight: 600;
+    color: white;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* 渐变背景 */
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+}
+
+/* 节点类型标识图标 */
+.drawflow-node .title::before {
+    content: "";
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* 节点图标颜色主题 */
+.drawflow-node.node-flowStart .title {
+    background: linear-gradient(135deg, #27ae60 0%, #219653 100%);
+}
+
+.drawflow-node.node-flowEnd .title {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.drawflow-node.node-llmResponse .title {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+}
+
+.drawflow-node.node-webSearch .title {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+.drawflow-node.node-userInput .title {
+    background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+}
+
+.drawflow-node.node-textOutput .title {
+    background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+}
+
+.drawflow-node.node-thinkOutput .title {
+    background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+}
+
+.drawflow-node.node-condition .title {
+    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+}
+
+.drawflow-node.node-switch .title {
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+}
+
+/* 添加节点类型图标 */
+.drawflow-node.node-flowStart .title::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>');
+}
+
+.drawflow-node.node-flowEnd .title::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M6 6h12v12H6z"/></svg>');
+}
+
+.drawflow-node.node-llmResponse .title::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>');
+}
+
+/* 节点内容区域美化 */
+.drawflow-node .node-content {
+    padding: 12px;
+    font-size: 13px;
+}
+
+/* 节点属性样式 */
+.node-property {
+    margin-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 8px;
+}
+
+.node-property-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+/* 输入输出端点美化 */
+.input-field, .output-field {
+    padding: 8px 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.02);
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.input-field::before, .output-field::after {
+    content: "";
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    background-color: var(--surface-color);
+    box-shadow: inset 0 0 0 2px var(--surface-color);
+    transition: all 0.2s ease;
+}
+
+.input-field::before {
+    margin-right: 8px;
+    background-color: rgba(52, 152, 219, 0.1);
+    border-color: #3498db;
+}
+
+.output-field::after {
+    margin-left: 8px;
+    background-color: rgba(231, 76, 60, 0.1);
+    border-color: #e74c3c;
+}
+
+/* 连接状态 */
+.input-field.connected::before, .output-field.connected::after {
+    background-color: var(--success-color);
+    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.3);
+}
+
+.input-field.connected, .output-field.connected {
+    background-color: rgba(46, 204, 113, 0.05);
+    border-color: var(--success-color);
+}
+
+/* 悬停效果 */
+.input-field:hover, .output-field:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* 节点连接线美化 */
+.drawflow .connection .main-path {
+    stroke-width: 3px;
+    stroke: var(--primary-color);
+    stroke-dasharray: none;
+    transition: all 0.2s ease;
+}
+
+.drawflow .connection .main-path:hover {
+    stroke-width: 5px;
+    stroke: var(--primary-dark);
+}
+
+.drawflow .connection .point {
+    fill: white;
+    stroke: var(--primary-color);
+    stroke-width: 2px;
+}
+
+.drawflow .connection .point:hover {
+    fill: var(--primary-color);
+    stroke-width: 3px;
+}
+
+/* 动态交互指示样式 */
+@keyframes connection-pulse {
+    0% { stroke-opacity: 0.6; stroke-width: 3px; }
+    50% { stroke-opacity: 1; stroke-width: 5px; }
+    100% { stroke-opacity: 0.6; stroke-width: 3px; }
+}
+
+.drawflow .connection .main-path.active {
+    animation: connection-pulse 2s infinite;
+}
+
+/* 节点执行状态样式增强 */
+.drawflow .drawflow-node.executing {
+    box-shadow: 0 0 0 3px var(--accent-color), 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: node-pulse 1.5s infinite;
+    z-index: 10;
+}
+
+.drawflow .drawflow-node.executed-success {
+    box-shadow: 0 0 0 3px var(--success-color), 0 4px 10px rgba(46, 204, 113, 0.3);
+    border-color: var(--success-color);
+}
+
+.drawflow .drawflow-node.executed-error {
+    box-shadow: 0 0 0 3px var(--danger-color), 0 4px 10px rgba(231, 76, 60, 0.3);
+    border-color: var(--danger-color);
+}
+
+@keyframes node-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+}
+
+/* 节点底部装饰和标识 */
+.drawflow-node::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+    opacity: 0.5;
+}
+
+/* 节点内部链接按钮样式 */
+.node-content .node-link {
+    color: var(--primary-color);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 12px;
+    display: inline-block;
+    margin-top: 4px;
+}
+
+.node-content .node-link:hover {
+    color: var(--primary-dark);
+}
+
+/* 节点编辑按钮美化 */
+.node-action-button {
+    width: 22px;
+    height: 22px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.node-action-button:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.1);
+}
+
+.node-action-button i {
+    font-size: 12px;
+    color: white;
+}
+
+/* 特定节点类型的额外样式 */
+
+/* LLM响应节点 */
+.drawflow-node.node-llmResponse .node-system-prompt,
+.drawflow-node.node-llmResponse .node-prompt {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    padding: 4px;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
+    max-height: 60px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* 条件节点分支线 */
+.drawflow-node.node-condition .output-field {
+    position: relative;
+}
+
+.drawflow-node.node-condition .output-field:nth-child(1)::before {
+    content: "✓";
+    color: var(--success-color);
+    margin-right: 4px;
+    font-weight: bold;
+}
+
+.drawflow-node.node-condition .output-field:nth-child(2)::before {
+    content: "✗";
+    color: var(--danger-color);
+    margin-right: 4px;
+    font-weight: bold;
+}
+
+/* 思考输出节点特殊样式 */
+.drawflow-node.node-thinkOutput {
+    background-color: rgba(156, 39, 176, 0.03);
+}
+
+.drawflow-node.node-thinkOutput .node-think-content {
+    font-style: italic;
+    color: #9C27B0;
+}

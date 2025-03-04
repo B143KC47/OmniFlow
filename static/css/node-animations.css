@@ -1,0 +1,131 @@
+/* OmniFlow节点动画效果 */
+
+/* 节点出现动画 */
+@keyframes nodeInsert {
+    from { 
+        opacity: 0; 
+        transform: scale(0.8); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1); 
+    }
+}
+
+.drawflow .drawflow-node {
+    animation: nodeInsert 0.3s ease-out forwards;
+}
+
+/* 连接创建动画 */
+@keyframes connectionCreate {
+    0% { 
+        stroke-dasharray: 5; 
+        stroke-dashoffset: 100; 
+    }
+    100% { 
+        stroke-dasharray: 0; 
+        stroke-dashoffset: 0; 
+    }
+}
+
+.drawflow .connection .main-path.new-connection {
+    animation: connectionCreate 0.5s ease-out forwards;
+}
+
+/* 节点选择动画 */
+@keyframes nodeSelect {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4);
+    }
+    50% { 
+        box-shadow: 0 0 0 8px rgba(67, 97, 238, 0);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(67, 97, 238, 0);
+    }
+}
+
+.drawflow .drawflow-node.selected {
+    animation: nodeSelect 1s ease-out;
+}
+
+/* 执行动画 */
+@keyframes nodeExecuting {
+    0% { 
+        box-shadow: 0 0 0 2px var(--accent-color); 
+    }
+    50% { 
+        box-shadow: 0 0 0 6px rgba(247, 37, 133, 0.3); 
+    }
+    100% { 
+        box-shadow: 0 0 0 2px var(--accent-color); 
+    }
+}
+
+.drawflow .drawflow-node.executing {
+    animation: nodeExecuting 1.5s infinite;
+}
+
+/* 节点成功动画 */
+@keyframes nodeSuccess {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+    }
+    50% { 
+        box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+    }
+}
+
+.drawflow .drawflow-node.executed-success {
+    animation: nodeSuccess 1.5s ease-out;
+}
+
+/* 节点错误动画 */
+@keyframes nodeError {
+    0%, 100% { 
+        transform: translateX(0);
+    }
+    20%, 60% { 
+        transform: translateX(-4px);
+    }
+    40%, 80% { 
+        transform: translateX(4px);
+    }
+}
+
+.drawflow .drawflow-node.executed-error {
+    animation: nodeError 0.5s ease-out;
+}
+
+/* 数据流动画 */
+@keyframes dataFlow {
+    0% {
+        stroke-dasharray: 10;
+        stroke-dashoffset: 100;
+    }
+    100% {
+        stroke-dasharray: 10;
+        stroke-dashoffset: 0;
+    }
+}
+
+.drawflow .connection .main-path.data-flowing {
+    animation: dataFlow 2s linear infinite;
+    stroke-width: 4px;
+    stroke: var(--primary-light);
+}
+
+/* 修改悬停动画 */
+@keyframes nodeHover {
+    to {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.drawflow .drawflow-node:hover:not(.executing):not(.selected) {
+    animation: nodeHover 0.3s forwards;
+}

@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import url('theme.css');
+@import url('node-styles.css');   /* 添加节点样式 */
+@import url('node-themes.css');    /* 添加节点主题 */
+@import url('node-animations.css'); /* 添加节点动画 */
 
 * {
     margin: 0;
