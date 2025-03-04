@@ -3,197 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OmniFlow - 智能流程处理平台</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <style>
-        .hero-section {
-            background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
-            color: white;
-            padding: 80px 0;
-            margin-bottom: 40px;
-        }
-        
-        .hero-section h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: white;
-        }
-        
-        .feature-card {
-            height: 100%;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: #0d6efd;
-        }
-        
-        .demo-img {
-            border-radius: 0.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            max-width: 100%;
-            height: auto;
-        }
-        
-        .cta-section {
-            background-color: #f8f9fa;
-            padding: 60px 0;
-            margin-top: 40px;
-        }
-    </style>
+    <title>OmniFlow - AI流程编辑器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/drawflow@0.0.59/dist/drawflow.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/drawflow@0.0.59/dist/drawflow.min.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-diagram-3"></i> OmniFlow
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/"><i class="bi bi-house"></i> 首页</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/node-editor"><i class="bi bi-diagram-2"></i> 流程编辑器</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/chat"><i class="bi bi-chat-dots"></i> 聊天界面</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/settings"><i class="bi bi-gear"></i> 系统设置</a>
-                    </li>
-                </ul>
+    <div class="wrapper">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-project-diagram"></i>
+                OmniFlow
+            </div>
+            <div class="actions">
+                <button id="btn-new" title="新建流程"><i class="fas fa-file"></i> 新建</button>
+                <button id="btn-save" title="保存流程"><i class="fas fa-save"></i> 保存</button>
+                <button id="btn-load" title="加载流程"><i class="fas fa-folder-open"></i> 加载</button>
+                <button id="btn-export" title="导出流程"><i class="fas fa-file-export"></i> 导出</button>
+                <button id="btn-run" title="运行流程" class="btn-accent"><i class="fas fa-play"></i> 运行</button>
+                <button id="btn-settings" title="设置"><i class="fas fa-cog"></i></button>
+                <button class="theme-toggle" id="theme-toggle" title="切换主题">
+                    <i class="fas fa-moon"></i>
+                </button>
             </div>
         </div>
-    </nav>
-
-    <section class="hero-section text-center">
-        <div class="container">
-            <h1>OmniFlow 智能流程处理平台</h1>
-            <p class="lead mb-4">简化流程设计、自动化业务处理、整合大语言模型能力的一站式解决方案</p>
-            <div>
-                <a href="/node-editor" class="btn btn-light btn-lg me-2">
-                    <i class="bi bi-diagram-2"></i> 开始使用流程编辑器
-                </a>
-                <a href="/chat" class="btn btn-outline-light btn-lg">
-                    <i class="bi bi-chat-dots"></i> 体验智能对话
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <section class="container mb-5">
-        <h2 class="text-center mb-4">核心功能</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card feature-card">
-                    <div class="card-body text-center">
-                        <div class="feature-icon">
-                            <i class="bi bi-diagram-3"></i>
+        
+        <div class="content">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    节点库
+                    <button class="sidebar-toggle" title="收起/展开侧边栏">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+                
+                <div class="node-categories">
+                    <div class="category-title">
+                        <i class="fas fa-play-circle"></i> 流程控制
+                    </div>
+                    <div class="node-list">
+                        <div class="node" draggable="true" data-node-type="flowStart">
+                            <div class="node-icon"><i class="fas fa-play"></i></div>
+                            <div class="node-label">Flow开始</div>
                         </div>
-                        <h3>可视化流程设计</h3>
-                        <p>通过直观的拖拽界面，轻松创建复杂流程，无需编程知识</p>
+                        <div class="node" draggable="true" data-node-type="flowEnd">
+                            <div class="node-icon"><i class="fas fa-stop"></i></div>
+                            <div class="node-label">Flow结束</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="node-categories">
+                    <div class="category-title">
+                        <i class="fas fa-robot"></i> AI节点
+                    </div>
+                    <div class="node-list">
+                        <div class="node" draggable="true" data-node-type="llmResponse">
+                            <div class="node-icon"><i class="fas fa-brain"></i></div>
+                            <div class="node-label">大语言模型</div>
+                        </div>
+                        <div class="node" draggable="true" data-node-type="webSearch">
+                            <div class="node-icon"><i class="fas fa-search"></i></div>
+                            <div class="node-label">上网搜索</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="node-categories">
+                    <div class="category-title">
+                        <i class="fas fa-exchange-alt"></i> 输入输出
+                    </div>
+                    <div class="node-list">
+                        <div class="node" draggable="true" data-node-type="userInput">
+                            <div class="node-icon"><i class="fas fa-keyboard"></i></div>
+                            <div class="node-label">用户输入</div>
+                        </div>
+                        <div class="node" draggable="true" data-node-type="textOutput">
+                            <div class="node-icon"><i class="fas fa-comment"></i></div>
+                            <div class="node-label">文本输出</div>
+                        </div>
+                        <div class="node" draggable="true" data-node-type="thinkOutput">
+                            <div class="node-icon"><i class="fas fa-lightbulb"></i></div>
+                            <div class="node-label">思考输出</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="node-categories">
+                    <div class="category-title">
+                        <i class="fas fa-code-branch"></i> 控制节点
+                    </div>
+                    <div class="node-list">
+                        <div class="node" draggable="true" data-node-type="condition">
+                            <div class="node-icon"><i class="fas fa-question"></i></div>
+                            <div class="node-label">条件判断</div>
+                        </div>
+                        <div class="node" draggable="true" data-node-type="switch">
+                            <div class="node-icon"><i class="fas fa-random"></i></div>
+                            <div class="node-label">多路选择</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="node-categories">
+                    <div class="category-title">
+                        <i class="fas fa-cog"></i> 数据处理
+                    </div>
+                    <div class="node-list">
+                        <div class="node" draggable="true" data-node-type="textProcess">
+                            <div class="node-icon"><i class="fas fa-font"></i></div>
+                            <div class="node-label">文本处理</div>
+                        </div>
+                        <div class="node" draggable="true" data-node-type="variable">
+                            <div class="node-icon"><i class="fas fa-cube"></i></div>
+                            <div class="node-label">变量设置</div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card feature-card">
-                    <div class="card-body text-center">
-                        <div class="feature-icon">
-                            <i class="bi bi-cpu"></i>
-                        </div>
-                        <h3>AI 驱动处理</h3>
-                        <p>整合多种大语言模型能力，提供智能分析和文本处理</p>
+            
+            <div class="editor-container">
+                <div class="editor-toolbar">
+                    <div class="toolbar-group">
+                        <button id="btn-zoom-in" title="放大"><i class="fas fa-search-plus"></i></button>
+                        <button id="btn-zoom-out" title="缩小"><i class="fas fa-search-minus"></i></button>
+                        <button id="btn-zoom-reset" title="重置缩放"><i class="fas fa-expand"></i></button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button id="btn-select-all" title="全选"><i class="fas fa-object-group"></i></button>
+                        <button id="btn-delete" title="删除所选"><i class="fas fa-trash-alt"></i></button>
+                        <button id="btn-lock" title="锁定/解锁所选"><i class="fas fa-lock"></i></button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button id="btn-undo" title="撤销"><i class="fas fa-undo"></i></button>
+                        <button id="btn-redo" title="重做"><i class="fas fa-redo"></i></button>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card feature-card">
-                    <div class="card-body text-center">
-                        <div class="feature-icon">
-                            <i class="bi bi-arrows-angle-expand"></i>
-                        </div>
-                        <h3>可扩展平台</h3>
-                        <p>支持多种节点类型和自定义扩展，满足不同业务场景需求</p>
-                    </div>
+                <div id="drawflow"></div>
+                <div class="status-bar">
+                    <div id="position-info">位置: 0, 0</div>
+                    <div id="zoom-info">缩放: 100%</div>
+                    <div id="selected-info">已选择: 0 个节点</div>
                 </div>
             </div>
         </div>
-    </section>
-
-    <section class="container mb-5">
-        <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <h2>直观的流程编辑器</h2>
-                <p class="lead">通过拖拽方式创建流程图，连接各种功能节点</p>
-                <ul class="list-unstyled">
-                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 多种节点类型支持不同功能</li>
-                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 实时验证确保流程正确</li>
-                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 可视化执行和调试</li>
-                </ul>
-                <a href="/node-editor" class="btn btn-primary mt-3">
-                    <i class="bi bi-play-fill"></i> 立即体验
-                </a>
+        
+        <!-- 聊天测试面板 -->
+        <div id="chat-panel" class="chat-panel">
+            <div class="chat-header">
+                <h3>对话测试</h3>
+                <button id="chat-toggle" class="chat-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
             </div>
-            <div class="col-lg-6">
-                <img src="/static/img/editor-demo.png" alt="流程编辑器演示" class="demo-img" onerror="this.src='https://via.placeholder.com/600x400?text=流程编辑器演示'">
-            </div>
-        </div>
-    </section>
-
-    <section class="container mb-5">
-        <div class="row align-items-center flex-row-reverse">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <h2>智能聊天界面</h2>
-                <p class="lead">与大语言模型进行自然语言对话，实现智能问答</p>
-                <ul class="list-unstyled">
-                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 支持多种消息类型</li>
-                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 自定义对话设置</li>
-                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 集成流程处理能力</li>
-                </ul>
-                <a href="/chat" class="btn btn-primary mt-3">
-                    <i class="bi bi-chat-dots"></i> 开始对话
-                </a>
-            </div>
-            <div class="col-lg-6">
-                <img src="/static/img/chat-demo.png" alt="聊天界面演示" class="demo-img" onerror="this.src='https://via.placeholder.com/600x400?text=聊天界面演示'">
-            </div>
-        </div>
-    </section>
-
-    <section class="cta-section text-center">
-        <div class="container">
-            <h2>准备好开始了吗？</h2>
-            <p class="lead mb-4">立即体验 OmniFlow 的强大功能，简化您的业务流程</p>
-            <a href="/node-editor" class="btn btn-primary btn-lg">开始使用</a>
-        </div>
-    </section>
-
-    <footer class="bg-dark text-white py-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>OmniFlow</h5>
-                    <p>智能流程处理平台 - 简化流程，增强处理能力</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p>© 2023 OmniFlow. 保留所有权利。</p>
+            <div class="chat-container">
+                <div id="chat-messages" class="chat-messages"></div>
+                <div class="chat-input-container">
+                    <input type="text" id="chat-input" placeholder="输入消息...">
+                    <button id="chat-send">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
+    
+    <!-- 保存对话框 -->
+    <div id="save-dialog" class="dialog">
+        <div class="dialog-header">
+            <h3>保存流程</h3>
+            <span class="close" id="save-close">&times;</span>
+        </div>
+        <div class="dialog-content">
+            <div class="form-group">
+                <div class="node-property-label">流程名称</div>
+                <input type="text" id="flow-name" placeholder="输入流程名称">
+            </div>
+            <div class="form-group">
+                <div class="node-property-label">流程描述 (可选)</div>
+                <textarea id="flow-description" placeholder="描述此流程的用途..." rows="3"></textarea>
+            </div>
+        </div>
+        <div class="dialog-buttons">
+            <button id="save-cancel" class="btn-secondary">取消</button>
+            <button id="save-confirm" class="btn-primary">保存</button>
+        </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 加载对话框 -->
+    <div id="load-dialog" class="dialog">
+        <div class="dialog-header">
+            <h3>加载流程</h3>
+            <span class="close" id="load-close">&times;</span>
+        </div>
+        <div class="dialog-content">
+            <div class="form-group">
+                <div class="node-property-label">选择流程</div>
+                <div id="flow-list"></div>
+            </div>
+        </div>
+        <div class="dialog-buttons">
+            <button id="load-cancel" class="btn-secondary">取消</button>
+            <button id="load-confirm" class="btn-primary" disabled>加载</button>
+        </div>
+    </div>
+    
+    <!-- 节点编辑对话框 -->
+    <div id="node-edit-dialog" class="dialog">
+        <div class="dialog-header">
+            <h3 id="node-edit-title">编辑节点</h3>
+            <span class="close" id="node-edit-close">&times;</span>
+        </div>
+        <div class="dialog-content" id="node-edit-content">
+            <!-- 动态内容 -->
+        </div>
+        <div class="dialog-buttons">
+            <button id="node-edit-cancel" class="btn-secondary">取消</button>
+            <button id="node-edit-confirm" class="btn-primary">应用</button>
+        </div>
+    </div>
+    
+    <!-- 设置对话框 -->
+    <div id="settings-dialog" class="dialog">
+        <div class="dialog-header">
+            <h3>设置</h3>
+            <span class="close" id="settings-close">&times;</span>
+        </div>
+        <div class="dialog-content">
+            <div class="form-group">
+                <div class="node-property-label">主题</div>
+                <select id="theme-select">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="auto">跟随系统</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <div class="node-property-label">网格大小</div>
+                <input type="range" id="grid-size" min="10" max="40" step="5" value="20">
+                <div id="grid-size-value">20</div>
+            </div>
+            <div class="form-group">
+                <div class="node-property-label">API密钥设置</div>
+                <input type="password" id="api-key" placeholder="输入LLM API密钥">
+            </div>
+        </div>
+        <div class="dialog-buttons">
+            <button id="settings-cancel" class="btn-secondary">取消</button>
+            <button id="settings-confirm" class="btn-primary">应用</button>
+        </div>
+    </div>
+    
+    <!-- 运行结果对话框 -->
+    <div id="run-result-dialog" class="dialog">
+        <div class="dialog-header">
+            <h3>流程运行结果</h3>
+            <span class="close" id="run-result-close">&times;</span>
+        </div>
+        <div class="dialog-content">
+            <div id="run-result-content" class="run-result-content"></div>
+            <div id="run-log" class="run-log"></div>
+        </div>
+        <div class="dialog-buttons">
+            <button id="run-result-close-btn" class="btn-primary">关闭</button>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

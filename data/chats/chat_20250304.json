@@ -1,9 +1,0 @@
-[
-  {
-    "timestamp": "2025-03-04T23:39:43.866449",
-    "user_message": "你好",
-    "message_type": "text",
-    "use_flow": false,
-    "system_response": "<strong>OmniFlow 助手</strong>: 收到您的text：「你好」，谢谢！"
-  }
-]
