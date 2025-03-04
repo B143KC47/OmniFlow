@@ -9,353 +9,307 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
         .chat-container {
-            height: calc(100vh - 160px);
+            max-width: 100%;
+            height: calc(100vh - 56px);
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
             display: flex;
             flex-direction: column;
         }
-        
+
         .chat-messages {
-            flex: 1;
+            flex-grow: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 20px;
             background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 5px 5px 0 0;
         }
-        
+
+        .chat-sidebar {
+            width: 300px;
+            background-color: #f8f9fa;
+            border-left: 1px solid #dee2e6;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
         .message {
-            margin-bottom: 15px;
-            max-width: 80%;
-        }
-        
-        .user-message {
-            margin-left: auto;
-            background-color: #d1ecf1;
-            border-radius: 15px 15px 0 15px;
-            padding: 10px 15px;
-        }
-        
-        .system-message {
-            margin-right: auto;
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 15px 15px 15px 0;
-            padding: 10px 15px;
-        }
-        
-        .message-time {
-            font-size: 0.75rem;
-            color: #6c757d;
-            display: block;
-            margin-top: 5px;
-        }
-        
-        .chat-input {
+            position: relative;
+            margin-bottom: 20px;
             padding: 15px;
-            background-color: white;
-            border: 1px solid #dee2e6;
-            border-top: none;
-            border-radius: 0 0 5px 5px;
+            border-radius: 10px;
+            max-width: 70%;
+            word-break: break-word;
         }
-        
+
+        .user-message {
+            background-color: #0d6efd;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+
+        .system-message {
+            background-color: #e9ecef;
+            color: #212529;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+        }
+
+        .message-time {
+            display: block;
+            font-size: 0.75rem;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
         .typing-indicator {
-            padding: 10px;
+            padding: 10px 15px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 20px;
             display: none;
+            width: fit-content;
         }
-        
+
         .typing-indicator span {
             height: 8px;
             width: 8px;
+            float: left;
             margin: 0 1px;
-            background-color: #3498db;
-            display: inline-block;
+            background-color: #9E9EA1;
+            display: block;
             border-radius: 50%;
-            animation: typing 1.4s infinite both;
+            opacity: 0.4;
+            animation: typing 1s infinite;
         }
-        
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        
+
+        .typing-indicator span:nth-of-type(1) { animation-delay: 0s; }
+        .typing-indicator span:nth-of-type(2) { animation-delay: 0.15s; }
+        .typing-indicator span:nth-of-type(3) { animation-delay: 0.3s; }
+
         @keyframes typing {
-            0% {
-                opacity: 0.4;
-                transform: translateY(0);
-            }
-            50% {
-                opacity: 1;
-                transform: translateY(-5px);
-            }
-            100% {
-                opacity: 0.4;
-                transform: translateY(0);
-            }
+            0% { transform: translateY(0px); }
+            35% { transform: translateY(-5px); }
+            65% { transform: translateY(0px); }
         }
-        
-        .message-type-selector .btn {
+
+        .chat-header {
+            padding: 10px 20px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-footer {
+            padding: 15px;
+            background-color: #ffffff;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .message-input-container {
+            display: flex;
+        }
+
+        .message-input {
+            resize: none;
             border-radius: 20px;
-            margin-right: 5px;
-            margin-bottom: 5px;
+            padding: 10px 15px;
+            max-height: 120px;
+            min-height: 50px;
+        }
+
+        .send-button {
+            margin-left: 10px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message-type-selector {
+            margin-bottom: 15px;
+        }
+
+        .flow-info {
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            margin-top: 10px;
+            background-color: #ffffff;
         }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">OmniFlow</a>
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-diagram-3"></i> OmniFlow
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="/"><i class="bi bi-house"></i> 首页</a>
+                        <a class="nav-link" href="/"><i class="bi bi-house"></i> 主页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/node-editor"><i class="bi bi-diagram-3"></i> 流程编辑器</a>
+                        <a class="nav-link" href="/node-editor"><i class="bi bi-diagram-2"></i> 流程编辑器</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="/chat"><i class="bi bi-chat-dots"></i> 聊天界面</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/settings"><i class="bi bi-gear"></i> 系统设置</a>
+                        <a class="nav-link" href="/settings"><i class="bi bi-gear"></i> 设置</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/faq"><i class="bi bi-question-circle"></i> 常见问题</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-9">
-                <div class="chat-container">
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="message system-message">
-                            <div>欢迎使用OmniFlow聊天界面！我是OmniFlow助手，请问有什么可以帮到您？</div>
-                            <span class="message-time">今天 12:00</span>
-                        </div>
-                    </div>
-                    
-                    <div class="typing-indicator" id="typingIndicator">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                    
-                    <div class="chat-input">
-                        <div class="mb-2 message-type-selector">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-outline-primary active" data-message-type="text">
-                                    <i class="bi bi-chat"></i> 文本
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-primary" data-message-type="question">
-                                    <i class="bi bi-question-circle"></i> 问题
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-primary" data-message-type="command">
-                                    <i class="bi bi-code-slash"></i> 命令
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="input-group">
-                            <textarea class="form-control" id="messageInput" rows="2" placeholder="输入消息..."></textarea>
-                            <button class="btn btn-primary" type="button" id="sendButton">
-                                <i class="bi bi-send"></i> 发送
-                            </button>
-                        </div>
-                        
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" id="useFlowCheckbox">
-                            <label class="form-check-label" for="useFlowCheckbox">
-                                使用流程处理消息
-                            </label>
-                        </div>
-                    </div>
+    <div class="chat-container d-flex flex-row">
+        <!-- 聊天主区域 -->
+        <div class="chat-main flex-grow-1 d-flex flex-column">
+            <!-- 聊天头部 -->
+            <div class="chat-header">
+                <h5 class="mb-0 me-auto">聊天界面</h5>
+                <div class="message-type-selector btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-primary active" data-message-type="text">
+                        <i class="bi bi-chat"></i> 文本
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-message-type="question">
+                        <i class="bi bi-question-circle"></i> 问题
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-message-type="command">
+                        <i class="bi bi-terminal"></i> 命令
+                    </button>
+                </div>
+                <button id="clearChat" class="btn btn-sm btn-outline-danger ms-2">
+                    <i class="bi bi-trash"></i> 清除对话
+                </button>
+            </div>
+
+            <!-- 聊天消息区域 -->
+            <div id="chatMessages" class="chat-messages">
+                <div class="message system-message">
+                    <div><strong>OmniFlow 助手</strong>: 欢迎使用OmniFlow聊天界面！我可以帮助您了解和使用OmniFlow的各项功能。请随时提问或进行对话。</div>
+                    <span class="message-time">12:00</span>
+                </div>
+
+                <div id="typingIndicator" class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <div class="message-time">OmniFlow正在输入...</div>
                 </div>
             </div>
-            
-            <div class="col-md-3">
-                <div class="card mb-3">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0">对话设置</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="modelSelect" class="form-label">选择模型</label>
-                            <select class="form-select" id="modelSelect">
-                                <option value="default" selected>默认模型</option>
-                                <option value="deepseek">DeepSeek Chat</option>
-                                <option value="gpt3">GPT-3.5 Turbo</option>
-                                <option value="gpt4">GPT-4</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="temperatureRange" class="form-label">Temperature</label>
-                            <input type="range" class="form-range" id="temperatureRange" min="0" max="2" step="0.1" value="0.7">
-                            <div class="d-flex justify-content-between">
-                                <small>精确</small>
-                                <small>0.7</small>
-                                <small>创意</small>
-                            </div>
-                        </div>
-                        
-                        <button class="btn btn-sm btn-outline-secondary w-100" id="clearChat">
-                            <i class="bi bi-trash"></i> 清除对话
-                        </button>
+
+            <!-- 聊天输入区域 -->
+            <div class="chat-footer">
+                <div class="message-input-container">
+                    <textarea id="messageInput" class="form-control message-input" placeholder="输入消息..." rows="1"></textarea>
+                    <button id="sendButton" class="btn btn-primary send-button">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聊天侧边栏 -->
+        <div class="chat-sidebar">
+            <div class="chat-settings">
+                <h5>对话设置</h5>
+                <hr>
+
+                <div class="mb-3">
+                    <label for="modelSelect" class="form-label">使用模型</label>
+                    <select class="form-select" id="modelSelect">
+                        <option value="default">默认模型</option>
+                        <!-- 模型选项将由JS动态添加 -->
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="temperatureRange" class="form-label">回复创造性</label>
+                    <input type="range" class="form-range" id="temperatureRange" min="0" max="1" step="0.1" value="0.7">
+                    <div class="d-flex justify-content-between">
+                        <small>精确</small>
+                        <small>0.7</small>
+                        <small>创造性</small>
                     </div>
                 </div>
-                
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0">使用的流程</h5>
+
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="useFlowCheckbox">
+                        <label class="form-check-label" for="useFlowCheckbox">使用流程处理消息</label>
                     </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <select class="form-select" id="flowSelect">
-                                <option value="none" selected>不使用流程</option>
-                                <option value="general">通用对话流程</option>
-                                <option value="customer">客服对话流程</option>
-                                <option value="technical">技术支持流程</option>
-                            </select>
-                        </div>
-                        
-                        <div class="flow-info d-none" id="flowInfo">
-                            <div class="mb-2">
-                                <small class="text-muted">流程描述:</small>
-                                <p id="flowDescription" class="mb-1">通用对话流程，适用于大多数会话场景。</p>
-                            </div>
-                            <a href="#" class="btn btn-sm btn-outline-primary" id="viewFlow">
-                                <i class="bi bi-eye"></i> 查看流程图
-                            </a>
-                        </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="flowSelect" class="form-label">选择流程</label>
+                    <select class="form-select" id="flowSelect">
+                        <option value="none">不使用流程</option>
+                        <!-- 流程选项将由JS动态添加 -->
+                    </select>
+                </div>
+
+                <div id="flowInfo" class="flow-info d-none">
+                    <div class="mb-2">
+                        <strong>流程描述</strong>
+                        <p id="flowDescription" class="mb-2 small">选择的流程</p>
                     </div>
+                    <button id="viewFlow" class="btn btn-sm btn-outline-primary w-100">
+                        <i class="bi bi-diagram-2"></i> 查看流程图
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-2 border-top">
+                <h5>提示</h5>
+                <hr>
+                <div class="list-group list-group-flush small">
+                    <a href="#" class="list-group-item list-group-item-action p-2" onclick="addSuggestion(this.textContent); return false;">
+                        OmniFlow是什么？
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action p-2" onclick="addSuggestion(this.textContent); return false;">
+                        如何创建自定义流程？
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action p-2" onclick="addSuggestion(this.textContent); return false;">
+                        我需要哪些API密钥？
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action p-2" onclick="addSuggestion(this.textContent); return false;">
+                        可以给出一些流程示例吗？
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/chat.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const messageTypeButtons = document.querySelectorAll('.message-type-selector .btn');
+        // 添加建议到输入框
+        function addSuggestion(text) {
             const messageInput = document.getElementById('messageInput');
-            const sendButton = document.getElementById('sendButton');
-            const chatMessages = document.getElementById('chatMessages');
-            const useFlowCheckbox = document.getElementById('useFlowCheckbox');
-            const flowSelect = document.getElementById('flowSelect');
-            const flowInfo = document.getElementById('flowInfo');
-            const typingIndicator = document.getElementById('typingIndicator');
-            
-            let currentMessageType = 'text';
-            let chatContext = {};
-            
-            // 消息类型切换
-            messageTypeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    messageTypeButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    currentMessageType = this.getAttribute('data-message-type');
-                    messageInput.placeholder = `输入${currentMessageType === 'question' ? '问题' : currentMessageType === 'command' ? '命令' : '消息'}...`;
-                });
-            });
-            
-            // 流程选择更改
-            flowSelect.addEventListener('change', function() {
-                if (this.value !== 'none') {
-                    flowInfo.classList.remove('d-none');
-                    useFlowCheckbox.checked = true;
-                } else {
-                    flowInfo.classList.add('d-none');
-                    useFlowCheckbox.checked = false;
-                }
-            });
-            
-            // 发送消息
-            sendButton.addEventListener('click', sendMessage);
-            messageInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-            
-            function sendMessage() {
-                const messageText = messageInput.value.trim();
-                if (!messageText) return;
-                
-                // 添加用户消息到聊天界面
-                addMessage(messageText, 'user');
-                
-                // 清空输入框
-                messageInput.value = '';
-                
-                // 显示输入指示器
-                typingIndicator.style.display = 'block';
-                
-                // 发送消息到后端
-                fetch('/api/send-message', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: messageText,
-                        type: currentMessageType,
-                        useFlow: useFlowCheckbox.checked,
-                        context: chatContext
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // 隐藏输入指示器
-                    typingIndicator.style.display = 'none';
-                    
-                    // 添加系统回复到聊天界面
-                    addMessage(data.reply, 'system');
-                    
-                    // 更新上下文
-                    chatContext = data.context || {};
-                })
-                .catch(error => {
-                    console.error('发送消息时出错:', error);
-                    typingIndicator.style.display = 'none';
-                    addMessage('<strong>错误:</strong> 消息发送失败，请稍后重试。', 'system');
-                });
+            if (messageInput) {
+                messageInput.value = text;
+                messageInput.focus();
             }
-            
-            function addMessage(text, sender) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${sender}-message`;
-                
-                const now = new Date();
-                const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-                
-                messageDiv.innerHTML = `
-                    <div>${text}</div>
-                    <span class="message-time">${timeStr}</span>
-                `;
-                
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-            
-            // 清除聊天按钮
-            document.getElementById('clearChat').addEventListener('click', function() {
-                if (confirm('确定要清除所有对话记录吗？')) {
-                    chatMessages.innerHTML = `
-                        <div class="message system-message">
-                            <div>对话已重置，请输入新消息。</div>
-                            <span class="message-time">${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}</span>
-                        </div>
-                    `;
-                    chatContext = {};
-                }
-            });
+        }
+        
+        // 自适应文本框高度
+        document.getElementById('messageInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            const newHeight = Math.min(this.scrollHeight, 120);
+            this.style.height = newHeight + 'px';
         });
     </script>
 </body>

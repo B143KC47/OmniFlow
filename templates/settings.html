@@ -7,119 +7,248 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/settings.css">
+    <style>
+        .settings-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .api-key-input {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .toggle-password:hover {
+            color: #0d6efd;
+        }
+        
+        .api-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .api-status.connected {
+            background-color: #198754;
+        }
+        
+        .api-status.disconnected {
+            background-color: #dc3545;
+        }
+        
+        .api-status.unknown {
+            background-color: #6c757d;
+        }
+        
+        .settings-section {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .settings-header {
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+        }
+        
+        .settings-header h4 {
+            margin-bottom: 0;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">OmniFlow</a>
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-diagram-3"></i> OmniFlow
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="/"><i class="bi bi-house"></i> 首页</a>
+                        <a class="nav-link" href="/"><i class="bi bi-house"></i> 主页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/node-editor"><i class="bi bi-diagram-3"></i> 流程编辑器</a>
+                        <a class="nav-link" href="/node-editor"><i class="bi bi-diagram-2"></i> 流程编辑器</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/chat"><i class="bi bi-chat-dots"></i> 聊天界面</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/settings"><i class="bi bi-gear"></i> 系统设置</a>
+                        <a class="nav-link active" href="/settings"><i class="bi bi-gear"></i> 设置</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/faq"><i class="bi bi-question-circle"></i> 常见问题</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-4 mb-5 settings-container">
         <h1 class="mb-4">系统设置</h1>
         
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="card-title mb-0"><i class="bi bi-key"></i> API 配置</h5>
+        <div id="settingsAlerts">
+            <!-- 提示消息将在这里动态显示 -->
+        </div>
+        
+        <!-- API配置部分 -->
+        <div class="settings-section">
+            <div class="settings-header">
+                <h4><i class="bi bi-key"></i> API配置</h4>
+                <p class="text-muted mb-0">配置大语言模型API密钥</p>
             </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
-                            <label for="deepseekApiKey" class="form-label">DeepSeek API 密钥</label>
-                            <div class="input-group">
-                                <input type="password" class="form-control" id="deepseekApiKey" placeholder="输入 DeepSeek API 密钥">
-                                <button class="btn btn-outline-secondary toggle-password" type="button">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-outline-primary" id="testDeepseekApi" type="button">测试连接</button>
-                            </div>
-                            <div class="form-text">用于访问 DeepSeek 大语言模型的 API 密钥</div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="deepseekApiKey" class="form-label">DeepSeek API密钥</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="deepseekApiKey" placeholder="输入您的DeepSeek API密钥">
+                            <button type="button" class="btn btn-outline-secondary toggle-password" title="显示/隐藏密钥">
+                                <i class="bi bi-eye"></i>
+                            </button>
                         </div>
+                        <small class="form-text text-muted">在DeepSeek开发者平台获取密钥</small>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
-                            <label for="openaiApiKey" class="form-label">OpenAI API 密钥</label>
-                            <div class="input-group">
-                                <input type="password" class="form-control" id="openaiApiKey" placeholder="输入 OpenAI API 密钥">
-                                <button class="btn btn-outline-secondary toggle-password" type="button">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-outline-primary" id="testOpenaiApi" type="button">测试连接</button>
-                            </div>
-                            <div class="form-text">用于访问 GPT 等 OpenAI 模型的 API 密钥</div>
+                    <button id="testDeepseekApi" class="btn btn-outline-primary">测试DeepSeek连接</button>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="openaiApiKey" class="form-label">OpenAI API密钥</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="openaiApiKey" placeholder="输入您的OpenAI API密钥">
+                            <button type="button" class="btn btn-outline-secondary toggle-password" title="显示/隐藏密钥">
+                                <i class="bi bi-eye"></i>
+                            </button>
                         </div>
+                        <small class="form-text text-muted">在OpenAI开发者平台获取密钥</small>
                     </div>
+                    <button id="testOpenaiApi" class="btn btn-outline-primary">测试OpenAI连接</button>
                 </div>
             </div>
         </div>
         
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="card-title mb-0"><i class="bi bi-cpu"></i> 模型配置</h5>
+        <!-- 模型配置部分 -->
+        <div class="settings-section">
+            <div class="settings-header">
+                <h4><i class="bi bi-cpu"></i> 模型配置</h4>
+                <p class="text-muted mb-0">选择默认模型和参数设置</p>
             </div>
-            <div class="card-body">
-                <div class="form-group mb-3">
-                    <label class="form-label">默认使用的模型</label>
-                    <div class="model-options" id="modelOptions">
-                        <!-- 动态加载模型选项 -->
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">默认使用的模型</label>
+                        <div id="modelOptions" class="mt-2">
+                            <!-- 模型选项将由JS动态添加 -->
+                        </div>
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">模型参数设置</label>
-                    <div class="row">
-                        <div class="col-md-6 col-lg-4 mb-3">
-                            <label for="temperature" class="form-label">Temperature</label>
-                            <div class="input-group">
-                                <input type="range" class="form-range" id="temperature" min="0" max="2" step="0.1" value="0.7">
-                                <span id="temperatureValue" class="ms-2">0.7</span>
-                            </div>
-                            <div class="form-text">控制输出的随机性，值越高结果越多样化</div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="temperature" class="form-label">Temperature<span class="text-muted ms-2" id="temperatureValue">0.7</span></label>
+                        <input type="range" class="form-range" id="temperature" min="0.0" max="1.0" step="0.1" value="0.7">
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted">更精确</small>
+                            <small class="text-muted">更创造性</small>
                         </div>
-                        <div class="col-md-6 col-lg-4 mb-3">
-                            <label for="maxTokens" class="form-label">最大 Token 数</label>
-                            <input type="number" class="form-control" id="maxTokens" value="2048" min="1" max="8192">
-                            <div class="form-text">限制模型输出的最大长度</div>
-                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="maxTokens" class="form-label">最大Token数</label>
+                        <input type="number" class="form-control" id="maxTokens" value="2048" min="100" max="4096">
+                        <small class="form-text text-muted">限制模型生成的最大Token数量</small>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="d-flex justify-content-between mb-4">
+        <!-- 界面设置部分 -->
+        <div class="settings-section">
+            <div class="settings-header">
+                <h4><i class="bi bi-brush"></i> 界面设置</h4>
+                <p class="text-muted mb-0">自定义应用程序外观</p>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="themeSelect" class="form-label">界面主题</label>
+                        <select class="form-select" id="themeSelect">
+                            <option value="default" selected>默认主题</option>
+                            <option value="dark">暗色主题</option>
+                            <option value="light">浅色主题</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="enableAnimations">
+                        <label class="form-check-label" for="enableAnimations">启用界面动画</label>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="fontSize" class="form-label">字体大小</label>
+                        <select class="form-select" id="fontSize">
+                            <option value="small">小</option>
+                            <option value="medium" selected>中</option>
+                            <option value="large">大</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="compactMode">
+                        <label class="form-check-label" for="compactMode">紧凑显示模式</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 操作按钮区域 -->
+        <div class="d-flex justify-content-between mt-4">
             <button id="resetSettings" class="btn btn-outline-danger">
-                <i class="bi bi-arrow-counterclockwise"></i> 重置设置
+                <i class="bi bi-arrow-counterclockwise"></i> 重置所有设置
             </button>
             <button id="saveSettings" class="btn btn-primary">
                 <i class="bi bi-save"></i> 保存设置
             </button>
         </div>
-
-        <div id="settingsAlerts">
-            <!-- 这里会显示提示信息 -->
-        </div>
     </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>OmniFlow</h5>
+                    <p>智能流程处理平台 - 简化流程，增强处理能力</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>© 2023 OmniFlow. 保留所有权利。</p>
+                </div>
+            </div>
+        </div>
+    </footer>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/settings.js"></script>

@@ -7,11 +7,55 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 40px;
+        }
+        
+        .hero-section h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .feature-card {
+            height: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #0d6efd;
+        }
+        
+        .demo-img {
+            border-radius: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .cta-section {
+            background-color: #f8f9fa;
+            padding: 60px 0;
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">OmniFlow</a>
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-diagram-3"></i> OmniFlow
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -21,7 +65,7 @@
                         <a class="nav-link active" href="/"><i class="bi bi-house"></i> 首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/node-editor"><i class="bi bi-diagram-3"></i> 流程编辑器</a>
+                        <a class="nav-link" href="/node-editor"><i class="bi bi-diagram-2"></i> 流程编辑器</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/chat"><i class="bi bi-chat-dots"></i> 聊天界面</a>
@@ -34,63 +78,122 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <div class="jumbotron">
-            <h1 class="display-4">欢迎使用 OmniFlow</h1>
-            <p class="lead">OmniFlow是一个智能流程处理平台，让你可以轻松创建、编辑和执行自定义流程。</p>
-            <hr class="my-4">
-            <p>通过直观的可视化编辑器构建流程，或使用聊天界面与系统交互。</p>
-        </div>
-
-        <div class="row mt-5">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0"><i class="bi bi-diagram-3"></i> 流程编辑器</h5>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <p class="card-text">使用直观的拖拽界面创建和编辑自定义流程图，连接各种节点实现复杂的自动化任务。</p>
-                        <div class="mt-auto">
-                            <a href="/node-editor" class="btn btn-primary">进入编辑器</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0"><i class="bi bi-chat-dots"></i> 聊天界面</h5>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <p class="card-text">与系统进行自然语言交互，使用大语言模型和流程图处理复杂查询和任务。</p>
-                        <div class="mt-auto">
-                            <a href="/chat" class="btn btn-primary">开始聊天</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0"><i class="bi bi-gear"></i> 系统设置</h5>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <p class="card-text">配置模型API密钥、设置偏好和管理系统选项，根据需求自定义OmniFlow。</p>
-                        <div class="mt-auto">
-                            <a href="/settings" class="btn btn-primary">前往设置</a>
-                        </div>
-                    </div>
-                </div>
+    <section class="hero-section text-center">
+        <div class="container">
+            <h1>OmniFlow 智能流程处理平台</h1>
+            <p class="lead mb-4">简化流程设计、自动化业务处理、整合大语言模型能力的一站式解决方案</p>
+            <div>
+                <a href="/node-editor" class="btn btn-light btn-lg me-2">
+                    <i class="bi bi-diagram-2"></i> 开始使用流程编辑器
+                </a>
+                <a href="/chat" class="btn btn-outline-light btn-lg">
+                    <i class="bi bi-chat-dots"></i> 体验智能对话
+                </a>
             </div>
         </div>
-    </div>
+    </section>
 
-    <footer class="bg-light text-center text-muted py-3 mt-5">
-        <p>OmniFlow &copy; 2023 | 一个智能流程处理平台</p>
+    <section class="container mb-5">
+        <h2 class="text-center mb-4">核心功能</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card">
+                    <div class="card-body text-center">
+                        <div class="feature-icon">
+                            <i class="bi bi-diagram-3"></i>
+                        </div>
+                        <h3>可视化流程设计</h3>
+                        <p>通过直观的拖拽界面，轻松创建复杂流程，无需编程知识</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card">
+                    <div class="card-body text-center">
+                        <div class="feature-icon">
+                            <i class="bi bi-cpu"></i>
+                        </div>
+                        <h3>AI 驱动处理</h3>
+                        <p>整合多种大语言模型能力，提供智能分析和文本处理</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card">
+                    <div class="card-body text-center">
+                        <div class="feature-icon">
+                            <i class="bi bi-arrows-angle-expand"></i>
+                        </div>
+                        <h3>可扩展平台</h3>
+                        <p>支持多种节点类型和自定义扩展，满足不同业务场景需求</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mb-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2>直观的流程编辑器</h2>
+                <p class="lead">通过拖拽方式创建流程图，连接各种功能节点</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 多种节点类型支持不同功能</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 实时验证确保流程正确</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 可视化执行和调试</li>
+                </ul>
+                <a href="/node-editor" class="btn btn-primary mt-3">
+                    <i class="bi bi-play-fill"></i> 立即体验
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <img src="/static/img/editor-demo.png" alt="流程编辑器演示" class="demo-img" onerror="this.src='https://via.placeholder.com/600x400?text=流程编辑器演示'">
+            </div>
+        </div>
+    </section>
+
+    <section class="container mb-5">
+        <div class="row align-items-center flex-row-reverse">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2>智能聊天界面</h2>
+                <p class="lead">与大语言模型进行自然语言对话，实现智能问答</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 支持多种消息类型</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 自定义对话设置</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 集成流程处理能力</li>
+                </ul>
+                <a href="/chat" class="btn btn-primary mt-3">
+                    <i class="bi bi-chat-dots"></i> 开始对话
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <img src="/static/img/chat-demo.png" alt="聊天界面演示" class="demo-img" onerror="this.src='https://via.placeholder.com/600x400?text=聊天界面演示'">
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section text-center">
+        <div class="container">
+            <h2>准备好开始了吗？</h2>
+            <p class="lead mb-4">立即体验 OmniFlow 的强大功能，简化您的业务流程</p>
+            <a href="/node-editor" class="btn btn-primary btn-lg">开始使用</a>
+        </div>
+    </section>
+
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>OmniFlow</h5>
+                    <p>智能流程处理平台 - 简化流程，增强处理能力</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>© 2023 OmniFlow. 保留所有权利。</p>
+                </div>
+            </div>
+        </div>
     </footer>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

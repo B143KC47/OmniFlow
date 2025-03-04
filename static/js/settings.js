@@ -1,15 +1,116 @@
 /**
- * OmniFlow 系统设置页面脚本
+ * OmniFlow 系统设置脚本
+ * 处理API密钥配置、模型选择和参数设置
  */
 
 document.addEventListener('DOMContentLoaded', function() {
     // 加载当前配置
     loadCurrentConfig();
     
-    // 设置密码显示/隐藏切换
-    document.querySelectorAll('.toggle-password').forEach(button => {
+    // 设置事件处理程序
+    setupEventHandlers();
+    
+    // 初始化表单组件
+    initFormComponents();
+});
+
+/**
+ * 加载当前配置
+ */
+function loadCurrentConfig() {
+    fetch('/api/get-config')
+        .then(response => response.json())
+        .then(data => {
+            // 填充API密钥
+            if (data.apiKeys) {
+                const deepseekKey = document.getElementById('deepseekApiKey');
+                const openaiKey = document.getElementById('openaiApiKey');
+                
+                if (deepseekKey && data.apiKeys.deepseek) {
+                    deepseekKey.value = data.apiKeys.deepseek;
+                }
+                
+                if (openaiKey && data.apiKeys.openai) {
+                    openaiKey.value = data.apiKeys.openai;
+                }
+            }
+            
+            // 加载模型选项
+            loadModelOptions(data.models || []);
+            
+            // 设置默认模型
+            const defaultModel = data.defaultModel || 'deepseek-chat';
+            const modelRadios = document.querySelectorAll('input[name="defaultModel"]');
+            modelRadios.forEach(radio => {
+                if (radio.value === defaultModel) {
+                    radio.checked = true;
+                }
+            });
+            
+            // 设置其他参数
+            if (data.parameters) {
+                if (data.parameters.temperature !== undefined) {
+                    const temperatureSlider = document.getElementById('temperature');
+                    const temperatureValue = document.getElementById('temperatureValue');
+                    if (temperatureSlider && temperatureValue) {
+                        temperatureSlider.value = data.parameters.temperature;
+                        temperatureValue.textContent = data.parameters.temperature;
+                    }
+                }
+                
+                if (data.parameters.maxTokens !== undefined) {
+                    const maxTokensInput = document.getElementById('maxTokens');
+                    if (maxTokensInput) {
+                        maxTokensInput.value = data.parameters.maxTokens;
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('加载配置时出错:', error);
+            showAlert('danger', '加载配置失败，请刷新页面重试。');
+        });
+}
+
+/**
+ * 加载模型选项
+ */
+function loadModelOptions(models) {
+    const modelOptionsContainer = document.getElementById('modelOptions');
+    if (!modelOptionsContainer) return;
+    
+    // 如果没有模型数据，提供默认选项
+    if (!models || models.length === 0) {
+        models = [
+            { id: 'deepseek-chat', name: 'DeepSeek Chat', enabled: true },
+            { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', enabled: true },
+            { id: 'gpt-4', name: 'GPT-4', enabled: true }
+        ];
+    }
+    
+    // 创建模型选项
+    const modelOptionsHTML = models.map(model => `
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="defaultModel" 
+                id="model_${model.id}" value="${model.id}" ${model.enabled ? '' : 'disabled'}>
+            <label class="form-check-label" for="model_${model.id}">
+                ${model.name} ${!model.enabled ? '<span class="badge bg-warning">需配置API</span>' : ''}
+            </label>
+        </div>
+    `).join('');
+    
+    modelOptionsContainer.innerHTML = modelOptionsHTML;
+}
+
+/**
+ * 设置事件处理程序
+ */
+function setupEventHandlers() {
+    // API密钥显示切换
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+    toggleButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const input = this.parentNode.querySelector('input');
+            const input = this.previousElementSibling;
             const icon = this.querySelector('i');
             
             if (input.type === 'password') {
@@ -22,180 +123,120 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Temperature滑块值显示
+    // API测试按钮
+    document.getElementById('testDeepseekApi')?.addEventListener('click', function() {
+        testApiConnection('deepseek');
+    });
+    
+    document.getElementById('testOpenaiApi')?.addEventListener('click', function() {
+        testApiConnection('openai');
+    });
+    
+    // 保存设置按钮
+    document.getElementById('saveSettings')?.addEventListener('click', function() {
+        saveSettings();
+    });
+    
+    // 重置设置按钮
+    document.getElementById('resetSettings')?.addEventListener('click', function() {
+        if (confirm('确定要重置所有设置吗？这将恢复到默认配置。')) {
+            resetSettings();
+        }
+    });
+    
+    // Temperature滑块更新值显示
     const temperatureSlider = document.getElementById('temperature');
     const temperatureValue = document.getElementById('temperatureValue');
-    
     if (temperatureSlider && temperatureValue) {
         temperatureSlider.addEventListener('input', function() {
             temperatureValue.textContent = this.value;
         });
     }
-    
-    // 测试API连接
-    document.getElementById('testDeepseekApi').addEventListener('click', function() {
-        const apiKey = document.getElementById('deepseekApiKey').value;
-        testApiConnection('deepseek-chat', apiKey, this);
-    });
-    
-    document.getElementById('testOpenaiApi').addEventListener('click', function() {
-        const apiKey = document.getElementById('openaiApiKey').value;
-        testApiConnection('gpt-3.5-turbo', apiKey, this);
-    });
-    
-    // 保存设置
-    document.getElementById('saveSettings').addEventListener('click', saveSettings);
-    
-    // 重置设置
-    document.getElementById('resetSettings').addEventListener('click', function() {
-        if (confirm('确定要重置所有设置吗？这将恢复默认配置。')) {
-            resetSettings();
-        }
-    });
-});
+}
 
 /**
- * 加载当前配置
+ * 初始化表单组件
  */
-function loadCurrentConfig() {
-    fetch('/api/get-config')
-        .then(response => response.json())
-        .then(config => {
-            // 填充API密钥
-            if (config.apiKeys) {
-                document.getElementById('deepseekApiKey').value = config.apiKeys.deepseek || '';
-                document.getElementById('openaiApiKey').value = config.apiKeys.openai || '';
-            }
-            
-            // 创建模型选项
-            if (config.models) {
-                const modelOptions = document.getElementById('modelOptions');
-                modelOptions.innerHTML = '';
-                
-                config.models.forEach(model => {
-                    const isSelected = model.id === config.defaultModel;
-                    const card = document.createElement('div');
-                    card.className = `model-card ${isSelected ? 'selected' : ''}`;
-                    card.setAttribute('data-model-id', model.id);
-                    
-                    let description = '';
-                    switch(model.id) {
-                        case 'deepseek-chat':
-                            description = '中英双语大模型，擅长代码与通用问答';
-                            break;
-                        case 'gpt-3.5-turbo':
-                            description = 'OpenAI的高效模型，平衡性能与成本';
-                            break;
-                        case 'gpt-4':
-                            description = 'OpenAI的高级模型，推理能力更强';
-                            break;
-                        default:
-                            description = '通用大语言模型';
-                    }
-                    
-                    card.innerHTML = `
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="defaultModel" 
-                                id="model_${model.id}" value="${model.id}" ${isSelected ? 'checked' : ''}>
-                            <label class="form-check-label w-100" for="model_${model.id}">
-                                <div class="model-name">${model.name}</div>
-                                <div class="model-description">${description}</div>
-                            </label>
-                        </div>
-                    `;
-                    
-                    modelOptions.appendChild(card);
-                    
-                    // 添加点击事件
-                    card.addEventListener('click', function() {
-                        document.querySelectorAll('.model-card').forEach(c => c.classList.remove('selected'));
-                        this.classList.add('selected');
-                        this.querySelector('input[type="radio"]').checked = true;
-                    });
-                });
-            }
-            
-            // 设置其他参数
-            if (config.parameters) {
-                document.getElementById('temperature').value = config.parameters.temperature || 0.7;
-                document.getElementById('temperatureValue').textContent = config.parameters.temperature || 0.7;
-                
-                document.getElementById('maxTokens').value = config.parameters.maxTokens || 2048;
-            }
-        })
-        .catch(error => {
-            console.error('加载配置失败:', error);
-            showAlert('加载配置失败，请刷新页面重试', 'danger');
-        });
+function initFormComponents() {
+    // 这里可以添加更复杂的表单组件初始化，如日期选择器、自动完成等
 }
 
 /**
  * 测试API连接
  */
-function testApiConnection(modelId, apiKey, button) {
+function testApiConnection(modelId) {
+    const apiKeyElement = modelId === 'deepseek' 
+        ? document.getElementById('deepseekApiKey')
+        : document.getElementById('openaiApiKey');
+    
+    if (!apiKeyElement) return;
+    
+    const apiKey = apiKeyElement.value.trim();
     if (!apiKey) {
-        showAlert('请输入API密钥', 'warning');
+        showAlert('warning', `请先填写 ${modelId === 'deepseek' ? 'DeepSeek' : 'OpenAI'} API 密钥`);
         return;
     }
     
-    // 保存原始按钮文本
-    const originalText = button.innerHTML;
-    
     // 显示加载状态
-    button.innerHTML = '<span class="spinner-border" role="status" aria-hidden="true"></span> 测试中...';
-    button.disabled = true;
-    
-    // 发送测试请求
-    fetch('/api/test-connection', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            modelId: modelId,
-            apiKey: apiKey
+    const testButton = document.getElementById(`test${modelId === 'deepseek' ? 'Deepseek' : 'Openai'}Api`);
+    if (testButton) {
+        const originalText = testButton.innerHTML;
+        testButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 测试中...';
+        testButton.disabled = true;
+        
+        // 发送API测试请求
+        fetch('/api/test-connection', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                modelId: modelId === 'deepseek' ? 'deepseek-chat' : 'gpt-3.5-turbo',
+                apiKey: apiKey
+            })
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        // 恢复按钮状态
-        button.innerHTML = originalText;
-        button.disabled = false;
-        
-        if (data.status === 'success') {
-            showAlert(`连接成功: ${data.message}`, 'success');
-        } else {
-            showAlert(`连接失败: ${data.message}`, 'danger');
-        }
-    })
-    .catch(error => {
-        // 恢复按钮状态
-        button.innerHTML = originalText;
-        button.disabled = false;
-        
-        console.error('测试连接时出错:', error);
-        showAlert('测试连接时出错，请检查网络连接', 'danger');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAlert('success', `${modelId === 'deepseek' ? 'DeepSeek' : 'OpenAI'} API 连接测试成功`);
+            } else {
+                showAlert('danger', `API 测试失败: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            console.error('API测试出错:', error);
+            showAlert('danger', `API 测试出错: ${error.message || '网络错误'}`);
+        })
+        .finally(() => {
+            // 恢复按钮状态
+            testButton.innerHTML = originalText;
+            testButton.disabled = false;
+        });
+    }
 }
 
 /**
  * 保存设置
  */
 function saveSettings() {
-    // 收集表单数据
-    const deepseekApiKey = document.getElementById('deepseekApiKey').value;
-    const openaiApiKey = document.getElementById('openaiApiKey').value;
-    const defaultModel = document.querySelector('input[name="defaultModel"]:checked')?.value || 'deepseek-chat';
-    const temperature = parseFloat(document.getElementById('temperature').value);
-    const maxTokens = parseInt(document.getElementById('maxTokens').value);
+    // 收集API密钥
+    const deepseekApiKey = document.getElementById('deepseekApiKey')?.value.trim();
+    const openaiApiKey = document.getElementById('openaiApiKey')?.value.trim();
     
-    // 构建配置对象
+    // 获取默认模型
+    const selectedModel = document.querySelector('input[name="defaultModel"]:checked')?.value || 'deepseek-chat';
+    
+    // 获取模型参数
+    const temperature = parseFloat(document.getElementById('temperature')?.value || 0.7);
+    const maxTokens = parseInt(document.getElementById('maxTokens')?.value || 2048);
+    
+    // 准备配置数据
     const config = {
         apiKeys: {
             deepseek: deepseekApiKey,
             openai: openaiApiKey
         },
-        defaultModel: defaultModel,
+        defaultModel: selectedModel,
         parameters: {
             temperature: temperature,
             maxTokens: maxTokens
@@ -213,14 +254,14 @@ function saveSettings() {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            showAlert('设置保存成功', 'success');
+            showAlert('success', '设置已成功保存');
         } else {
-            showAlert(`保存失败: ${data.message}`, 'danger');
+            showAlert('danger', `保存设置失败: ${data.message}`);
         }
     })
     .catch(error => {
-        console.error('保存设置出错:', error);
-        showAlert('保存设置时出错，请重试', 'danger');
+        console.error('保存设置时出错:', error);
+        showAlert('danger', `保存设置出错: ${error.message || '网络错误'}`);
     });
 }
 
@@ -228,47 +269,53 @@ function saveSettings() {
  * 重置设置
  */
 function resetSettings() {
-    document.getElementById('deepseekApiKey').value = '';
-    document.getElementById('openaiApiKey').value = '';
+    // 清空API密钥
+    const deepseekApiKey = document.getElementById('deepseekApiKey');
+    const openaiApiKey = document.getElementById('openaiApiKey');
     
-    // 选择默认模型
+    if (deepseekApiKey) deepseekApiKey.value = '';
+    if (openaiApiKey) openaiApiKey.value = '';
+    
+    // 重置默认模型
     const defaultModelRadio = document.getElementById('model_deepseek-chat');
-    if (defaultModelRadio) {
-        defaultModelRadio.checked = true;
-        document.querySelectorAll('.model-card').forEach(card => {
-            card.classList.remove('selected');
-            if (card.getAttribute('data-model-id') === 'deepseek-chat') {
-                card.classList.add('selected');
-            }
-        });
+    if (defaultModelRadio) defaultModelRadio.checked = true;
+    
+    // 重置温度参数
+    const temperatureSlider = document.getElementById('temperature');
+    const temperatureValue = document.getElementById('temperatureValue');
+    if (temperatureSlider && temperatureValue) {
+        temperatureSlider.value = 0.7;
+        temperatureValue.textContent = '0.7';
     }
     
-    // 重置其他参数
-    document.getElementById('temperature').value = 0.7;
-    document.getElementById('temperatureValue').textContent = 0.7;
-    document.getElementById('maxTokens').value = 2048;
+    // 重置最大Token数
+    const maxTokensInput = document.getElementById('maxTokens');
+    if (maxTokensInput) maxTokensInput.value = 2048;
     
-    showAlert('设置已重置为默认值', 'info');
+    showAlert('info', '设置已重置为默认值，点击"保存设置"按钮以应用更改。');
 }
 
 /**
- * 显示提示信息
+ * 显示提示消息
  */
-function showAlert(message, type) {
-    // 创建提示元素
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show settings-alert`;
-    alertDiv.innerHTML = `
+function showAlert(type, message) {
+    const alertsContainer = document.getElementById('settingsAlerts');
+    if (!alertsContainer) return;
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.role = 'alert';
+    
+    alert.innerHTML = `
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     
-    // 添加到页面
-    document.getElementById('settingsAlerts').appendChild(alertDiv);
+    alertsContainer.appendChild(alert);
     
-    // 5秒后自动消失
+    // 5秒后自动关闭
     setTimeout(() => {
-        const alert = bootstrap.Alert.getOrCreateInstance(alertDiv);
-        alert.close();
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
     }, 5000);
 }

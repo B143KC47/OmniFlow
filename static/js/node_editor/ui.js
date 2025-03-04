@@ -7,6 +7,7 @@ import { FlowCore } from './core.js';
 import { FlowNodes } from './nodes.js';
 import { FlowConnections } from './connections.js';
 import { FlowIO } from './io.js';
+import { FlowUtils } from './utils.js';
 
 export const FlowUI = {
     /**
@@ -26,6 +27,9 @@ export const FlowUI = {
         
         // 设置键盘快捷键
         this.setupKeyboardShortcuts();
+        
+        // 初始化缩放级别显示
+        this.updateZoomLevel();
         
         return this;
     },
@@ -51,9 +55,9 @@ export const FlowUI = {
         }
         
         // 启动执行按钮
-        const startExecution = document.getElementById('startExecution');
-        if (startExecution) {
-            startExecution.addEventListener('click', () => {
+        const startExecutionBtn = document.getElementById('startExecution');
+        if (startExecutionBtn) {
+            startExecutionBtn.addEventListener('click', () => {
                 FlowIO.startFlowExecution();
             });
         }
@@ -64,183 +68,141 @@ export const FlowUI = {
      */
     setupToolbarEvents() {
         // 新建流程
-        const newFlow = document.getElementById('newFlow');
-        if (newFlow) {
-            newFlow.addEventListener('click', () => {
+        const newFlowBtn = document.getElementById('newFlow');
+        if (newFlowBtn) {
+            newFlowBtn.addEventListener('click', () => {
                 if (confirm('确定要创建新流程吗？当前未保存的内容将丢失。')) {
                     FlowCore.resetState();
                     FlowIO.clearCanvas();
+                    this.showStatusMessage('已创建新流程', 'success');
                 }
             });
         }
         
         // 保存流程
-        const saveFlow = document.getElementById('saveFlow');
-        if (saveFlow) {
-            saveFlow.addEventListener('click', () => {
-                const modalElement = document.getElementById('saveFlowModal');
-                if (!modalElement) return;
-                
-                const modal = new bootstrap.Modal(modalElement);
-                
+        const saveFlowBtn = document.getElementById('saveFlow');
+        if (saveFlowBtn) {
+            saveFlowBtn.addEventListener('click', () => {
+                const modal = new bootstrap.Modal(document.getElementById('saveFlowModal'));
                 // 将当前流程名填入模态框
                 const flowNameInput = document.getElementById('flowName');
                 const saveFlowNameInput = document.getElementById('saveFlowName');
                 if (flowNameInput && saveFlowNameInput) {
-                    saveFlowNameInput.value = flowNameInput.value;
+                    saveFlowNameInput.value = flowNameInput.value || '';
                 }
-                
                 modal.show();
             });
         }
         
         // 确认保存
-        const confirmSave = document.getElementById('confirmSave');
-        if (confirmSave) {
-            confirmSave.addEventListener('click', () => {
+        const confirmSaveBtn = document.getElementById('confirmSave');
+        if (confirmSaveBtn) {
+            confirmSaveBtn.addEventListener('click', () => {
                 FlowIO.saveFlow();
             });
         }
         
         // 加载流程
-        const loadFlow = document.getElementById('loadFlow');
-        if (loadFlow) {
-            loadFlow.addEventListener('click', () => {
+        const loadFlowBtn = document.getElementById('loadFlow');
+        if (loadFlowBtn) {
+            loadFlowBtn.addEventListener('click', () => {
                 FlowIO.showLoadFlowDialog();
             });
         }
         
         // 删除选中节点
-        const deleteSelected = document.getElementById('deleteSelected');
-        if (deleteSelected) {
-            deleteSelected.addEventListener('click', () => {
-                FlowNodes.deleteSelected();
+        const deleteSelectedBtn = document.getElementById('deleteSelected');
+        if (deleteSelectedBtn) {
+            deleteSelectedBtn.addEventListener('click', () => {
+                if (FlowCore.state.selectedNode) {
+                    FlowNodes.deleteNode(FlowCore.state.selectedNode);
+                } else if (FlowCore.state.selectedConnection) {
+                    const connId = FlowCore.state.selectedConnection.id;
+                    FlowConnections.removeConnection(connId);
+                    FlowCore.state.selectedConnection = null;
+                }
             });
         }
         
         // 复制选中节点
-        const duplicateSelected = document.getElementById('duplicateSelected');
-        if (duplicateSelected) {
-            duplicateSelected.addEventListener('click', () => {
-                FlowNodes.duplicateSelected();
+        const duplicateSelectedBtn = document.getElementById('duplicateSelected');
+        if (duplicateSelectedBtn) {
+            duplicateSelectedBtn.addEventListener('click', () => {
+                if (FlowCore.state.selectedNode) {
+                    FlowNodes.duplicateNode(FlowCore.state.selectedNode);
+                }
             });
         }
         
         // 执行流程
-        const executeFlow = document.getElementById('executeFlow');
-        if (executeFlow) {
-            executeFlow.addEventListener('click', () => {
+        const executeFlowBtn = document.getElementById('executeFlow');
+        if (executeFlowBtn) {
+            executeFlowBtn.addEventListener('click', () => {
                 FlowIO.executeFlow();
             });
         }
         
         // 验证流程
-        const validateFlow = document.getElementById('validateFlow');
-        if (validateFlow) {
-            validateFlow.addEventListener('click', () => {
+        const validateFlowBtn = document.getElementById('validateFlow');
+        if (validateFlowBtn) {
+            validateFlowBtn.addEventListener('click', () => {
                 FlowIO.validateFlow();
             });
         }
         
         // 自适应视图按钮
-        const fitContent = document.getElementById('fitContent');
-        if (fitContent) {
-            fitContent.addEventListener('click', () => {
+        const fitContentBtn = document.getElementById('fitContent');
+        if (fitContentBtn) {
+            fitContentBtn.addEventListener('click', () => {
                 FlowCore.fitContent();
+                this.updateZoomLevel();
+            });
+        }
+        
+        // 缩放按钮
+        const zoomInBtn = document.getElementById('zoomIn');
+        const zoomOutBtn = document.getElementById('zoomOut');
+        const resetViewBtn = document.getElementById('resetView');
+        
+        if (zoomInBtn) {
+            zoomInBtn.addEventListener('click', () => {
+                FlowCore.zoom(0.1);
+                this.updateZoomLevel();
+            });
+        }
+        
+        if (zoomOutBtn) {
+            zoomOutBtn.addEventListener('click', () => {
+                FlowCore.zoom(-0.1);
+                this.updateZoomLevel();
+            });
+        }
+        
+        if (resetViewBtn) {
+            resetViewBtn.addEventListener('click', () => {
+                FlowCore.resetView();
+                this.updateZoomLevel();
             });
         }
         
         // 流程名称更改
-        const flowName = document.getElementById('flowName');
-        if (flowName) {
-            flowName.addEventListener('change', (e) => {
+        const flowNameInput = document.getElementById('flowName');
+        if (flowNameInput) {
+            flowNameInput.addEventListener('change', (e) => {
                 FlowCore.state.flowName = e.target.value;
             });
         }
     },
     
     /**
-     * 初始化迷你地图
+     * 更新缩放级别显示
      */
-    initMiniMap() {
-        if (!FlowCore.state.miniMapEnabled) return;
-        
-        const miniMap = document.getElementById('miniMap');
-        if (!miniMap) return;
-        
-        // 创建迷你地图视口
-        const viewport = document.createElement('div');
-        viewport.className = 'mini-map-viewport';
-        miniMap.appendChild(viewport);
-        
-        // 定时更新迷你地图
-        setInterval(() => {
-            this.updateMiniMap();
-        }, 500);
-    },
-    
-    /**
-     * 更新迷你地图
-     */
-    updateMiniMap() {
-        if (!FlowCore.state.miniMapEnabled) return;
-        
-        const miniMap = document.getElementById('miniMap');
-        const viewport = miniMap?.querySelector('.mini-map-viewport');
-        if (!miniMap || !viewport) return;
-        
-        // 清除旧的节点表示
-        const oldNodes = miniMap.querySelectorAll('.mini-map-node');
-        oldNodes.forEach(node => node.remove());
-        
-        // 计算适当的缩放比例
-        const canvas = FlowCore.state.canvas;
-        const canvasRect = canvas.getBoundingClientRect();
-        const miniMapRect = miniMap.getBoundingClientRect();
-        
-        const scaleX = miniMapRect.width / canvasRect.width;
-        const scaleY = miniMapRect.height / canvasRect.height;
-        const scale = Math.min(scaleX, scaleY) * 0.9; // 留一些边距
-        
-        // 更新视口位置和大小
-        const visibleWidth = canvasRect.width / FlowCore.state.scale;
-        const visibleHeight = canvasRect.height / FlowCore.state.scale;
-        
-        viewport.style.width = `${visibleWidth * scale}px`;
-        viewport.style.height = `${visibleHeight * scale}px`;
-        viewport.style.left = `${(-FlowCore.state.offsetX) * scale}px`;
-        viewport.style.top = `${(-FlowCore.state.offsetY) * scale}px`;
-        
-        // 添加节点表示
-        FlowCore.state.nodes.forEach(nodeData => {
-            const node = document.querySelector(`.node[data-node-id="${nodeData.id}"]`);
-            if (node) {
-                const nodeRect = node.getBoundingClientRect();
-                const miniNode = document.createElement('div');
-                miniNode.className = 'mini-map-node';
-                
-                // 计算节点在迷你地图中的位置
-                const x = nodeData.position.x * scale;
-                const y = nodeData.position.y * scale;
-                const width = nodeRect.width * scale;
-                const height = nodeRect.height * scale;
-                
-                miniNode.style.left = `${x}px`;
-                miniNode.style.top = `${y}px`;
-                miniNode.style.width = `${width}px`;
-                miniNode.style.height = `${height}px`;
-                
-                // 设置节点颜色
-                const nodeType = node.getAttribute('data-node-type');
-                const nodeTypes = require('./nodes.js').nodeTypes;
-                const nodeConfig = nodeTypes[nodeType];
-                if (nodeConfig) {
-                    miniNode.style.backgroundColor = nodeConfig.color;
-                }
-                
-                miniMap.appendChild(miniNode);
-            }
-        });
+    updateZoomLevel() {
+        const zoomLevelElement = document.getElementById('zoomLevel');
+        if (zoomLevelElement) {
+            const percentage = Math.round(FlowCore.state.scale * 100);
+            zoomLevelElement.textContent = `${percentage}%`;
+        }
     },
     
     /**
@@ -268,33 +230,32 @@ export const FlowUI = {
             // Ctrl+S - 保存流程
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
-                const modalElement = document.getElementById('saveFlowModal');
-                if (!modalElement) return;
-                
-                const modal = new bootstrap.Modal(modalElement);
-                const flowNameInput = document.getElementById('flowName');
-                const saveFlowNameInput = document.getElementById('saveFlowName');
-                
-                if (flowNameInput && saveFlowNameInput) {
-                    saveFlowNameInput.value = flowNameInput.value;
-                }
-                
-                modal.show();
+                document.getElementById('saveFlow')?.click();
             }
             
             // Ctrl+O - 打开流程
             if (e.ctrlKey && e.key === 'o') {
                 e.preventDefault();
-                FlowIO.showLoadFlowDialog();
+                document.getElementById('loadFlow')?.click();
             }
             
             // Ctrl+N - 新建流程
             if (e.ctrlKey && e.key === 'n') {
                 e.preventDefault();
-                if (confirm('确定要创建新流程吗？当前未保存的内容将丢失。')) {
-                    FlowCore.resetState();
-                    FlowIO.clearCanvas();
-                }
+                document.getElementById('newFlow')?.click();
+            }
+            
+            // F5 - 执行流程
+            if (e.key === 'F5') {
+                e.preventDefault();
+                document.getElementById('executeFlow')?.click();
+            }
+            
+            // Ctrl+F - 适应内容
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                FlowCore.fitContent();
+                this.updateZoomLevel();
             }
             
             // Ctrl++ 或 Ctrl+= - 放大
@@ -326,6 +287,95 @@ export const FlowUI = {
                 FlowCore.deselectAll();
                 FlowNodes.updatePropertiesPanel();
             }
+        });
+    },
+    
+    /**
+     * 初始化迷你地图
+     */
+    initMiniMap() {
+        const miniMap = document.getElementById('miniMap');
+        if (!miniMap) return;
+        
+        // 创建视口元素
+        const viewport = document.createElement('div');
+        viewport.className = 'mini-map-viewport';
+        miniMap.appendChild(viewport);
+        
+        // 创建标签
+        const label = document.createElement('div');
+        label.className = 'mini-map-label';
+        label.textContent = '迷你地图';
+        miniMap.appendChild(label);
+        
+        // 定期更新迷你地图
+        setInterval(() => this.updateMiniMap(), 500);
+    },
+    
+    /**
+     * 更新迷你地图
+     */
+    updateMiniMap() {
+        const miniMap = document.getElementById('miniMap');
+        if (!miniMap) return;
+        
+        const viewport = miniMap.querySelector('.mini-map-viewport');
+        if (!viewport) return;
+        
+        // 清除旧的节点表示
+        miniMap.querySelectorAll('.mini-map-node').forEach(node => node.remove());
+        
+        // 计算缩放比例
+        const canvas = FlowCore.state.canvas;
+        if (!canvas) return;
+        
+        const canvasRect = canvas.getBoundingClientRect();
+        const miniMapRect = miniMap.getBoundingClientRect();
+        
+        const scaleX = miniMapRect.width / canvasRect.width;
+        const scaleY = miniMapRect.height / canvasRect.height;
+        const scale = Math.min(scaleX, scaleY) * 0.9; // 留一些边距
+        
+        // 更新视口位置和大小
+        const visibleWidth = canvasRect.width / FlowCore.state.scale;
+        const visibleHeight = canvasRect.height / FlowCore.state.scale;
+        
+        viewport.style.width = `${visibleWidth * scale}px`;
+        viewport.style.height = `${visibleHeight * scale}px`;
+        viewport.style.left = `${(-FlowCore.state.offsetX) * scale}px`;
+        viewport.style.top = `${(-FlowCore.state.offsetY) * scale}px`;
+        
+        // 添加节点表示
+        FlowCore.state.nodes.forEach(nodeData => {
+            const node = document.querySelector(`.node[data-node-id="${nodeData.id}"]`);
+            if (!node) return;
+            
+            const miniNode = document.createElement('div');
+            miniNode.className = 'mini-map-node';
+            
+            const nodeRect = node.getBoundingClientRect();
+            
+            // 计算节点在迷你地图中的位置和尺寸
+            const x = nodeData.position.x * scale;
+            const y = nodeData.position.y * scale;
+            const width = nodeRect.width * scale;
+            const height = nodeRect.height * scale;
+            
+            miniNode.style.left = `${x}px`;
+            miniNode.style.top = `${y}px`;
+            miniNode.style.width = `${width}px`;
+            miniNode.style.height = `${height}px`;
+            
+            // 设置节点颜色
+            const nodeType = node.getAttribute('data-node-type');
+            if (nodeType) {
+                const typeConfig = FlowNodes.nodeTypes?.[nodeType];
+                if (typeConfig?.color) {
+                    miniNode.style.backgroundColor = typeConfig.color;
+                }
+            }
+            
+            miniMap.appendChild(miniNode);
         });
     },
     
