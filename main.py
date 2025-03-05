@@ -1,12 +1,17 @@
 import sys
+import os
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QSplitter, QWidget, QVBoxLayout, 
                             QHBoxLayout, QTextEdit, QPushButton, QLineEdit, QLabel, 
-                            QTabWidget, QScrollArea, QFrame)
+                            QTabWidget, QScrollArea, QFrame, QMessageBox)
 from PyQt5.QtCore import Qt, QDateTime
 from PyQt5.QtGui import QColor, QPainter, QFont
 
 # 导入模组化的节点编辑器
 from node_editor.view import FlowEditorView
+from chat_ui import EnhancedChatWidget
+from chat_history import ChatSessionManager
+from chat_settings import ChatSettingsWidget
+from llm_connector import LLMConnector
 
 class NodeEditorWidget(QWidget):
     def __init__(self, parent=None):
@@ -159,9 +164,17 @@ class ModelSettingsWidget(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("LLM Chat System")
+        self.setWindowTitle("OmniFlow 对话编辑系统")
         self.resize(1200, 800)
+        
+        # 创建LLM连接器
+        self.llm_connector = LLMConnector()
+        
+        # 设置UI
         self.setup_ui()
+        
+        # 设置信号连接
+        self.setup_connections()
         
     def setup_ui(self):
         # 设置样式表
@@ -191,31 +204,150 @@ class MainWindow(QMainWindow):
         # 主布局与分割器
         self.main_splitter = QSplitter(Qt.Horizontal)
         
-        # 左侧：Chat
-        self.chat_widget = ChatWidget()
+        # 聊天界面区域 - 包含聊天历史管理和聊天窗口
+        chat_container = QWidget()
+        chat_layout = QHBoxLayout(chat_container)
+        chat_layout.setContentsMargins(0, 0, 0, 0)
+        chat_layout.setSpacing(0)
+        
+        # 聊天历史管理
+        self.session_manager = ChatSessionManager()
+        self.session_manager.setMaximumWidth(250)
+        
+        # 增强的聊天界面
+        self.chat_widget = EnhancedChatWidget()
+        
+        chat_layout.addWidget(self.session_manager)
+        chat_layout.addWidget(self.chat_widget)
         
         # 右侧：选项卡
         self.right_tabs = QTabWidget()
         
         # 设置选项卡
-        self.settings_widget = ModelSettingsWidget()
+        self.settings_widget = ChatSettingsWidget()
         
         # 节点编辑器选项卡 - 使用模组化的NodeEditorWidget
         self.node_editor = NodeEditorWidget()
         
         # 添加选项卡
-        self.right_tabs.addTab(self.settings_widget, "Model Settings")
+        self.right_tabs.addTab(self.settings_widget, "模型设置")
         self.right_tabs.addTab(self.node_editor, "节点编辑器")
         
         # 将部件添加到分割器
-        self.main_splitter.addWidget(self.chat_widget)
+        self.main_splitter.addWidget(chat_container)
         self.main_splitter.addWidget(self.right_tabs)
         
-        # 设置初始大小（2:1比例）
+        # 设置初始大小比例
         self.main_splitter.setSizes([800, 400])
         
         # 设置中央部件
         self.setCentralWidget(self.main_splitter)
+        
+        # 状态栏显示当前模型
+        self.statusBar().showMessage(f"当前模型: {self.llm_connector.settings['model']}")
+    
+    def setup_connections(self):
+        """设置信号和槽连接"""
+        # 聊天窗口信号
+        self.chat_widget.messageSent.connect(self.on_message_sent)
+        
+        # 聊天历史信号
+        self.session_manager.sessionSelected.connect(self.on_session_selected)
+        self.session_manager.newSessionCreated.connect(self.on_new_session)
+        
+        # 设置窗口信号
+        self.settings_widget.settingsChanged.connect(self.on_settings_changed)
+        
+        # LLM连接器信号
+        self.llm_connector.responseReceived.connect(self.on_llm_response)
+        self.llm_connector.errorOccurred.connect(self.on_llm_error)
+        
+        # 加载设置
+        self.settings_widget.load_settings()
+    
+    def on_message_sent(self, message):
+        """处理发送的消息"""
+        # 保存消息到会话
+        self.session_manager.save_message(message, True)
+        
+        # 发送消息到LLM
+        self.llm_connector.send_message(message)
+        
+        # 显示正在输入的提示
+        self.chat_widget.message_area.add_system_message("AI正在思考...")
+    
+    def on_llm_response(self, response):
+        """处理LLM响应"""
+        # 移除"正在思考"提示
+        container = self.chat_widget.message_area.widget()
+        if container:
+            layout = container.layout()
+            if layout and layout.count() > 1:
+                # 获取最后一个非拉伸项
+                item = layout.itemAt(layout.count() - 2)
+                if item and item.widget():
+                    widget = item.widget()
+                    if isinstance(widget, QLabel) and "AI正在思考..." in widget.text():
+                        widget.deleteLater()
+        
+        # 显示响应
+        self.chat_widget.message_area.add_message(response, False)
+        
+        # 保存到会话
+        self.session_manager.save_message(response, False)
+    
+    def on_llm_error(self, error):
+        """处理LLM错误"""
+        # 显示错误消息
+        self.chat_widget.message_area.add_system_message(f"错误: {error}")
+    
+    def on_session_selected(self, session_id, messages):
+        """处理选择会话事件"""
+        # 清除当前聊天
+        self.chat_widget.clear_chat()
+        
+        # 加载历史消息
+        for msg in messages:
+            self.chat_widget.message_area.add_message(
+                msg['content'], 
+                msg['is_user']
+            )
+        
+        # 更新LLM连接器的历史
+        self.llm_connector.set_history(messages)
+    
+    def on_new_session(self, session_id):
+        """处理新建会话事件"""
+        self.chat_widget.clear_chat()
+        self.llm_connector.clear_history()
+    
+    def on_settings_changed(self, settings):
+        """处理设置变更"""
+        # 更新LLM连接器设置
+        self.llm_connector.update_settings(settings)
+        
+        # 更新状态栏
+        self.statusBar().showMessage(f"当前模型: {settings['model']}")
+        
+        # 应用主题
+        if 'dark_mode' in settings:
+            # 在这里可以实现主题切换
+            pass
+            
+        # 应用字体大小
+        if 'font_size' in settings:
+            font_size = 11  # 默认中等大小
+            if settings['font_size'] == "小":
+                font_size = 9
+            elif settings['font_size'] == "大":
+                font_size = 13
+                
+            # 可以在这里应用字体大小
+            
+    def closeEvent(self, event):
+        """应用关闭事件"""
+        # 您可以在这里添加提示保存会话等功能
+        event.accept()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
