@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniFlow Chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat-enhanced.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="chat-root">
+        <!-- 聊天记录侧边栏 -->
+        <aside class="chat-sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="OmniFlow" class="app-logo">
+                <button id="newChatBtn" class="new-chat-button">
+                    <i class="fas fa-plus"></i> 新对话
+                </button>
+                <button id="toggleSidebarBtn" class="toggle-sidebar-button">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <div class="sidebar-content">
+                <div class="chat-list" id="chatList">
+                    <!-- 聊天记录将动态加载 -->
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <p>暂无聊天记录</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <a href="/editor" class="sidebar-link">
+                    <i class="fas fa-project-diagram"></i> 流程编辑器
+                </a>
+                <button id="themeToggleBtn" class="sidebar-theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </aside>
+        
+        <!-- 主聊天区域 -->
+        <main class="chat-main">
+            <!-- 移动端菜单按钮 -->
+            <button id="mobileMenuBtn" class="mobile-menu-button">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h1 id="chatTitle">新对话</h1>
+                    <div class="chat-actions">
+                        <button id="editTitleBtn" title="编辑标题" class="action-button">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button id="shareChatBtn" title="分享对话" class="action-button">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                        <button id="deleteChatBtn" title="删除对话" class="action-button">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chat-history" id="chatHistory">
+                    <div class="welcome-message">
+                        <div class="welcome-title">
+                            <div class="welcome-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h2>欢迎使用 OmniFlow</h2>
+                        </div>
+                        <p>开始一个新对话，或从左侧选择历史记录</p>
+                        <div class="welcome-examples">
+                            <h3>示例问题</h3>
+                            <div class="example-grid">
+                                <button class="example-button">如何使用OmniFlow的流程编辑器？</button>
+                                <button class="example-button">能否帮我分析一段Python代码？</button>
+                                <button class="example-button">请推荐一些提高工作效率的方法</button>
+                                <button class="example-button">什么是机器学习？请用通俗的语言解释</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-area">
+                    <div class="chat-input-container">
+                        <textarea id="messageInput" placeholder="输入消息..." rows="1"></textarea>
+                        <button id="sendButton" class="send-button" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="input-info">
+                        <span class="hint">Shift + Enter 换行</span>
+                        <div class="typing-status">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 添加logo图标 -->
