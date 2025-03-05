@@ -1089,5 +1089,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // 启动应用
-    init();
+        // 启动应用
+        init();
+    });

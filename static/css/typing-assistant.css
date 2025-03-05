@@ -1,0 +1,162 @@
+/* OmniFlow打字助手样式 */
+
+.suggestions-panel {
+    position: fixed;
+    max-height: 200px;
+    width: 300px;
+    background-color: var(--background-medium);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    z-index: 1000;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.suggestions-panel::-webkit-scrollbar {
+    width: 5px;
+}
+
+.suggestions-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.suggestions-panel::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 3px;
+}
+
+.suggestions-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.suggestion-item {
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: background-color var(--transition-fast);
+}
+
+.suggestion-item:hover {
+    background-color: var(--background-light);
+}
+
+.suggestion-item.active {
+    background-color: var(--background-light);
+}
+
+/* 命令建议样式 */
+.suggestion-command {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-family: 'Fira Code', monospace;
+    min-width: 80px;
+}
+
+.suggestion-description {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 表情建议样式 */
+.suggestion-emoji {
+    font-size: 1.2em;
+    min-width: 1.5em;
+    text-align: center;
+}
+
+.suggestion-text {
+    font-family: 'Fira Code', monospace;
+    color: var(--text-secondary);
+}
+
+/* 编程语言建议样式 */
+.suggestion-language {
+    font-family: 'Fira Code', monospace;
+    color: var(--accent-color);
+    width: 100%;
+}
+
+/* 帮助对话框样式 */
+.help-dialog {
+    background-color: var(--background-medium);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.commands-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.command-item {
+    display: flex;
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--background-dark);
+}
+
+.command-name {
+    font-family: 'Fira Code', monospace;
+    color: var(--primary-color);
+    margin-right: var(--spacing-md);
+    min-width: 100px;
+}
+
+.command-desc {
+    color: var(--text-secondary);
+}
+
+.help-section h3 {
+    margin-bottom: var(--spacing-md);
+    font-size: 1.1em;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--spacing-xs);
+}
+
+.markdown-help {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+}
+
+.markdown-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xs);
+}
+
+.markdown-item code {
+    font-family: 'Fira Code', monospace;
+    color: var(--accent-color);
+    background-color: var(--background-dark);
+    padding: 2px 5px;
+    border-radius: var(--border-radius-sm);
+}
+
+/* 响应式样式调整 */
+@media (max-width: 768px) {
+    .commands-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .markdown-help {
+        grid-template-columns: 1fr;
+    }
+}
