@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniFlow - 智能流程编辑器</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>OmniFlow</h1>
+        <nav>
+            <ul>
+                <li><a href="/">主页</a></li>
+                <li><a href="/chat">聊天</a></li>
+                <li><a href="/editor">节点编辑器</a></li>
+                <li><a href="/settings">设置</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="hero">
+            <h2>欢迎使用 OmniFlow</h2>
+            <p>集成聊天界面和节点编辑器的智能工作流平台</p>
+            <div class="cta-buttons">
+                <a href="/chat" class="btn primary">开始聊天</a>
+                <a href="/editor" class="btn secondary">使用编辑器</a>
+            </div>
+        </section>
+        
+        <section class="features">
+            <h2>主要功能</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>智能聊天</h3>
+                    <p>通过聊天界面与系统交互，获取即时响应</p>
+                </div>
+                <div class="feature-card">
+                    <h3>节点编辑器</h3>
+                    <p>可视化创建和编辑工作流程</p>
+                </div>
+                <div class="feature-card">
+                    <h3>自定义设置</h3>
+                    <p>根据需求调整系统参数和行为</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2023 OmniFlow. 保留所有权利。</p>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

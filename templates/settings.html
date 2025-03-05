@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置 - OmniFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+</head>
+<body>
+    <header>
+        <h1>OmniFlow</h1>
+        <nav>
+            <ul>
+                <li><a href="/">主页</a></li>
+                <li><a href="/chat">聊天</a></li>
+                <li><a href="/editor">节点编辑器</a></li>
+                <li><a href="/settings" class="active">设置</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="settings-container">
+        <h2>系统设置</h2>
+        
+        <form id="settingsForm" class="settings-form">
+            <div class="settings-section">
+                <h3>外观设置</h3>
+                <div class="form-group">
+                    <label for="theme">主题</label>
+                    <select id="theme" name="theme">
+                        <option value="light">浅色</option>
+                        <option value="dark">深色</option>
+                        <option value="auto">跟随系统</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fontSize">字体大小</label>
+                    <input type="range" id="fontSize" name="fontSize" min="12" max="24" step="1" value="16">
+                    <span id="fontSizeValue">16px</span>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>聊天设置</h3>
+                <div class="form-group">
+                    <label for="messageHistory">保存消息历史记录</label>
+                    <input type="checkbox" id="messageHistory" name="messageHistory" checked>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notificationSound">启用通知声音</label>
+                    <input type="checkbox" id="notificationSound" name="notificationSound">
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>节点编辑器设置</h3>
+                <div class="form-group">
+                    <label for="gridSnap">网格对齐</label>
+                    <input type="checkbox" id="gridSnap" name="gridSnap" checked>
+                </div>
+                
+                <div class="form-group">
+                    <label for="autoSave">自动保存</label>
+                    <select id="autoSave" name="autoSave">
+                        <option value="off">关闭</option>
+                        <option value="1">每分钟</option>
+                        <option value="5">每5分钟</option>
+                        <option value="10">每10分钟</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn primary">保存设置</button>
+                <button type="reset" class="btn secondary">重置</button>
+            </div>
+        </form>
+    </main>
+    
+    <footer>
+        <p>&copy; 2023 OmniFlow. 保留所有权利。</p>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+</body>
+</html>

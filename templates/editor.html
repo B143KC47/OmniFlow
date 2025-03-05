@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>节点编辑器 - OmniFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* 强制覆盖全局样式 */
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+        }
+        
+        #editor-root {
+            width: 100vw !important;
+            height: 100vh !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+        }
+        
+        .editor-container {
+            width: 100vw !important;
+            max-width: 100vw !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow-x: hidden !important;
+        }
+        
+        .editor-workspace {
+            width: 100vw !important;
+            max-width: 100vw !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+        
+        /* 修复边距 */
+        * {
+            box-sizing: border-box !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="editor-root" class="editor-root">
+        <header id="editorHeader" class="editor-header">
+            <div class="header-left">
+                <h1>OmniFlow <span class="subtitle">节点编辑器</span></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">主页</a></li>
+                    <li><a href="/chat">聊天</a></li>
+                    <li><a href="/editor" class="active">节点编辑器</a></li>
+                    <li><a href="/settings">设置</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main class="editor-container">
+            <!-- 编辑器工具栏 -->
+            <div class="editor-toolbar">
+                <div class="editor-tools">
+                    <button id="newFlow" class="tool-button" title="新建流程">
+                        <i class="fas fa-file"></i>
+                    </button>
+                    <button id="saveFlow" class="tool-button" title="保存流程">
+                        <i class="fas fa-save"></i>
+                    </button>
+                    <button id="loadFlow" class="tool-button" title="加载流程">
+                        <i class="fas fa-folder-open"></i>
+                    </button>
+                    <button id="exportFlow" class="tool-button" title="导出流程">
+                        <i class="fas fa-file-export"></i>
+                    </button>
+                    <div class="vertical-separator"></div>
+                    <button id="zoomIn" class="tool-button" title="放大">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <span id="zoomInfo" class="zoom-info">100%</span>
+                    <button id="zoomOut" class="tool-button" title="缩小">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <button id="resetView" class="tool-button" title="重置视图">
+                        <i class="fas fa-home"></i>
+                    </button>
+                    <div class="vertical-separator"></div>
+                    <div class="status-info">
+                        <span class="hint-text">右键点击画布添加节点 | 空格+拖动移动画布 | 滚轮缩放</span>
+                    </div>
+                </div>
+                <div class="editor-tools-right">
+                    <button id="toggleFullScreen" class="tool-button" title="全屏模式">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- 编辑器画布区域 -->
+            <div id="editorWorkspace" class="editor-workspace">
+                <div id="editorCanvas" class="editor-canvas">
+                    <!-- 这里将显示节点图 -->
+                </div>
+                <!-- 节点指示器容器 -->
+                <div class="node-indicators"></div>
+                <!-- 右击菜单 -->
+                <div id="contextMenu" class="context-menu">
+                    <div class="context-menu-title">添加节点</div>
+                    <div class="context-menu-group" data-group="basic">
+                        <div class="context-menu-item" data-node-type="flow-start">
+                            <i class="fas fa-play-circle"></i> 流程开始
+                        </div>
+                        <div class="context-menu-item" data-node-type="flow-end">
+                            <i class="fas fa-stop-circle"></i> 流程结束
+                        </div>
+                    </div>
+                    <div class="context-menu-separator"></div>
+                    <div class="context-menu-item" data-action="copy">
+                        <i class="fas fa-copy"></i> 复制
+                    </div>
+                    <div class="context-menu-item" data-action="paste">
+                        <i class="fas fa-paste"></i> 粘贴
+                    </div>
+                </div>
+                <!-- 添加画布控制按钮 -->
+                <div class="canvas-controls">
+                    <button id="centerNodesBtn" class="canvas-control-button" title="居中显示所有节点">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </button>
+                    <button id="resetZoomBtn" class="canvas-control-button" title="重置缩放">
+                        <i class="fas fa-crosshairs"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- 节点属性面板（作为弹出层） -->
+            <div id="nodePropertiesPanel" class="node-properties-panel">
+                <div class="panel-header">
+                    <h3>节点属性</h3>
+                    <button id="closeProperties" class="close-button">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="panel-content">
+                    <div id="propertyForm">
+                        <!-- 属性表单将动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer id="editorFooter" class="editor-footer">
+            <p>&copy; 2023 OmniFlow. 保留所有权利。</p>
+        </footer>
+    </div>
+    
+    <!-- 添加新的修复脚本 -->
+    <script src="{{ url_for('static', filename='js/canvas-fullwidth-fix.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsplumb@2.15.6/dist/js/jsplumb.min.js"></script>
+    <script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/editor-layout-fix.js') }}"></script>
+</body>
+</html>

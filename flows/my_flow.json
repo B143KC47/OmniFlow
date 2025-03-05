@@ -1,0 +1,30 @@
+{
+  "name": "my_flow",
+  "nodes": [
+    {
+      "id": "node_1",
+      "type": "flow-start",
+      "position": {
+        "left": 100,
+        "top": 150
+      },
+      "data": {
+        "title": "开始",
+        "description": "流程开始节点"
+      }
+    },
+    {
+      "id": "node_2",
+      "type": "flow-end",
+      "position": {
+        "left": 448.5555419921875,
+        "top": 296.99999237060547
+      },
+      "data": {
+        "title": "结束",
+        "description": "流程结束节点"
+      }
+    }
+  ],
+  "connections": []
+}
