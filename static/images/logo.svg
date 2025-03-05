@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="50" viewBox="0 0 150 50">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4A90E2" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+  </defs>
+  <g>
+    <path fill="url(#gradient)" d="M32,8 C45.25,8 56,18.75 56,32 C56,45.25 45.25,56 32,56 C18.75,56 8,45.25 8,32 C8,18.75 18.75,8 32,8 Z M30,22 L22,32 L30,42 L34,42 L26,32 L34,22 L30,22 Z M42,22 L34,32 L42,42 L46,42 L38,32 L46,22 L42,22 Z" transform="scale(0.5)" />
+    <text x="35" y="32" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">OmniFlow</text>
+  </g>
+</svg>

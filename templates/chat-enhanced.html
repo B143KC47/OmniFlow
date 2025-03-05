@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/chat-enhanced.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat-components.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -109,4 +110,20 @@
         </main>
     </div>
 
-    <!-- 添加logo图标 -->
+    <!-- 模板内容 -->
+    <template id="codeBlockTemplate">
+        <div class="code-block-actions">
+            <button class="code-action copy-code" title="复制代码">
+                <i class="fas fa-copy"></i>
+            </button>
+            <button class="code-action run-code" title="运行代码">
+                <i class="fas fa-play"></i>
+            </button>
+        </div>
+    </template>
+
+    <!-- 脚本 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="{{ url_for('static', filename='js/chat-enhanced.js') }}"></script>
+</body>
+</html>
