@@ -1,0 +1,52 @@
+{
+  "name": "omniflow",
+  "version": "1.0.0",
+  "description": "基于节点的编辑器，用于创建和执行本地LLM工作流",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/B143KC47/OmniFlow.git"
+  },
+  "keywords": [
+    "llm",
+    "workflow",
+    "node-editor",
+    "ai"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/B143KC47/OmniFlow/issues"
+  },
+  "homepage": "https://github.com/B143KC47/OmniFlow#readme",
+  "dependencies": {
+    "next": "^14.0.0",
+    "next-intl": "^4.0.0",
+    "react": "^18.2.0",
+    "react-contexify": "^6.0.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.5.0",
+    "reactflow": "^11.11.4",
+    "uuid": "^9.0.1",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "@types/react": "^18.2.33",
+    "@types/react-dom": "^18.2.14",
+    "@types/uuid": "^9.0.6",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.52.0",
+    "eslint-config-next": "^14.0.0",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "typescript": "^5.2.2"
+  }
+}
