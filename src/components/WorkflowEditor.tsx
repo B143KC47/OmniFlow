@@ -2,15 +2,17 @@ import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { v4 as uuidv4 } from 'uuid';
 import dynamic from 'next/dynamic';
 import clsx from 'clsx';
+import { useContextMenu } from 'react-contexify';
 import {
   Connection as FlowConnection,
   Edge as FlowEdge,
   Node as FlowNode,
   XYPosition,
   useReactFlow,
-  useNodesState as useReactFlowNodesState,
-  useEdgesState as useReactFlowEdgesState,
-  addEdge as addFlowEdge,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  ReactFlowProvider
 } from 'reactflow';
 import { NodeData, NodeType, Workflow, Connection as WorkflowConnection } from '../types';
 import WorkflowController, { ExecutionState } from '../services/WorkflowController';
@@ -18,37 +20,17 @@ import McpService from '../services/McpService';
 
 // 使用动态导入避免 SSR 问题
 const ReactFlow = dynamic(
-  async () => {
-    const ReactFlow = await import('reactflow');
-    return ReactFlow.default;
-  },
-  { 
-    loading: () => <div>加载中...</div>,
-    ssr: false
-  }
+  () => import('reactflow').then(mod => mod.default),
+  { ssr: false }
 );
 
 const Controls = dynamic(
-  async () => {
-    const ReactFlow = await import('reactflow');
-    return ReactFlow.Controls;
-  },
+  () => import('reactflow').then(mod => mod.Controls),
   { ssr: false }
 );
 
 const Background = dynamic(
-  async () => {
-    const ReactFlow = await import('reactflow');
-    return ReactFlow.Background;
-  },
-  { ssr: false }
-);
-
-const ReactFlowProvider = dynamic(
-  async () => {
-    const ReactFlow = await import('reactflow');
-    return ReactFlow.ReactFlowProvider;
-  },
+  () => import('reactflow').then(mod => mod.Background),
   { ssr: false }
 );
 
@@ -56,7 +38,6 @@ const ReactFlowProvider = dynamic(
 import 'reactflow/dist/style.css';
 
 // 动态导入其他组件
-const NodePalette = dynamic(() => import('./NodePalette'), { ssr: false });
 const TextInputNode = dynamic(() => import('./nodes/TextInputNode'), { ssr: false });
 const LlmQueryNode = dynamic(() => import('./nodes/LlmQueryNode'), { ssr: false });
 const WebSearchNode = dynamic(() => import('./nodes/WebSearchNode'), { ssr: false });
@@ -108,6 +89,9 @@ const nodeTypes: NodeTypes = {
 type CustomFlowNode = FlowNode<NodeData>;
 type CustomEdge = FlowEdge;
 
+// 上下文菜单ID
+const WORKFLOW_MENU_ID = 'workflow-context-menu';
+
 // 内部工作流编辑器组件
 const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
   // 使用 useState 来跟踪客户端渲染状态
@@ -118,19 +102,9 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     setIsClient(true);
   }, []);
 
-  const {
-    useNodesState,
-    useEdgesState,
-    useReactFlow,
-    useContextMenu,
-    addEdge,
-  } = require('reactflow');
-
-  const MENU_ID = 'workflow-context-menu';
-
   // ReactFlow元素状态
-  const [nodes, setNodes, onNodesChange] = useReactFlowNodesState<NodeData>([]);
-  const [edges, setEdges, onEdgesChange] = useReactFlowEdgesState<CustomEdge>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<CustomEdge>([]);
   const [executionState, setExecutionState] = useState<ExecutionState | null>(null);
   const [showMcpManager, setShowMcpManager] = useState(false);
   
@@ -233,7 +207,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
 
   // 处理连接创建
   const onConnect = useCallback((connection: FlowConnection) => {
-    setEdges(edges => addFlowEdge({
+    setEdges(edges => addEdge({
       ...connection,
       id: `e-${connection.source}-${connection.target}-${Date.now()}`,
     }, edges));
@@ -357,7 +331,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
 
   // 处理右键菜单
   const { show } = useContextMenu({
-    id: MENU_ID,
+    id: WORKFLOW_MENU_ID,
   });
 
   const onContextMenu = useCallback(
@@ -408,10 +382,6 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
       {workflowController && (
         <>
           <div className="comfy-editor">
-            <div className="comfy-sidebar">
-              <NodePalette />
-            </div>
-            
             <div className="comfy-main" onContextMenu={onContextMenu}>
               <div className="comfy-toolbar">
                 <button
@@ -476,7 +446,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
               </div>
 
               <ContextMenu 
-                id={MENU_ID}
+                id={WORKFLOW_MENU_ID}
                 x={0}
                 y={0}
                 onClose={() => {}}
@@ -494,24 +464,15 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
 
           <style jsx>{`
             .comfy-editor {
-              display: flex;
               height: 100vh;
               width: 100%;
               position: relative;
               background-color: var(--background-color);
             }
             
-            .comfy-sidebar {
-              width: 280px;
-              background-color: #0a0a0a;
-              border-right: 1px solid #282828;
-              padding: 16px;
-              flex-shrink: 0;
-              overflow-y: auto;
-            }
-            
             .comfy-main {
-              flex: 1;
+              height: 100%;
+              width: 100%;
               position: relative;
               overflow: hidden;
             }
@@ -627,12 +588,10 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
   );
 };
 
-// 包装组件，提供ReactFlowProvider
+// 包装组件，确保每个工作流编辑器实例都有自己的 ReactFlow 上下文
 const WorkflowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
-  // 使用 useState 来跟踪客户端渲染状态
   const [isClient, setIsClient] = useState(false);
 
-  // 在客户端挂载后更新状态
   useEffect(() => {
     setIsClient(true);
   }, []);
