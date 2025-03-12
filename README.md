@@ -4,7 +4,10 @@ OmniFlow 是一个强大的节点式工作流编辑器，专为 LLM (Large Langu
 
 
 
+## 界面预览
 
+![OmniFlow界面预览](screenshot.png)
+工作流编辑器提供了直观的可视化界面
 
 ## 🌟 主要特性
 
