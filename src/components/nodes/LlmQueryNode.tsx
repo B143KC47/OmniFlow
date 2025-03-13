@@ -28,14 +28,19 @@ const LlmQueryNode = memo(({
       },
       model: {
         type: 'select',
-        value: data.inputs?.model?.value || 'gpt-3.5-turbo',
-        options: ['gpt-3.5-turbo', 'gpt-4', 'claude-2', 'llama-2'],
+        value: data.inputs?.model?.value || 'deepseek-chat',
+        options: ['deepseek-chat'],
+      },
+      systemPrompt: {
+        type: 'text',
+        value: data.inputs?.systemPrompt?.value || 'You are a helpful assistant',
+        placeholder: '系统提示词',
       },
       temperature: {
         type: 'number',
         value: data.inputs?.temperature?.value || 0.7,
         min: 0,
-        max: 2,
+        max: 1,
         step: 0.1,
       },
       maxTokens: {
@@ -44,6 +49,11 @@ const LlmQueryNode = memo(({
         min: 1,
         max: 4096,
         step: 1,
+      },
+      stream: {
+        type: 'select',
+        value: data.inputs?.stream?.value || 'false',
+        options: ['true', 'false'],
       },
     },
     outputs: {

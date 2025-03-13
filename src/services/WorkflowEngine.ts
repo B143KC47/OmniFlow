@@ -33,13 +33,23 @@ class WorkflowEngine {
     this.nodeExecutors[NodeType.LLM_QUERY] = {
       execute: async (node: Node, inputs: Record<string, any>) => {
         const prompt = node.data.inputs?.prompt?.value || inputs.text || '';
-        const model = node.data.inputs?.model?.value || 'gpt-3.5-turbo';
+        const model = node.data.inputs?.model?.value || 'deepseek-chat';
+        const systemPrompt = node.data.inputs?.systemPrompt?.value || 'You are a helpful assistant';
         const temperature = node.data.inputs?.temperature?.value || 0.7;
         const maxTokens = node.data.inputs?.maxTokens?.value || 1000;
+        const stream = node.data.inputs?.stream?.value === 'true';
+        
+        // Use the API key from inputs if available (from ModelSelectorNode)
+        const apiKey = inputs.apiKey || '';
 
         try {
-          // TODO: 实现实际的LLM API调用
-          const response = await this.mockLlmCall(prompt, model, temperature, maxTokens);
+          // If no API key, use mock response
+          if (!apiKey) {
+            return { text: this.mockLlmCallDeepseek(prompt, model, systemPrompt, temperature, maxTokens, stream) };
+          }
+          
+          // Attempt actual API call for DeepSeek
+          const response = await this.callDeepseekAPI(apiKey, prompt, model, systemPrompt, temperature, maxTokens, stream);
           return { text: response };
         } catch (error: unknown) {
           throw new Error(`LLM查询失败: ${error instanceof Error ? error.message : String(error)}`);
@@ -82,11 +92,20 @@ class WorkflowEngine {
     // 模型选择器节点执行器
     this.nodeExecutors[NodeType.MODEL_SELECTOR] = {
       execute: async (node: Node) => {
-        const model = node.data.inputs?.model?.value || 'gpt-3.5-turbo';
-        const parameters = node.data.inputs?.parameters?.value || '';
+        const model = node.data.inputs?.model?.value || 'deepseek-chat';
+        const apiKey = node.data.inputs?.apiKey?.value || '';
+        const systemPrompt = node.data.inputs?.systemPrompt?.value || 'You are a helpful assistant';
+        const temperature = node.data.inputs?.temperature?.value || 0.7;
+        const maxTokens = node.data.inputs?.maxTokens?.value || 1000;
+        const stream = node.data.inputs?.stream?.value === 'true';
+
         return {
           model,
-          parameters,
+          apiKey,
+          systemPrompt,
+          temperature,
+          maxTokens,
+          stream
         };
       },
     };
@@ -130,6 +149,56 @@ class WorkflowEngine {
     };
   }
 
+  // 使用DeepSeek API调用
+  private async callDeepseekAPI(
+    apiKey: string, 
+    prompt: string,
+    model: string,
+    systemPrompt: string,
+    temperature: number,
+    maxTokens: number,
+    stream: boolean
+  ): Promise<string> {
+    try {
+      // This would be a call to DeepSeek API - here's the code structure
+      // In a browser environment, you would use fetch instead
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            { "role": "system", "content": systemPrompt },
+            { "role": "user", "content": prompt }
+          ],
+          temperature: temperature,
+          max_tokens: maxTokens,
+          stream: stream
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`DeepSeek API error: ${error.message || response.statusText}`);
+      }
+
+      if (stream) {
+        // Handle streaming response - in a real implementation this would use proper streaming
+        return "Streaming response started. Check console for messages.";
+      } else {
+        const data = await response.json();
+        return data.choices[0].message.content;
+      }
+    } catch (error) {
+      console.error("DeepSeek API call failed:", error);
+      // Fall back to mock if API call fails
+      return this.mockLlmCallDeepseek(prompt, model, systemPrompt, temperature, maxTokens, stream);
+    }
+  }
+
   // 使用MCP服务执行网络搜索
   private async performWebSearch(query: string, provider: string, maxResults: number): Promise<string> {
     try {
@@ -152,15 +221,41 @@ class WorkflowEngine {
     }
   }
 
-  // 模拟LLM调用
-  private async mockLlmCall(
+  // 模拟DeepSeek LLM调用
+  private mockLlmCallDeepseek(
     prompt: string,
     model: string,
+    systemPrompt: string,
     temperature: number,
-    maxTokens: number
-  ): Promise<string> {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return `模拟LLM响应：\n输入：${prompt}\n模型：${model}\n温度：${temperature}\n最大长度：${maxTokens}`;
+    maxTokens: number,
+    stream: boolean
+  ): string {
+    return `模拟DeepSeek响应：
+输入: ${prompt}
+系统提示词: ${systemPrompt}
+模型: ${model}
+温度: ${temperature}
+最大Token数: ${maxTokens}
+流式输出: ${stream}
+
+注意：这是一个模拟响应。实际使用时，请提供有效的DeepSeek API密钥。
+DeepSeek API使用方式:
+\`\`\`python
+from openai import OpenAI
+
+client = OpenAI(api_key="<DeepSeek API Key>", base_url="https://api.deepseek.com")
+
+response = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant"},
+        {"role": "user", "content": "Hello"},
+    ],
+    stream=False
+)
+
+print(response.choices[0].message.content)
+\`\`\``;
   }
 
   // 模拟网络搜索

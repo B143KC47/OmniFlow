@@ -23,31 +23,64 @@ const ModelSelectorNode = memo(({
     inputs: {
       model: {
         type: 'select',
-        value: data.inputs?.model?.value || 'gpt-3.5-turbo',
+        value: data.inputs?.model?.value || 'deepseek-chat',
         options: [
-          'gpt-3.5-turbo',
-          'gpt-4',
-          'claude-2',
-          'llama-2',
-          'stable-diffusion',
-          'midjourney',
-          'dall-e-3',
+          'deepseek-chat',
         ],
       },
-      parameters: {
+      apiKey: {
         type: 'text',
-        value: data.inputs?.parameters?.value || '',
-        placeholder: '请输入模型参数（JSON格式）',
+        value: data.inputs?.apiKey?.value || '',
+        placeholder: '请输入DeepSeek API密钥',
+      },
+      systemPrompt: {
+        type: 'text',
+        value: data.inputs?.systemPrompt?.value || 'You are a helpful assistant',
+        placeholder: '系统提示词',
+      },
+      temperature: {
+        type: 'number',
+        value: data.inputs?.temperature?.value || 0.7,
+        min: 0,
+        max: 1,
+        step: 0.1,
+      },
+      maxTokens: {
+        type: 'number',
+        value: data.inputs?.maxTokens?.value || 1000,
+        min: 1,
+        max: 4096,
+        step: 1,
+      },
+      stream: {
+        type: 'select',
+        value: data.inputs?.stream?.value || 'false',
+        options: ['true', 'false'],
       },
     },
     outputs: {
       model: {
         type: 'text',
-        value: data.inputs?.model?.value || '',
+        value: data.inputs?.model?.value || 'deepseek-chat',
       },
-      parameters: {
+      apiKey: {
         type: 'text',
-        value: data.inputs?.parameters?.value || '',
+        value: data.inputs?.apiKey?.value || '',
+      },
+      systemPrompt: {
+        type: 'text',
+        value: data.inputs?.systemPrompt?.value || 'You are a helpful assistant',
+      },
+      config: {
+        type: 'text',
+        value: JSON.stringify({
+          model: data.inputs?.model?.value || 'deepseek-chat',
+          apiKey: data.inputs?.apiKey?.value || '',
+          systemPrompt: data.inputs?.systemPrompt?.value || 'You are a helpful assistant',
+          temperature: data.inputs?.temperature?.value || 0.7,
+          maxTokens: data.inputs?.maxTokens?.value || 1000,
+          stream: data.inputs?.stream?.value === 'true',
+        }, null, 2),
       },
     },
     onChange: (nodeId: string, newData: NodeData) => {
