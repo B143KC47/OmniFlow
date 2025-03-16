@@ -96,7 +96,7 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ## 📫 Contact
 
-- Create an issue: [Issue Tracker](https://github.com/yourusername/OmniFlow/issues)
+- Create an issue: [Issue Tracker](https://github.com/B143KC47/OmniFlow/issues)
 - Email: ltu46166@gmail.com
 
 ## 🙏 Acknowledgments

@@ -100,7 +100,7 @@ OmniFlow/
 
 ## 📫 联系我们
 
-- 遇到问题？[提交 Issue](https://github.com/yourusername/OmniFlow/issues)
+- 遇到问题？[提交 Issue](https://github.com/B143KC47/OmniFlow/issues)
 - 想要交流？发送邮件到 ltu46166@gmail.com
 
 ## 🙏 特别感谢
