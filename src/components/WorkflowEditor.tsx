@@ -42,7 +42,6 @@ const TextInputNode = dynamic(() => import('./nodes/TextInputNode'), { ssr: fals
 const LlmQueryNode = dynamic(() => import('./nodes/LlmQueryNode'), { ssr: false });
 const WebSearchNode = dynamic(() => import('./nodes/WebSearchNode'), { ssr: false });
 const DocumentQueryNode = dynamic(() => import('./nodes/DocumentQueryNode'), { ssr: false });
-const ModelSelectorNode = dynamic(() => import('./nodes/ModelSelectorNode'), { ssr: false });
 const CustomNodeComponent = dynamic(() => import('./nodes/CustomNode'), { ssr: false });
 const ContextMenu = dynamic(() => import('./ContextMenu'), { ssr: false });
 const McpManager = dynamic(() => import('./McpManager'), { ssr: false });
@@ -65,7 +64,6 @@ const nodeTypeMap: Record<string, string> = {
   'llmQuery': 'llmQuery',
   'webSearch': 'webSearch',
   'documentQuery': 'documentQuery',
-  'modelSelector': 'modelSelector',
   'custom': 'custom',
 };
 
@@ -75,7 +73,6 @@ const nodeTypes: NodeTypes = {
   'llmQuery': LlmQueryNode,
   'webSearch': WebSearchNode,
   'documentQuery': DocumentQueryNode,
-  'modelSelector': ModelSelectorNode,
   'custom': CustomNodeComponent,
 };
 
@@ -230,9 +227,6 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
         break;
       case 'documentQuery':
         label = '文档查询';
-        break;
-      case 'modelSelector':
-        label = '模型选择';
         break;
       case 'custom':
         label = '自定义节点';

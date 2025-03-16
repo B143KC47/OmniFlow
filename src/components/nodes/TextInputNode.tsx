@@ -27,10 +27,24 @@ const TextInputNode = memo(({
         placeholder: '请输入文本',
       },
     },
-    // 移除输出，使其不输出内容
-    outputs: {},
+    outputs: {
+      text: {
+        type: 'text',
+        value: data.inputs?.text?.value || '',
+      }
+    },
     onChange: (nodeId: string, newData: NodeData) => {
-      onDataChange(newData);
+      // 当输入改变时，同步更新输出
+      const updatedData = {
+        ...newData,
+        outputs: {
+          text: {
+            type: 'text',
+            value: newData.inputs?.text?.value || '',
+          }
+        }
+      };
+      onDataChange(updatedData);
     }
   };
 

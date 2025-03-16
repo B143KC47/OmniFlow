@@ -18,10 +18,10 @@ const LlmQueryNode = memo(({
   onDataChange
 }: LlmQueryNodeProps) => {
   const modelOptions = [
-    'deepseek-chat', 
-    'deepseek-reasoner',  // 添加新的模型选项
+    'deepseek-chat',
+    'deepseek-reasoner',
   ];
-
+  
   const initialData: NodeData = {
     ...data,
     label: 'LLM 查询',
