@@ -2,9 +2,18 @@
 
 An advanced node-based workflow editor designed for LLM (Large Language Model) applications, enabling visual construction and execution of complex AI workflows.
  
+🚧 WORK IN PROGRESS - DEMO ONLY 🚧
+
 [中文文档](./README.CN.md)
 
-![OmniFlow Interface](./docs/images/screenshot.png)
+![OmniFlow Interface](./docs/images/asset1.png)
+![OmniFlow Interface](./docs/images/asset2.png)
+![OmniFlow Interface](./docs/images/asset3.png)
+![OmniFlow Interface](./docs/images/asset4.png)
+
+
+
+
 
 ## ✨ Features
 
@@ -88,7 +97,7 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 ## 📫 Contact
 
 - Create an issue: [Issue Tracker](https://github.com/yourusername/OmniFlow/issues)
-- Email: your.email@example.com
+- Email: ltu46166@gmail.com
 
 ## 🙏 Acknowledgments
 

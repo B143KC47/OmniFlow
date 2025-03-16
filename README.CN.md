@@ -2,9 +2,15 @@
 
 OmniFlow 是一款专注于大语言模型应用的可视化工作流编辑器。通过简单的拖拽操作，你就能轻松构建复杂的 AI 工作流，让创意快速落地。
 
+🚧 开发进行中 - DEMO ONLY 🚧
+
 [English](./README.md)
 
-![OmniFlow 界面](./docs/images/screenshot.png)
+![OmniFlow 界面](./docs/images/asset1.png)
+![OmniFlow 界面](./docs/images/asset2.png)
+![OmniFlow 界面](./docs/images/asset3.png)
+![OmniFlow 界面](./docs/images/asset4.png)
+
 
 ## ✨ 亮点特色
 
@@ -95,7 +101,7 @@ OmniFlow/
 ## 📫 联系我们
 
 - 遇到问题？[提交 Issue](https://github.com/yourusername/OmniFlow/issues)
-- 想要交流？发送邮件到 your.email@example.com
+- 想要交流？发送邮件到 ltu46166@gmail.com
 
 ## 🙏 特别感谢
 
