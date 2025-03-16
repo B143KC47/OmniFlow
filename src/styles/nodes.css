@@ -12,7 +12,7 @@
   margin-bottom: 12px;
   backdrop-filter: blur(5px);
   border-radius: 4px;
-  overflow: visible; /* 改为visible以显示所有内容 */
+  overflow: visible; /* 确保所有内容可见 */
   position: relative;
 }
 
@@ -153,8 +153,14 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 260px; /* 确保节点有足够宽度显示内容 */
   max-width: 320px; /* 限制最大宽度以保持界面整洁 */
+  /* 重要：默认显示层级 */
+  z-index: 1;
+  opacity: 1;
+  position: relative;
+  background-color: var(--node-color);
 }
 
+/* 解决连接过程中节点消失问题的关键：确保节点在任何状态下都有合理的显示 */
 .comfy-node:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
@@ -166,6 +172,22 @@
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.25), 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 20; /* 确保选中节点在最顶层 */
+}
+
+/* 连接状态样式 - 解决连接过程中节点消失的问题 */
+.comfy-node.connectable {
+  border-color: var(--success-color) !important;
+  box-shadow: 0 0 0 2px var(--success-color), 0 0 20px rgba(46, 204, 113, 0.5) !important;
+  z-index: 1000 !important; /* 确保连接状态的节点在最顶层 */
+  transform: scale(1.02); /* 轻微放大以增强视觉效果 */
+  pointer-events: auto !important; /* 确保可点击 */
+}
+
+.comfy-node.not-connectable {
+  opacity: 0.6 !important; /* 提高不兼容节点的透明度 */
+  filter: grayscale(50%);
+  z-index: 50 !important; /* 不完全置于底层 */
+  pointer-events: auto !important; /* 保持可交互 */
 }
 
 /* 输入控件美化 */
@@ -189,6 +211,7 @@
   border-color: var(--primary-color);
   outline: none;
   box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.25);
+  z-index: 5; /* 确保聚焦的输入框在上层 */
 }
 
 /* 输入框占位符颜色 */
@@ -202,36 +225,30 @@
   width: 100%;
   height: 4px;
   background: #333;
-  border-radius: 2px;
   outline: none;
+  border-radius: 2px;
   margin: 8px 0;
 }
 
 .comfy-node-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--primary-color);
   cursor: pointer;
-  transition: all 0.2s ease;
+  border: 2px solid var(--node-color);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
 }
 
-.comfy-node-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 0 0 4px rgba(16, 163, 127, 0.3);
-}
-
 .comfy-node-slider::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--primary-color);
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
+  border: 2px solid var(--node-color);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -274,6 +291,7 @@
   overflow: hidden;
   padding: 10px 12px; /* 增加内边距使标题更突出 */
   background: linear-gradient(to right, rgba(26, 26, 26, 0.95), rgba(20, 20, 20, 0.9));
+  z-index: 5; /* 确保标题在内容上方 */
 }
 
 .comfy-node-header::after {
@@ -370,6 +388,8 @@
 .comfy-node-content {
   padding: 12px;
   background-color: var(--node-color);
+  position: relative; /* 确保内容有定位上下文 */
+  z-index: 1; /* 低于标题和连接点 */
 }
 
 .comfy-node-row {
@@ -451,19 +471,24 @@
   box-shadow: 0 0 0 1px #e91e63, 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 节点连接点样式 */
+/* 节点连接点样式 - 重要：解决连接点被覆盖的问题 */
 .comfy-node-handle {
   width: 10px !important;
   height: 10px !important;
   background-color: var(--handle-bg) !important;
   border: 2px solid var(--handle-color) !important;
   transition: all 0.15s ease-out !important;
+  position: absolute !important; /* 确保绝对定位 */
+  z-index: 2000 !important; /* 确保连接点始终在最顶层 */
+  pointer-events: all !important; /* 确保可点击 */
 }
 
+/* 连接点悬停效果改进 */
 .comfy-node-handle:hover {
   background-color: var(--handle-color) !important;
   box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.4) !important;
   transform: scale(1.2) !important;
+  z-index: 1001 !important; /* 悬停时提升层级 */
 }
 
 /* 输入连接点左边突出 */
@@ -478,7 +503,7 @@
 
 /* 连接点提示文本 - 当鼠标悬停时显示 */
 .comfy-node-handle::after {
-  content: attr(id);
+  content: attr(data-tooltip);
   position: absolute;
   background: rgba(0, 0, 0, 0.8);
   color: white;
@@ -491,10 +516,45 @@
   pointer-events: none;
   transform: translateY(-100%);
   top: -5px;
+  z-index: 1002; /* 确保提示始终在顶层 */
 }
 
 .comfy-node-handle:hover::after {
   opacity: 1;
+}
+
+/* 防止连接过程中的闪烁 */
+.react-flow__handle-connecting {
+  opacity: 1 !important;
+}
+
+.react-flow__handle-valid {
+  background-color: var(--success-color) !important;
+  border-color: var(--success-color) !important;
+}
+
+/* 连接中的手柄样式增强 */
+.react-flow__handle-connecting.comfy-node-handle,
+.react-flow__handle-valid.comfy-node-handle {
+  box-shadow: 0 0 0 4px rgba(16, 163, 127, 0.3) !important;
+  z-index: 2010 !important; /* 连接中的手柄提升到最顶层 */
+  opacity: 1 !important; /* 确保完全可见 */
+  pointer-events: all !important; /* 确保可交互 */
+}
+
+/* 连接线激活时的样式 */
+.react-flow__connection-path {
+  stroke: var(--connection-color);
+  stroke-width: 2px;
+  filter: drop-shadow(0 0 3px var(--connection-color));
+  opacity: 1;
+  z-index: 1999 !important; /* 确保连接线始终可见 */
+}
+
+/* 确保连接元素在最顶层 */
+.react-flow__connection {
+  z-index: 2000 !important;
+  pointer-events: all !important; /* 确保可交互 */
 }
 
 /* 滚动条美化 */
@@ -506,104 +566,65 @@
 
 .comfy-result-content::-webkit-scrollbar-track,
 .comfy-error-content::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 3px;
 }
 
 .comfy-result-content::-webkit-scrollbar-thumb,
 .comfy-error-content::-webkit-scrollbar-thumb {
-  background: #333;
+  background: rgba(16, 163, 127, 0.5);
   border-radius: 3px;
-  border: 1px solid #0a0a0a;
 }
 
 .comfy-result-content::-webkit-scrollbar-thumb:hover,
 .comfy-error-content::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
+  background: rgba(16, 163, 127, 0.7);
 }
 
-/* 节点折叠状态 */
-.comfy-node.collapsed .comfy-node-content {
-  display: none;
+/* 动画效果 - 连接过程中的流动效果 */
+@keyframes flowDash {
+  from {
+    stroke-dashoffset: 10;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
-.comfy-node.collapsed {
-  width: auto;
-  min-width: 150px;
+/* 确保拖拽中的节点始终可见 */
+.react-flow__node-dragging {
+  z-index: 1000 !important;
+  opacity: 0.9 !important;
 }
 
-/* 增强节点类型样式 */
-.node-type-input .comfy-node-header {
-  background: linear-gradient(135deg, rgba(21, 101, 192, 0.7), rgba(30, 136, 229, 0.5));
+/* 连接成功的节点样式 */
+.comfy-node.connected {
+  border-color: var(--connection-color);
+  box-shadow: 0 0 0 1px var(--connection-color);
 }
 
-.node-type-llm .comfy-node-header {
-  background: linear-gradient(135deg, rgba(13, 140, 109, 0.7), rgba(16, 163, 127, 0.5));
+/* 确保连接中的元素在最高层级，避免被其他元素覆盖 */
+.react-flow__connection-path,
+.react-flow__edges path,
+.react-flow__handle {
+  z-index: 2000 !important;
 }
 
-.node-type-document .comfy-node-header {
-  background: linear-gradient(135deg, rgba(123, 31, 162, 0.7), rgba(156, 39, 176, 0.5));
+/* 确保所有连接相关元素都有合适的鼠标交互 */
+.react-flow__handle,
+.react-flow__connection {
+  pointer-events: all !important;
+  cursor: crosshair !important;
 }
 
-.node-type-search .comfy-node-header {
-  background: linear-gradient(135deg, rgba(239, 108, 0, 0.7), rgba(255, 152, 0, 0.5));
+/* 确保连接过程的节点处于激活状态 */
+.react-flow__node-connecting {
+  z-index: 1000 !important;
+  opacity: 1 !important;
 }
 
-.node-type-output .comfy-node-header {
-  background: linear-gradient(135deg, rgba(211, 47, 47, 0.7), rgba(244, 67, 54, 0.5));
-}
-
-.node-type-model .comfy-node-header {
-  background: linear-gradient(135deg, rgba(81, 45, 168, 0.7), rgba(107, 87, 255, 0.5));
-}
-
-.node-type-utility .comfy-node-header {
-  background: linear-gradient(135deg, rgba(69, 90, 100, 0.7), rgba(96, 125, 139, 0.5));
-}
-
-/* 长文本溢出处理 */
-.comfy-node-expandable-content {
-  max-height: 120px;
-  overflow-y: auto;
-  position: relative;
-}
-
-.comfy-node-expandable-content.expanded {
-  max-height: none;
-}
-
-.comfy-expand-toggle {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background: linear-gradient(to right, rgba(20, 20, 20, 0), rgba(20, 20, 20, 1) 50%);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  color: var(--primary-color);
-  cursor: pointer;
-  user-select: none;
-}
-
-/* 可调整大小的节点 */
-.comfy-node-resize-handle {
-  position: absolute;
-  bottom: -5px;
-  right: -5px;
-  width: 10px;
-  height: 10px;
-  cursor: nwse-resize;
-  background-color: var(--node-border-color);
-  border-radius: 50%;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.comfy-node:hover .comfy-node-resize-handle {
-  opacity: 1;
-}
-
-.comfy-node-resize-handle:hover,
-.comfy-node-resize-handle:active {
-  background-color: var(--primary-color);
+/* 确保连接源节点显示状态 */
+.react-flow__node.source {
+  z-index: 1000 !important; 
+  box-shadow: 0 0 0 2px var(--primary-color), 0 0 20px rgba(16, 163, 127, 0.5) !important;
 }

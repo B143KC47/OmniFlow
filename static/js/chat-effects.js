@@ -91,7 +91,17 @@ function setupScrollEffects() {
     const scrollIndicator = document.createElement('div');
     scrollIndicator.className = 'scroll-indicator';
     scrollIndicator.innerHTML = '<i class="fas fa-chevron-down"></i>';
-    document.querySelector('.chat-main').appendChild(scrollIndicator);
+    
+    // 为滚动指示器添加波纹效果支持
+    scrollIndicator.setAttribute('role', 'button');
+    scrollIndicator.dataset.buttonType = 'action';
+    
+    const chatMain = document.querySelector('.chat-main');
+    if (chatMain) {
+        chatMain.appendChild(scrollIndicator);
+    } else {
+        document.body.appendChild(scrollIndicator);
+    }
     
     // 监听滚动事件
     chatHistory.addEventListener('scroll', function() {
@@ -305,6 +315,7 @@ function addScrollIndicatorStyle() {
             transform: translateY(10px);
             transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background-color 0.2s ease;
             z-index: 100;
+            overflow: hidden; /* 为波纹效果添加 */
         }
         
         .scroll-indicator.visible {
@@ -454,7 +465,6 @@ function addScrollToTopButton() {
         
         .scroll-to-top:hover {
             background-color: var(--primary-dark);
-            transform: scale(1.1);
         }
     `;
     document.head.appendChild(style);
@@ -699,16 +709,16 @@ function setupNotifications() {
                     document.body.removeChild(notifDialog);
                 }, 300);
             });
-            
-            // 添加滑出动画
-            const slideOutStyle = document.createElement('style');
-            slideOutStyle.textContent = `
+
+            // 为通知对话框添加关键帧动画
+            const animationStyle = document.createElement('style');
+            animationStyle.textContent = `
                 @keyframes slideOut {
                     from { transform: translateY(0); opacity: 1; }
-                    to { transform: translateY(100px); opacity: 0; }
+                    to { transform: translateY(20px); opacity: 0; }
                 }
             `;
-            document.head.appendChild(slideOutStyle);
+            document.head.appendChild(animationStyle);
         }, 5000);
     }
 }

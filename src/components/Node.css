@@ -1,0 +1,61 @@
+.node {
+  position: absolute;
+  width: 180px;
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  user-select: none;
+}
+
+.node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background-color: #4a90e2;
+  color: white;
+  border-radius: 5px 5px 0 0;
+  font-weight: bold;
+}
+
+.node-delete-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.node-content {
+  padding: 10px;
+}
+
+.node-port {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+  height: 24px;
+}
+
+.node-input {
+  justify-content: flex-start;
+}
+
+.node-output {
+  justify-content: flex-end;
+}
+
+.port-connector {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #67c23a;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.port-connector:hover {
+  background-color: #4caf50;
+  transform: scale(1.2);
+}

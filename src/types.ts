@@ -22,11 +22,21 @@ export enum NodeType {
 // 为了向后兼容，保留 NodeTypeEnum
 export const NodeTypeEnum = NodeType;
 
+// 节点状态类型
+export type NodeStatusType = 'running' | 'completed' | 'error' | 'connected' | undefined;
+
+// 节点连接状态
+export type NodeConnectStatusType = 'compatible' | 'incompatible' | 'none' | undefined;
+
 export interface NodeData {
   label: string;
   inputs: Record<string, any>;
   outputs: Record<string, any>;
   onChange?: (nodeId: string, data: any) => void;
+  // 节点执行状态
+  status?: NodeStatusType;
+  // 节点连接兼容性状态
+  connectStatus?: NodeConnectStatusType;
 }
 
 export interface Node {
@@ -55,4 +65,4 @@ export interface Workflow {
   edges: Edge[];
   createdAt: Date;
   updatedAt: Date;
-} 
+}

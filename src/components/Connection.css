@@ -1,0 +1,22 @@
+.connection-path {
+  stroke: #4a90e2;
+  stroke-width: 2px;
+  fill: none;
+  pointer-events: none;
+}
+
+.temp-connection .connection-path {
+  stroke: #9cb3d8;
+  stroke-dasharray: 5, 5;
+}
+
+.connection-delete-btn {
+  fill: #f56c6c;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.connection:hover .connection-delete-btn {
+  opacity: 1;
+}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
+import Script from 'next/script';
 
 // 动态导入 WorkflowEditor 组件
 const WorkflowEditor = dynamic(
@@ -15,8 +16,16 @@ const WorkflowEditor = dynamic(
   }
 );
 
-import { Workflow } from '../types';
+// 导入导航组件
+import QueueHistory from '../components/QueueHistory';
+import NodeLibrary from '../components/NodeLibrary';
+import ModelLibrary from '../components/ModelLibrary';
 import McpManager from '../components/McpManager';
+import WorkflowManager from '../components/WorkflowManager';
+import NewWorkflowModal from '../components/NewWorkflowModal';
+import SettingsModal from '../components/SettingsModal';
+
+import { Workflow } from '../types';
 
 interface WorkflowStorage {
   id: string;
@@ -39,7 +48,15 @@ const HomePage: React.FC = () => {
   const [currentWorkflow, setCurrentWorkflow] = useState<Workflow | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [workflows, setWorkflows] = useState<WorkflowStorage[]>([]);
+  
+  // 导航模态框状态
+  const [showQueueHistory, setShowQueueHistory] = useState(false);
+  const [showNodeLibrary, setShowNodeLibrary] = useState(false);
+  const [showModelLibrary, setShowModelLibrary] = useState(false);
   const [showMcpManager, setShowMcpManager] = useState(false);
+  const [showWorkflowManager, setShowWorkflowManager] = useState(false);
+  const [showNewWorkflowModal, setShowNewWorkflowModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   // 在客户端挂载后更新状态
   useEffect(() => {
@@ -99,12 +116,13 @@ const HomePage: React.FC = () => {
   };
 
   // 创建新工作流
-  const handleCreateNewWorkflow = () => {
+  const handleCreateNewWorkflow = (name?: string, description?: string, template?: string) => {
     const now = Date.now();
     const id = `workflow_${now}`;
     const newWorkflow: Workflow = {
       id,
-      name: '新工作流',
+      name: name || '新工作流',
+      description: description || '',
       nodes: [],
       edges: [],
       createdAt: new Date(now),
@@ -115,9 +133,9 @@ const HomePage: React.FC = () => {
   };
 
   // 加载工作流
-  const handleLoadWorkflow = (workflowItem: WorkflowStorage) => {
+  const handleLoadWorkflow = (workflowId: string) => {
     try {
-      const storedWorkflow = localStorage.getItem(`workflow_${workflowItem.id}`);
+      const storedWorkflow = localStorage.getItem(`workflow_${workflowId}`);
       if (storedWorkflow) {
         setCurrentWorkflow(JSON.parse(storedWorkflow));
       }
@@ -153,9 +171,11 @@ const HomePage: React.FC = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // 显示MCP管理器
-  const handleShowMcpManager = () => {
-    setShowMcpManager(true);
+  // 保存系统设置
+  const handleSaveSettings = (settings: any) => {
+    // 在这里实现设置保存逻辑
+    console.log('保存设置:', settings);
+    // 可以根据设置更新界面主题等
   };
 
   // 只在客户端渲染时显示完整内容
@@ -169,6 +189,9 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col bg-[#050505] text-[#e0e0e0] overflow-hidden">
+      {/* 加载按钮效果脚本 */}
+      <Script src="/js/button-effects.js" strategy="afterInteractive" />
+
       {/* 顶部导航栏 */}
       <header className="bg-[#0a0a0a] border-b border-[#282828] h-14 flex items-center px-4 z-10 shadow-md">
       <div className="flex items-center">
@@ -187,34 +210,37 @@ const HomePage: React.FC = () => {
         </div>
         <div className="flex-1 flex justify-center">
           <div className="flex space-x-2">
-            <button className="px-4 py-1.5 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] hover:border-[#10a37f] rounded text-sm transition-all duration-200 flex items-center">
+            <button 
+              onClick={() => setShowQueueHistory(true)}
+              className="px-4 py-1.5 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] hover:border-[#10a37f] rounded text-sm transition-all duration-200 flex items-center"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               队列历史
             </button>
-            <button className="px-4 py-1.5 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] hover:border-[#10a37f] rounded text-sm transition-all duration-200 flex items-center">
+            <button 
+              onClick={() => setShowNodeLibrary(true)}
+              className="px-4 py-1.5 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] hover:border-[#10a37f] rounded text-sm transition-all duration-200 flex items-center"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
               节点库
             </button>
-            <button className="px-4 py-1.5 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] hover:border-[#10a37f] rounded text-sm transition-all duration-200 flex items-center">
+            <button 
+              onClick={() => setShowModelLibrary(true)}
+              className="px-4 py-1.5 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] hover:border-[#10a37f] rounded text-sm transition-all duration-200 flex items-center"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
               </svg>
               模型库
             </button>
             <button 
-              onClick={handleShowMcpManager}
+              onClick={() => setShowWorkflowManager(true)}
               className="px-4 py-1.5 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] hover:border-[#10a37f] rounded text-sm transition-all duration-200 flex items-center"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-              </svg>
-              外部服务
-            </button>
-            <button className="px-4 py-1.5 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] hover:border-[#10a37f] rounded text-sm transition-all duration-200 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
               </svg>
@@ -224,7 +250,7 @@ const HomePage: React.FC = () => {
         </div>
         <div className="flex items-center space-x-3">
           <button 
-            onClick={handleCreateNewWorkflow}
+            onClick={() => setShowNewWorkflowModal(true)}
             className="px-4 py-1.5 bg-[#10a37f] hover:bg-[#0fd292] rounded text-white text-sm transition-all duration-200 shadow-lg shadow-[#10a37f]/20 flex items-center"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -232,7 +258,10 @@ const HomePage: React.FC = () => {
             </svg>
             新建工作流
           </button>
-          <button className="p-1.5 rounded hover:bg-[#1a1a1a] transition-all duration-200 border border-transparent hover:border-[#282828]">
+          <button 
+            onClick={() => setShowSettingsModal(true)}
+            className="p-1.5 rounded hover:bg-[#1a1a1a] transition-all duration-200 border border-transparent hover:border-[#282828]"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#10a37f]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -282,7 +311,7 @@ const HomePage: React.FC = () => {
                         ? 'bg-[#141414] border-[#10a37f] shadow-md shadow-[#10a37f]/10' 
                         : 'border-transparent hover:bg-[#141414] hover:border-[#282828]'
                       }`}
-                      onClick={() => handleLoadWorkflow(workflow)}
+                      onClick={() => handleLoadWorkflow(workflow.id)}
                     >
                       <span className="truncate flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 mr-2 ${currentWorkflow?.id === workflow.id ? 'text-[#10a37f]' : 'text-[#666]'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -309,7 +338,7 @@ const HomePage: React.FC = () => {
             
             <div className="p-3 border-t border-[#282828] bg-[#0e0e0e]">
               <button
-                onClick={handleCreateNewWorkflow}
+                onClick={() => setShowNewWorkflowModal(true)}
                 className="w-full flex items-center justify-center px-4 py-2.5 bg-[#10a37f] hover:bg-[#0fd292] rounded-md text-white text-sm transition-all duration-200 shadow-lg shadow-[#10a37f]/20"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -352,11 +381,41 @@ const HomePage: React.FC = () => {
         </div>
       </footer>
 
+      {/* 队列历史模态框 */}
+      {showQueueHistory && <QueueHistory onClose={() => setShowQueueHistory(false)} />}
+
+      {/* 节点库模态框 */}
+      {showNodeLibrary && <NodeLibrary onClose={() => setShowNodeLibrary(false)} />}
+
+      {/* 模型库模态框 */}
+      {showModelLibrary && <ModelLibrary onClose={() => setShowModelLibrary(false)} />}
+
       {/* MCP管理器模态框 */}
-      {showMcpManager && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <McpManager onClose={() => setShowMcpManager(false)} />
-        </div>
+      {showMcpManager && <McpManager onClose={() => setShowMcpManager(false)} />}
+
+      {/* 工作流管理模态框 */}
+      {showWorkflowManager && (
+        <WorkflowManager 
+          onClose={() => setShowWorkflowManager(false)} 
+          onLoadWorkflow={handleLoadWorkflow}
+          onCreateWorkflow={() => setShowNewWorkflowModal(true)}
+        />
+      )}
+
+      {/* 新建工作流模态框 */}
+      {showNewWorkflowModal && (
+        <NewWorkflowModal 
+          onClose={() => setShowNewWorkflowModal(false)} 
+          onCreateWorkflow={handleCreateNewWorkflow}
+        />
+      )}
+
+      {/* 设置模态框 */}
+      {showSettingsModal && (
+        <SettingsModal 
+          onClose={() => setShowSettingsModal(false)}
+          onSave={handleSaveSettings}
+        />
       )}
     </div>
   );
