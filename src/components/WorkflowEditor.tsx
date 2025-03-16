@@ -44,8 +44,6 @@ const WebSearchNode = dynamic(() => import('./nodes/WebSearchNode'), { ssr: fals
 const DocumentQueryNode = dynamic(() => import('./nodes/DocumentQueryNode'), { ssr: false });
 const ModelSelectorNode = dynamic(() => import('./nodes/ModelSelectorNode'), { ssr: false });
 const CustomNodeComponent = dynamic(() => import('./nodes/CustomNode'), { ssr: false });
-const EncoderNode = dynamic(() => import('./nodes/EncoderNode'), { ssr: false });
-const SamplerNode = dynamic(() => import('./nodes/SamplerNode'), { ssr: false });
 const ContextMenu = dynamic(() => import('./ContextMenu'), { ssr: false });
 const McpManager = dynamic(() => import('./McpManager'), { ssr: false });
 
@@ -69,8 +67,6 @@ const nodeTypeMap: Record<string, string> = {
   'documentQuery': 'documentQuery',
   'modelSelector': 'modelSelector',
   'custom': 'custom',
-  'encoder': 'encoder',
-  'sampler': 'sampler',
 };
 
 // 自定义节点类型映射
@@ -81,8 +77,6 @@ const nodeTypes: NodeTypes = {
   'documentQuery': DocumentQueryNode,
   'modelSelector': ModelSelectorNode,
   'custom': CustomNodeComponent,
-  'encoder': EncoderNode,
-  'sampler': SamplerNode,
 };
 
 // 定义节点类型
@@ -242,12 +236,6 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
         break;
       case 'custom':
         label = '自定义节点';
-        break;
-      case 'encoder':
-        label = '编码器';
-        break;
-      case 'sampler':
-        label = '采样器';
         break;
       default:
         label = type;

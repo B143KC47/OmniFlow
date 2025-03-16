@@ -17,6 +17,11 @@ const LlmQueryNode = memo(({
   isConnectable,
   onDataChange
 }: LlmQueryNodeProps) => {
+  const modelOptions = [
+    'deepseek-chat', 
+    'deepseek-reasoner',  // 添加新的模型选项
+  ];
+
   const initialData: NodeData = {
     ...data,
     label: 'LLM 查询',
@@ -29,7 +34,7 @@ const LlmQueryNode = memo(({
       model: {
         type: 'select',
         value: data.inputs?.model?.value || 'deepseek-chat',
-        options: ['deepseek-chat'],
+        options: modelOptions,
       },
       systemPrompt: {
         type: 'text',

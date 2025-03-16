@@ -27,12 +27,8 @@ const TextInputNode = memo(({
         placeholder: '请输入文本',
       },
     },
-    outputs: {
-      text: {
-        type: 'text',
-        value: data.inputs?.text?.value || '',
-      },
-    },
+    // 移除输出，使其不输出内容
+    outputs: {},
     onChange: (nodeId: string, newData: NodeData) => {
       onDataChange(newData);
     }
