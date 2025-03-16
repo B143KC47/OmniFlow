@@ -1,0 +1,85 @@
+.input {
+  height: var(--input-height);
+  padding: 0 var(--spacing-lg);
+  background: var(--node-input-bg);
+  border: 1px solid var(--node-input-border);
+  border-radius: var(--radius-base);
+  color: var(--node-input-text);
+  font-size: var(--text-base);
+  transition: var(--transition-base);
+  width: 100%;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-primary);
+}
+
+.input::placeholder {
+  color: var(--text-placeholder);
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 输入框尺寸 */
+.input-sm {
+  height: 32px;
+  padding: 0 var(--spacing-md);
+  font-size: var(--text-sm);
+}
+
+.input-lg {
+  height: 40px;
+  padding: 0 var(--spacing-xl);
+  font-size: var(--text-lg);
+}
+
+/* 文本域 */
+textarea.input {
+  height: auto;
+  min-height: 80px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  resize: vertical;
+}
+
+/* 选择框 */
+select.input {
+  appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23666' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right var(--spacing-sm) center;
+  background-repeat: no-repeat;
+  background-size: 20px;
+}
+
+/* 错误状态 */
+.input-error {
+  border-color: var(--error-color);
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.25);
+}
+
+/* 表单组 */
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.form-error {
+  margin-top: var(--spacing-xs);
+  color: var(--error-color);
+  font-size: var(--text-sm);
+}

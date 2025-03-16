@@ -1,0 +1,106 @@
+:root {
+  /* Colors */
+  --primary-color: #10a37f;
+  --primary-hover: #0fd292;
+  --primary-shadow: rgba(16, 163, 127, 0.25);
+  --error-color: #e91e63;
+  --success-color: #2ecc71;
+  --warning-color: #ff9800;
+  --info-color: #1e88e5;
+  
+  /* Background Colors */
+  --bg-base: #050505;
+  --bg-surface: #141414;
+  --bg-elevated: #1a1a1a;
+  --bg-input: #141414;
+  --bg-hover: #1a1a1a;
+  --bg-overlay: rgba(0, 0, 0, 0.75);
+  
+  /* Border Colors */
+  --border-base: #282828;
+  --border-focus: var(--primary-color);
+  --border-light: #333333;
+  
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-disabled: #666;
+  --text-placeholder: #444;
+  --text-muted: #888888;
+  
+  /* Node Colors */
+  --node-color: #0a0a0a;
+  --node-border-color: #282828;
+  --node-title-color: #ffffff;
+  --node-text-color: rgba(255, 255, 255, 0.7);
+  --node-input-bg: #141414;
+  --node-input-border: #333;
+  --node-input-text: #ffffff;
+  
+  /* Handle Colors */
+  --handle-bg: #141414;
+  --handle-color: var(--primary-color);
+  --connection-color: var(--primary-color);
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+  --shadow-primary: 0 0 0 2px rgba(16, 163, 127, 0.25);
+  
+  /* Transitions */
+  --transition-base: all 0.2s ease;
+  --transition-fast: 0.15s ease-out;
+  --transition-smooth: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-normal: 0.2s ease-out;
+  --transition-slow: 0.3s ease-out;
+  
+  /* Spacings */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  
+  /* Font Sizes */
+  --text-xs: 10px;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --font-code: 'Fira Code', 'Consolas', monospace;
+  
+  /* Border Radius */
+  --radius-sm: 2px;
+  --radius-base: 4px;
+  --radius-lg: 6px;
+  --radius-full: 9999px;
+  
+  /* Z-index layers */
+  --z-base: 1;
+  --z-elevated: 5;
+  --z-sticky: 10;
+  --z-drawer: 20;
+  --z-modal: 30;
+  --z-popover: 40;
+  --z-tooltip: 50;
+  --z-node: 1;
+  --z-node-selected: 20;
+  --z-node-header: 5;
+  --z-handle: 2000;
+  --z-connection: 1999;
+  --z-node-dragging: 1000;
+
+  /* Component Dimensions */
+  --button-height: 36px;
+  --input-height: 36px;
+  --modal-width: 480px;
+}
+
+/* Dark theme specific variables */
+[data-theme="dark"] {
+  --bg-overlay-opacity: 0.75;
+}

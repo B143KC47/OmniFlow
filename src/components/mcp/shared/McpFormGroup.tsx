@@ -4,76 +4,34 @@ interface McpFormGroupProps {
   label: string;
   error?: string;
   required?: boolean;
+  className?: string;
   children: React.ReactNode;
 }
 
-const McpFormGroup: React.FC<McpFormGroupProps> = ({
-  label,
+const McpFormGroup: React.FC<McpFormGroupProps> = ({ 
+  label, 
   error,
   required,
+  className = '',
   children
 }) => {
   return (
-    <div className="mcp-form-group">
-      <label className="form-label">
-        {label}
-        {required && <span className="required-mark">*</span>}
-      </label>
+    <div className={`form-group ${className}`}>
+      {label && (
+        <label className="form-label">
+          {label}
+          {required && <span className="required-mark">*</span>}
+        </label>
+      )}
       {children}
       {error && (
-        <div className="error-message">
-          <svg viewBox="0 0 20 20" fill="currentColor" className="error-icon">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+        <div className="form-error">
+          <svg className="error-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
           </svg>
-          {error}
+          <span>{error}</span>
         </div>
       )}
-
-      <style jsx>{`
-        .mcp-form-group {
-          margin-bottom: 20px;
-        }
-
-        .form-label {
-          display: block;
-          margin-bottom: 8px;
-          font-size: 14px;
-          font-weight: 500;
-          color: #e0e0e0;
-        }
-
-        .required-mark {
-          color: #e91e63;
-          margin-left: 4px;
-        }
-
-        .error-message {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          color: #e91e63;
-          font-size: 12px;
-          margin-top: 4px;
-          animation: fadeIn 0.2s ease-out;
-        }
-
-        .error-icon {
-          width: 16px;
-          height: 16px;
-          flex-shrink: 0;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-4px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 };

@@ -3,8 +3,10 @@ import type { AppProps } from 'next/app';
 import { ReactFlowProvider } from 'reactflow';
 import { IntlProvider } from 'next-intl';
 import Head from 'next/head';
-import '@/styles/globals.css';
-import '@/styles/nodes.css';
+import '../styles/globals.css';
+import '../styles/nodes.css';
+import '../styles/components/button.css';
+import '../styles/components/input.css';
 import 'reactflow/dist/style.css';
 
 function MyApp({ Component, pageProps }: AppProps) {

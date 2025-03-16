@@ -1,0 +1,86 @@
+.node {
+  background: var(--node-color);
+  border: 1px solid var(--node-border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-base);
+  position: relative;
+  user-select: none;
+  z-index: var(--z-node);
+}
+
+.node.selected {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-primary);
+  z-index: var(--z-node-selected);
+}
+
+.node.dragging {
+  z-index: var(--z-node-dragging);
+}
+
+.node-header {
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--node-border-color);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: var(--z-node-header);
+}
+
+.node-title {
+  color: var(--node-title-color);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin: 0;
+}
+
+.node-content {
+  padding: var(--spacing-md);
+}
+
+.node-controls {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.node-handle {
+  width: 12px;
+  height: 12px;
+  background: var(--handle-bg);
+  border: 2px solid var(--handle-color);
+  border-radius: var(--radius-full);
+  position: absolute;
+  z-index: var(--z-handle);
+  transition: var(--transition-base);
+}
+
+.node-handle:hover {
+  transform: scale(1.2);
+  background: var(--handle-color);
+}
+
+.node-handle.input {
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.node-handle.output {
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* 节点连接线样式 */
+.connection-line {
+  stroke: var(--connection-color);
+  stroke-width: 2;
+  fill: none;
+}
+
+.connection-line-hover {
+  stroke-width: 3;
+}
