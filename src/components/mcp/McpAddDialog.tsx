@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import McpModal from './shared/McpModal';
 import McpFormGroup, { formControlStyles, buttonStyles, ConfigEditor } from './shared/McpFormGroup';
 import { useConfigDialog } from './hooks/useConfigDialog';
+import { useTranslation } from '../../utils/i18n';
 
 interface ProviderData {
   name: string;
@@ -26,6 +27,7 @@ const McpAddDialog: React.FC<McpAddDialogProps> = ({
   onProviderDataChange,
   onConfigJsonChange,
 }) => {
+  const { t } = useTranslation();
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -56,13 +58,13 @@ const McpAddDialog: React.FC<McpAddDialogProps> = ({
     const errors: Record<string, string> = {};
     
     if (!providerData.name.trim()) {
-      errors.name = '请输入服务名称';
+      errors.name = t('common.error.required');
     } else if (providerData.name.length < 2) {
-      errors.name = '服务名称至少需要2个字符';
+      errors.name = t('mcp.form.error.nameLength');
     }
     
     if (!providerData.description.trim()) {
-      errors.description = '请输入服务描述';
+      errors.description = t('common.error.required');
     }
     
     setFormErrors(errors);
@@ -87,25 +89,25 @@ const McpAddDialog: React.FC<McpAddDialogProps> = ({
 
   const renderFooter = () => (
     <>
-      <button className="mcp-cancel-btn" onClick={handleCancel}>取消</button>
+      <button className="mcp-cancel-btn" onClick={handleCancel}>{t('common.cancel')}</button>
       <button
         className="mcp-submit-btn"
         onClick={handleSubmit}
         disabled={!providerData.name || !isJsonValid}
       >
-        添加
+        {t('common.add')}
       </button>
     </>
   );
 
   return (
     <McpModal
-      title="添加新服务"
+      title={t('mcp.actions.add')}
       onClose={handleCancel}
       footer={renderFooter()}
     >
       <McpFormGroup 
-        label="服务名称" 
+        label={t('mcp.form.serviceName')}
         required 
         error={submitAttempted ? formErrors.name : undefined}
       >
@@ -116,13 +118,13 @@ const McpAddDialog: React.FC<McpAddDialogProps> = ({
             onProviderDataChange({ name: e.target.value });
             if (submitAttempted) validateForm();
           }}
-          placeholder="输入服务名称，如: Bing搜索"
+          placeholder={t('mcp.form.serviceNamePlaceholder')}
           className={formErrors.name && submitAttempted ? 'has-error' : ''}
         />
       </McpFormGroup>
 
       <McpFormGroup 
-        label="描述"
+        label={t('mcp.form.description')}
         required
         error={submitAttempted ? formErrors.description : undefined}
       >
@@ -132,28 +134,28 @@ const McpAddDialog: React.FC<McpAddDialogProps> = ({
             onProviderDataChange({ description: e.target.value });
             if (submitAttempted) validateForm();
           }}
-          placeholder="描述服务的功能和用途"
+          placeholder={t('mcp.form.descriptionPlaceholder')}
           className={formErrors.description && submitAttempted ? 'has-error' : ''}
         />
       </McpFormGroup>
 
-      <McpFormGroup label="分类" required>
+      <McpFormGroup label={t('mcp.form.category')} required>
         <select
           value={providerData.category}
           onChange={(e) => onProviderDataChange({ category: e.target.value })}
         >
-          <option value="search">搜索</option>
-          <option value="ai">AI</option>
-          <option value="database">数据库</option>
-          <option value="custom">自定义</option>
+          <option value="search">{t('mcp.filter.search')}</option>
+          <option value="ai">{t('mcp.filter.ai')}</option>
+          <option value="database">{t('mcp.filter.database')}</option>
+          <option value="custom">{t('mcp.filter.custom')}</option>
         </select>
         <div className="field-help">
-          选择最匹配服务功能的分类
+          {t('mcp.form.categoryDescription')}
         </div>
       </McpFormGroup>
 
       <McpFormGroup 
-        label="配置 (JSON格式)" 
+        label={t('mcp.form.config')}
         required
         error={submitAttempted && jsonError ? jsonError : undefined}
       >

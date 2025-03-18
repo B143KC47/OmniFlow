@@ -1,218 +1,449 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
+import Modal from './shared/Modal';
+import { useTranslation } from '../utils/i18n';
+import { AppSettings } from '../contexts/SettingsContext';
 
 interface SettingsModalProps {
   onClose: () => void;
-  initialSettings?: any;
-  onSave?: (settings: any) => void;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, initialSettings = {}, onSave }) => {
-  const [settings, setSettings] = useState({
-    theme: 'dark',
-    language: 'zh-CN',
-    autoSave: true,
-    animationsEnabled: true,
-    connectionStyle: 'bezier',
-    nodeSnapToGrid: true,
-    enableNotifications: true,
-    ...initialSettings
+const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
+  const { t, changeLanguage, isLoading } = useTranslation();
+  const { settings, updateCategorySettings, isUpdating } = useSettings();
+  const [error, setError] = useState<string | null>(null);
+  
+  // 本地设置状态，用于表单 - 使用扁平化的结构方便UI操作
+  const [localSettings, setLocalSettings] = useState({
+    theme: settings.appearance.theme,
+    language: settings.appearance.language,
+    reduceAnimations: settings.appearance.reduceAnimations,
+    showBackgroundPattern: settings.appearance.showBackgroundPattern,
+    autoSave: settings.workflow.autoSave,
+    autoSaveInterval: settings.workflow.autoSaveInterval,
+    showNodeTooltips: settings.workflow.showNodeTooltips,
+    snapToGrid: settings.workflow.snapToGrid,
+    gridSize: settings.workflow.gridSize
   });
-
+  
   // 处理设置更改
   const handleChange = (key: string, value: any) => {
-    setSettings((prev) => ({
-      ...prev,
+    setLocalSettings({
+      ...localSettings,
       [key]: value
-    }));
+    });
   };
-
+  
   // 保存设置
-  const handleSaveSettings = () => {
-    if (onSave) {
-      onSave(settings);
+  const handleSave = useCallback(async () => {
+    try {
+      setError(null);
+      
+      // 如果语言发生变化，需要更新语言
+      if (settings.appearance.language !== localSettings.language) {
+        await changeLanguage(localSettings.language);
+      }
+      
+      // 更新外观相关的设置
+      updateCategorySettings('appearance', {
+        theme: localSettings.theme,
+        language: localSettings.language,
+        reduceAnimations: localSettings.reduceAnimations,
+        showBackgroundPattern: localSettings.showBackgroundPattern
+      });
+      
+      // 更新工作流相关的设置
+      updateCategorySettings('workflow', {
+        autoSave: localSettings.autoSave,
+        autoSaveInterval: localSettings.autoSaveInterval,
+        showNodeTooltips: localSettings.showNodeTooltips,
+        snapToGrid: localSettings.snapToGrid,
+        gridSize: localSettings.gridSize
+      });
+      
+      // 等待所有更新完成
+      await Promise.resolve();
+      onClose();
+    } catch (error) {
+      console.error('保存设置失败:', error);
+      setError(t('settings.errors.saveFailed'));
     }
-    
-    // 保存到本地存储
-    localStorage.setItem('omniflow-settings', JSON.stringify(settings));
-    
-    onClose();
-  };
-
-  // 复位到默认设置
-  const handleReset = () => {
-    const defaultSettings = {
-      theme: 'dark',
-      language: 'zh-CN',
-      autoSave: true,
-      animationsEnabled: true,
-      connectionStyle: 'bezier',
-      nodeSnapToGrid: true,
-      enableNotifications: true
-    };
-    
-    setSettings(defaultSettings);
-  };
+  }, [localSettings, settings.appearance.language, updateCategorySettings, changeLanguage, onClose, t]);
+  
+  // 语言选项
+  const languageOptions = [
+    { value: 'en-US', label: 'English' },
+    { value: 'zh-CN', label: '中文' }
+  ];
+  
+  // 主题选项
+  const themeOptions = [
+    { value: 'dark', label: t('settings.theme.dark') },
+    { value: 'light', label: t('settings.theme.light') },
+    { value: 'system', label: t('settings.theme.system') }
+  ];
+  
+  // 连接样式选项
+  const connectionStyleOptions = [
+    { value: 'bezier', label: t('settings.connectionStyle.bezier') },
+    { value: 'straight', label: t('settings.connectionStyle.straight') },
+    { value: 'step', label: t('settings.connectionStyle.step') },
+    { value: 'smoothstep', label: t('settings.connectionStyle.smoothstep') }
+  ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-[#0a0a0a] border border-[#282828] rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-        <div className="flex justify-between items-center px-6 py-4 border-b border-[#282828] bg-[#0e0e0e]">
-          <h2 className="text-lg font-semibold text-white flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-[#10a37f]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    <Modal
+      title={t('settings.title')}
+      onClose={onClose}
+      onSave={handleSave}
+      saveLabel={t('common.save')}
+      cancelLabel={t('common.cancel')}
+      disabled={isLoading || isUpdating}
+    >
+      <div className="settings-modal">
+        {(isLoading || isUpdating) && (
+          <div className="settings-loading-overlay">
+            <div className="settings-loading-spinner"></div>
+            <div className="settings-loading-text">{t('settings.updating')}</div>
+          </div>
+        )}
+        
+        {error && (
+          <div className="settings-error-message">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
-            系统设置
-          </h2>
-          <button 
-            onClick={onClose}
-            className="text-[#666] hover:text-white transition-colors p-1 rounded-full hover:bg-[#1a1a1a]"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+            {error}
+          </div>
+        )}
+
+        <div className="settings-section">
+          <h3 className="settings-section-title">{t('settings.appearance')}</h3>
+          
+          <div className="settings-field">
+            <label htmlFor="theme">{t('settings.theme.label')}:</label>
+            <div className="settings-field-control">
+              <select 
+                id="theme"
+                value={localSettings.theme}
+                onChange={(e) => handleChange('theme', e.target.value)}
+              >
+                {themeOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          <div className="settings-field">
+            <label htmlFor="language">{t('settings.language.label')}:</label>
+            <div className="settings-field-control">
+              <select 
+                id="language"
+                value={localSettings.language}
+                onChange={(e) => handleChange('language', e.target.value)}
+              >
+                {languageOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          <div className="settings-field">
+            <label htmlFor="reduceAnimations">
+              {t('settings.animations.label')}:
+            </label>
+            <div className="settings-field-control">
+              <input 
+                id="reduceAnimations"
+                type="checkbox"
+                checked={localSettings.reduceAnimations}
+                onChange={(e) => handleChange('reduceAnimations', e.target.checked)}
+              />
+              <span className="checkbox-label">
+                {t('settings.animations.reduce')}
+              </span>
+            </div>
+          </div>
+          
+          <div className="settings-field">
+            <label htmlFor="showBackgroundPattern">
+              {t('settings.background.label')}:
+            </label>
+            <div className="settings-field-control">
+              <input 
+                id="showBackgroundPattern"
+                type="checkbox"
+                checked={localSettings.showBackgroundPattern}
+                onChange={(e) => handleChange('showBackgroundPattern', e.target.checked)}
+              />
+              <span className="checkbox-label">
+                {t('settings.background.show')}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="p-6 max-h-[70vh] overflow-y-auto">
-          <div className="space-y-6">
-            {/* 主题设置 */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-white">界面主题</label>
-              <div className="flex space-x-3">
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="theme" 
-                    checked={settings.theme === 'dark'} 
-                    onChange={() => handleChange('theme', 'dark')}
-                    className="form-radio text-[#10a37f] focus:ring-[#10a37f] focus:ring-offset-transparent"
-                  />
-                  <span className="text-sm">暗色主题</span>
-                </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="theme" 
-                    checked={settings.theme === 'light'} 
-                    onChange={() => handleChange('theme', 'light')}
-                    className="form-radio text-[#10a37f] focus:ring-[#10a37f] focus:ring-offset-transparent"
-                  />
-                  <span className="text-sm">亮色主题</span>
-                </label>
+        <div className="settings-section">
+          <h3 className="settings-section-title">{t('settings.workflow')}</h3>
+          
+          <div className="settings-field">
+            <label htmlFor="snapToGrid">
+              {t('settings.nodeSnapToGrid.label')}:
+            </label>
+            <div className="settings-field-control">
+              <input 
+                id="snapToGrid"
+                type="checkbox"
+                checked={localSettings.snapToGrid}
+                onChange={(e) => handleChange('snapToGrid', e.target.checked)}
+              />
+              <span className="checkbox-label">
+                {t('settings.nodeSnapToGrid.enable')}
+              </span>
+            </div>
+          </div>
+          
+          {localSettings.snapToGrid && (
+            <div className="settings-field">
+              <label htmlFor="gridSize">
+                {t('settings.gridSize.label')}:
+              </label>
+              <div className="settings-field-control">
+                <input 
+                  id="gridSize"
+                  type="number"
+                  min="5"
+                  max="50"
+                  value={localSettings.gridSize}
+                  onChange={(e) => handleChange('gridSize', parseInt(e.target.value, 10))}
+                  className="grid-size-input"
+                />
+                <span className="unit">px</span>
               </div>
             </div>
-            
-            {/* 语言设置 */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-white">语言</label>
-              <select 
-                value={settings.language} 
-                onChange={(e) => handleChange('language', e.target.value)}
-                className="w-full bg-[#141414] border border-[#282828] focus:border-[#10a37f] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#10a37f] transition-all duration-200"
-              >
-                <option value="zh-CN">中文</option>
-                <option value="en-US">English</option>
-              </select>
-            </div>
-            
-            {/* 自动保存 */}
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">自动保存工作流</span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={settings.autoSave} 
-                  onChange={(e) => handleChange('autoSave', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-[#282828] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-[#10a37f] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10a37f]"></div>
-              </label>
-            </div>
-            
-            {/* 动画效果 */}
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">启用动画效果</span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={settings.animationsEnabled} 
-                  onChange={(e) => handleChange('animationsEnabled', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-[#282828] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-[#10a37f] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10a37f]"></div>
-              </label>
-            </div>
-            
-            {/* 连接线样式 */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-white">连接线样式</label>
-              <select 
-                value={settings.connectionStyle} 
-                onChange={(e) => handleChange('connectionStyle', e.target.value)}
-                className="w-full bg-[#141414] border border-[#282828] focus:border-[#10a37f] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#10a37f] transition-all duration-200"
-              >
-                <option value="bezier">贝塞尔曲线</option>
-                <option value="straight">直线</option>
-                <option value="step">阶梯线</option>
-                <option value="smoothstep">平滑阶梯线</option>
-              </select>
-            </div>
-            
-            {/* 节点对齐网格 */}
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">节点对齐网格</span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={settings.nodeSnapToGrid} 
-                  onChange={(e) => handleChange('nodeSnapToGrid', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-[#282828] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-[#10a37f] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10a37f]"></div>
-              </label>
-            </div>
-            
-            {/* 通知提醒 */}
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">启用通知提醒</span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={settings.enableNotifications} 
-                  onChange={(e) => handleChange('enableNotifications', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-[#282828] peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-[#10a37f] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10a37f]"></div>
-              </label>
+          )}
+          
+          <div className="settings-field">
+            <label htmlFor="showNodeTooltips">
+              {t('settings.nodeTooltips.label')}:
+            </label>
+            <div className="settings-field-control">
+              <input 
+                id="showNodeTooltips"
+                type="checkbox"
+                checked={localSettings.showNodeTooltips}
+                onChange={(e) => handleChange('showNodeTooltips', e.target.checked)}
+              />
+              <span className="checkbox-label">
+                {t('settings.nodeTooltips.show')}
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-between items-center px-6 py-4 border-t border-[#282828] bg-[#0e0e0e]">
-          <button
-            onClick={handleReset}
-            className="px-4 py-2 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] rounded text-sm transition-all duration-200"
-          >
-            恢复默认
-          </button>
-          <div className="flex space-x-3">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] rounded text-sm transition-all duration-200"
-            >
-              取消
-            </button>
-            <button
-              onClick={handleSaveSettings}
-              className="px-4 py-2 bg-[#10a37f] hover:bg-[#0fd292] text-white rounded text-sm transition-all duration-200 shadow-lg shadow-[#10a37f]/20"
-            >
-              保存
-            </button>
+        <div className="settings-section">
+          <h3 className="settings-section-title">{t('settings.other')}</h3>
+          
+          <div className="settings-field">
+            <label htmlFor="autoSave">
+              {t('settings.autoSave.label')}:
+            </label>
+            <div className="settings-field-control">
+              <input 
+                id="autoSave"
+                type="checkbox"
+                checked={localSettings.autoSave}
+                onChange={(e) => handleChange('autoSave', e.target.checked)}
+              />
+              <span className="checkbox-label">
+                {t('settings.autoSave.enable')}
+              </span>
+            </div>
+          </div>
+          
+          {localSettings.autoSave && (
+            <div className="settings-field">
+              <label htmlFor="autoSaveInterval">
+                {t('settings.autoSaveInterval.label')}:
+              </label>
+              <div className="settings-field-control">
+                <input 
+                  id="autoSaveInterval"
+                  type="number"
+                  min="1"
+                  max="30"
+                  value={localSettings.autoSaveInterval}
+                  onChange={(e) => handleChange('autoSaveInterval', parseInt(e.target.value, 10))}
+                  className="interval-input"
+                />
+                <span className="unit">{t('settings.autoSaveInterval.minutes')}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="settings-section settings-section-about">
+          <h3 className="settings-section-title">{t('settings.about.title')}</h3>
+          <div className="about-info">
+            <div>OmniFlow</div>
+            <div className="version">v0.1.0-alpha</div>
+            <div className="copyright">© 2023 OmniFlow Team</div>
           </div>
         </div>
+
+        <style jsx>{`
+          .settings-modal {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 1rem;
+          }
+          
+          .settings-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+          }
+          
+          .settings-section:last-child {
+            border-bottom: none;
+          }
+          
+          .settings-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+          }
+          
+          .settings-field {
+            display: flex;
+            align-items: center;
+          }
+          
+          .settings-field label {
+            flex: 1;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+          }
+          
+          .settings-field-control {
+            flex: 2;
+            display: flex;
+            align-items: center;
+          }
+          
+          .settings-field-control select {
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            width: 100%;
+          }
+          
+          .settings-field-control input[type="checkbox"] {
+            margin-right: 0.5rem;
+          }
+          
+          .settings-field-control input[type="number"] {
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            width: 80px;
+          }
+          
+          .unit {
+            margin-left: 0.5rem;
+            color: var(--text-secondary);
+          }
+          
+          .checkbox-label {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+          }
+          
+          .settings-section-about {
+            text-align: center;
+          }
+          
+          .about-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+          }
+          
+          .version {
+            color: var(--accent-color);
+          }
+          
+          .copyright {
+            font-size: 0.8rem;
+          }
+
+          .settings-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+          }
+          
+          .settings-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--accent-color);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 1rem;
+          }
+          
+          .settings-loading-text {
+            color: #fff;
+            font-size: 0.9rem;
+          }
+          
+          .settings-error-message {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+          }
+          
+          .settings-error-message svg {
+            margin-right: 0.5rem;
+          }
+          
+          @keyframes spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
       </div>
-    </div>
+    </Modal>
   );
 };
 

@@ -1,118 +1,159 @@
 # OmniFlow
 
-OmniFlow 是一款专注于大语言模型应用的可视化工作流编辑器。通过简单的拖拽操作，你就能轻松构建复杂的 AI 工作流，让创意快速落地。
+<div align="center">
 
-🚧 开发进行中 - DEMO ONLY 🚧
+![OmniFlow Logo](./docs/images/logo.png) <!-- 可选：如果项目有logo，保留此行；否则移除 -->
 
-[English](./README.md)
+**一款为大型语言模型（LLM）应用设计的高级、基于节点的工作流编辑器**
 
-![OmniFlow 界面](./docs/images/asset1.png)
-![OmniFlow 界面](./docs/images/asset2.png)
-![OmniFlow 界面](./docs/images/asset3.png)
-![OmniFlow 界面](./docs/images/asset4.png)
+[![状态](https://img.shields.io/badge/状态-开发中-yellow)](https://github.com/B143KC47/OmniFlow)
+[![许可协议](https://img.shields.io/badge/许可协议-非商业-red)](./LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-18-blue)](https://reactjs.org/)
 
+[English](./README.md) | [中文文档](./README.CN.md)
 
-## ✨ 亮点特色
+</div>
 
-- 🎯 所见即所得的拖拽式编辑器，不写代码也能搭建 AI 应用
-- 🎨 精心设计的深色主题，让你专注于创作
-- 🔌 丰富的节点类型，满足各类 AI 任务需求
-- ⚡ 工作流实时执行，所有操作即时响应
-- 🛠️ 模块化设计，轻松扩展新功能
-- 🌐 无缝对接主流 AI 服务
-- 📊 直观的执行状态展示
+> 🚧 **正在施工 - 仅供演示** 🚧
+>
+> OmniFlow 仍在积极开发中，许多功能尚未完成。使用过程中可能会遇到 bug 和不稳定性。 欢迎您的测试和反馈，这将帮助我们改进项目！
 
-## 🔧 技术选型
+## 📸 概览
 
-- **前端框架**: Next.js 14
-- **界面组件**: React 18 + TailwindCSS
-- **工作流引擎**: React Flow
-- **状态管理**: Zustand
-- **开发语言**: TypeScript
-- **多语言支持**: next-intl
+<div align="center">
+    <img src="./docs/images/asset1.png" alt="OmniFlow 界面" width="49%" />
+    <img src="./docs/images/asset2.png" alt="OmniFlow 界面" width="49%" />
+</div>
+<div align="center">
+    <img src="./docs/images/asset3.png" alt="OmniFlow 界面" width="49%" />
+    <img src="./docs/images/asset4.png" alt="OmniFlow 界面" width="49%" />
+</div>
 
-## 🚀 快速上手
+## ✨ 特性
 
-### 运行环境
+| 功能 | 描述 |
+|---------|-------------|
+| 📝 **直观的编辑器** | 拖放式节点编辑器，用于可视化工作流创建 |
+| 🤖 **丰富的节点类型** | 适用于各种 AI 任务的广泛节点库 |
+| 🔄 **实时执行** | 实时观看您的工作流程运行 |
+| 🔌 **模块化设计** | 轻松扩展自定义节点 |
+| 🌐 **多服务集成** | 连接多个 AI 服务和 API |
+| 🎯 **高级控制流** | 复杂的节点路由和条件执行 |
+| 🎨 **美观的 UI** | 深色主题，响应式界面 |
 
-确保你的电脑已安装：
-- Node.js（16.0 或更高版本）
-- 包管理器（npm 或 yarn）
+## 🔧 技术栈
+
+<table>
+    <tr>
+        <td><b>框架</b></td>
+        <td>Next.js 14</td>
+    </tr>
+    <tr>
+        <td><b>UI</b></td>
+        <td>React 18, TailwindCSS</td>
+    </tr>
+    <tr>
+        <td><b>工作流引擎</b></td>
+        <td>React Flow</td>
+    </tr>
+    <tr>
+        <td><b>状态管理</b></td>
+        <td>Zustand</td>
+    </tr>
+    <tr>
+        <td><b>类型系统</b></td>
+        <td>TypeScript</td>
+    </tr>
+    <tr>
+        <td><b>国际化</b></td>
+        <td>next-intl</td>
+    </tr>
+</table>
+
+## 🚀 快速开始
+
+### 前置条件
+
+- Node.js 16+
+- npm 或 yarn
 - Git
 
-### 安装教程
-
-复制下面的命令一键部署：
+### 安装
 
 ```bash
-# 下载项目
+# 克隆仓库
 git clone https://github.com/yourusername/OmniFlow.git
 
-# 进入项目目录并安装依赖
+# 进入项目目录
 cd OmniFlow
-npm install
 
-# 启动开发环境
+# 安装依赖
+npm install
+# 或者
+yarn install
+
+# 启动开发服务器
 npm run dev
+# 或者
+yarn dev
 ```
 
-启动成功后，打开浏览器访问 `http://localhost:3000` 即可开始使用。
+运行后，打开浏览器并访问：`http://localhost:3000`
 
-## 📖 使用指南
+## 📖 文档
 
-我们提供了详尽的使用文档，你可以在 [docs](./docs) 目录下找到：
-- 快速入门教程
-- 功能详解
-- 最佳实践
-- 常见问题解答
+详细文档位于 [docs](./docs) 目录中，涵盖：
 
-## 🛠️ 开发指南
+- 用户指南
+- API 参考
+- 节点类型
+- 扩展开发
 
-### 项目结构一览
+## 🛠️ 开发
+
+### 项目结构
 
 ```
 OmniFlow/
-├── src/               # 源码目录
-│   ├── components/    # React组件
-│   ├── services/      # 核心业务逻辑
-│   ├── styles/        # 样式文件
-│   ├── types/        # 类型定义
-│   └── utils/        # 工具函数
-├── public/           # 静态资源
-└── docs/            # 项目文档
+├── src/
+│   ├── components/    # React 组件
+│   ├── services/      # 业务逻辑服务
+│   ├── styles/        # 全局样式 & 主题
+│   ├── types/         # TypeScript 定义
+│   └── utils/         # 实用函数
+├── public/            # 静态资源
+└── docs/              # 文档
 ```
 
-### 常用命令
+### 可用脚本
 
-- `npm run dev`: 启动本地开发环境
-- `npm run build`: 打包生产版本
-- `npm run lint`: 代码规范检查
-- `npm test`: 运行测试用例
+| 命令 | 描述 |
+|---------|-------------|
+| `npm run dev` | 启动开发服务器 |
+| `npm run build` | 构建生产版本 |
+| `npm run lint` | 运行 linter |
+| `npm test` | 运行测试 |
 
-## ⚠️ 开源协议
+## ⚠️ 许可协议
 
-本项目采用非商业性使用许可证，详情请查看 [LICENSE](LICENSE) 文件。
-特别说明：本项目仅供学习和个人使用，严禁用于商业目的。
+本项目采用非商业许可协议 - 详细信息请参阅 [LICENSE](LICENSE) 文件。
+**严禁商业用途。**
 
-## 🤝 参与贡献
+## 🤝 贡献
 
-我们欢迎各种形式的贡献，无论是新功能、文档改进还是 bug 修复。参与开发前，请先阅读[贡献指南](CONTRIBUTING.md)。
+欢迎贡献！ 请先阅读我们的 [贡献指南](CONTRIBUTING.md)。
 
-## 📫 联系我们
+## 📫 联系方式
 
-- 遇到问题？[提交 Issue](https://github.com/B143KC47/OmniFlow/issues)
-- 想要交流？发送邮件到 ltu46166@gmail.com
+- **问题反馈**: [GitHub Issue Tracker](https://github.com/B143KC47/OmniFlow/issues)
+- **邮箱**: ltu46166@gmail.com
+- **Twitter**: [@YourTwitterHandle](https://twitter.com/YourTwitterHandle) <!-- 可选：如果项目有Twitter账号，可以添加 -->
 
-## 🙏 特别感谢
+## 🙏 鸣谢
 
-项目离不开这些优秀的开源工具：
+感谢所有使本项目成为可能的开源项目：
 
-- [React Flow](https://reactflow.dev/) - 强大的工作流引擎
-- [Next.js](https://nextjs.org/) - React 应用开发框架
-- [TailwindCSS](https://tailwindcss.com/) - 实用优先的 CSS 框架
-
-> 💡 小贴士
-> 
-> - 首次使用建议先阅读快速入门教程
-> - 遇到问题先看看常见问题解答
-> - 有好的想法随时可以提 Issue 讨论
+- [React Flow](https://reactflow.dev/)
+- [Next.js](https://nextjs.org/)
+- [TailwindCSS](https://tailwindcss.com/)

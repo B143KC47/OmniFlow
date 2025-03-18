@@ -17,6 +17,7 @@ import {
 import { NodeData, NodeType, Workflow, Connection as WorkflowConnection } from '../types';
 import WorkflowController, { ExecutionState } from '../services/WorkflowController';
 import McpService from '../services/McpService';
+import { useTranslation } from '../utils/i18n';
 
 // 使用动态导入避免 SSR 问题
 const ReactFlow = dynamic(
@@ -85,6 +86,7 @@ const WORKFLOW_MENU_ID = 'workflow-context-menu';
 
 // 内部工作流编辑器组件
 const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
+  const { t } = useTranslation();
   // 使用 useState 来跟踪客户端渲染状态
   const [isClient, setIsClient] = useState(false);
 
@@ -217,19 +219,19 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     let label = '未知节点';
     switch (type) {
       case 'textInput':
-        label = '文本输入';
+        label = t('nodes.textInput.name');
         break;
       case 'llmQuery':
-        label = 'LLM 查询';
+        label = t('nodes.llmQuery.name');
         break;
       case 'webSearch':
-        label = '网络搜索';
+        label = t('nodes.webSearch.name');
         break;
       case 'documentQuery':
-        label = '文档查询';
+        label = t('nodes.documentQuery.name');
         break;
       case 'custom':
-        label = '自定义节点';
+        label = t('nodes.custom.name');
         break;
       default:
         label = type;
@@ -260,7 +262,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
 
     // 添加节点
     setNodes(nds => [...nds, newNode]);
-  }, [setNodes]);
+  }, [setNodes, t]);
 
   // 显示MCP管理器
   const handleShowMcpManager = useCallback(() => {
@@ -376,7 +378,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
                       : 'comfy-button-primary'
                   )}
                 >
-                  执行
+                  {t('workflow.execute')}
                 </button>
                 <button
                   onClick={handleStop}
@@ -388,20 +390,20 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
                       : 'comfy-button-danger'
                   )}
                 >
-                  停止
+                  {t('workflow.stop')}
                 </button>
                 <button
                   onClick={handleSaveWorkflow}
                   disabled={executionState?.isRunning}
                   className="comfy-button comfy-button-secondary"
                 >
-                  保存
+                  {t('workflow.save')}
                 </button>
                 <button
                   onClick={handleShowMcpManager}
                   className="comfy-button comfy-button-secondary"
                 >
-                  管理外部服务
+                  {t('workflow.manageExternalServices')}
                 </button>
               </div>
 

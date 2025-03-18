@@ -1,8 +1,299 @@
 {
+  "app": {
+    "title": "OmniFlow",
+    "header": {
+      "settings": "设置",
+      "workflow": "工作流",
+      "export": "导出",
+      "import": "导入",
+      "help": "帮助",
+      "queueHistory": "队列历史"
+    },
+    "loading": "加载中...",
+    "welcome": "欢迎使用 OmniFlow"
+  },
+  "settings": {
+    "title": "系统设置",
+    "updating": "正在更新设置...",
+    "errors": {
+      "saveFailed": "保存设置失败",
+      "loadFailed": "加载设置失败",
+      "updateFailed": "更新设置失败",
+      "invalidValue": "无效的设置值"
+    },
+    "appearance": {
+      "title": "外观",
+      "theme": "界面主题",
+      "darkTheme": "暗色主题",
+      "lightTheme": "亮色主题",
+      "systemTheme": "跟随系统",
+      "language": "语言",
+      "reduceAnimations": "减少动画效果",
+      "showBackgroundPattern": "显示背景图案"
+    },
+    "workflow": {
+      "title": "工作流",
+      "autoSave": "自动保存工作流",
+      "autoSaveInterval": "自动保存间隔 (分钟)",
+      "snapToGrid": "节点对齐网格",
+      "showNodeTooltips": "显示节点提示"
+    },
+    "buttons": {
+      "save": "保存",
+      "cancel": "取消",
+      "reset": "恢复默认"
+    }
+  },
+  "workflow": {
+    "newWorkflow": "新建工作流",
+    "openWorkflow": "打开工作流",
+    "saveWorkflow": "保存工作流",
+    "deleteWorkflow": "删除工作流",
+    "runWorkflow": "运行工作流",
+    "stopWorkflow": "停止工作流",
+    "noWorkflow": "暂无工作流",
+    "noWorkflowDescription": "创建一个新工作流或从文件导入",
+    "confirmDelete": "确认删除",
+    "confirmDeleteDescription": "此操作无法撤销，是否继续？",
+    "name": "名称",
+    "description": "描述",
+    "createdAt": "创建时间",
+    "lastModified": "上次修改",
+    "importWorkflow": "导入工作流",
+    "exportWorkflow": "导出工作流",
+    "createWorkflow": {
+      "title": "创建新工作流",
+      "nameLabel": "工作流名称",
+      "namePlaceholder": "输入工作流名称",
+      "descriptionLabel": "工作流描述",
+      "descriptionPlaceholder": "简要描述此工作流的用途"
+    },
+    "myWorkflows": "我的工作流",
+    "searchPlaceholder": "搜索工作流...",
+    "defaultName": "新工作流",
+    "errors": {
+      "loadFailed": "加载工作流失败",
+      "saveFailed": "保存工作流失败",
+      "deleteFailed": "删除工作流失败",
+      "updateFailed": "更新工作流失败",
+      "rollbackFailed": "回滚状态失败"
+    }
+  },
+  "nodes": {
+    "common": {
+      "input": "输入",
+      "output": "输出",
+      "settings": "设置",
+      "delete": "删除",
+      "duplicate": "复制",
+      "connect": "连接",
+      "disconnect": "断开连接",
+      "run": "运行",
+      "configure": "配置",
+      "collapse": "折叠",
+      "expand": "展开",
+      "inputs": "输入",
+      "outputs": "输出"
+    },
+    "textInput": {
+      "name": "文本输入",
+      "description": "允许用户输入文本内容",
+      "placeholder": "在此输入文本"
+    },
+    "llmQuery": {
+      "name": "LLM查询",
+      "description": "向大语言模型发送查询",
+      "modelLabel": "选择模型",
+      "promptLabel": "提示词",
+      "promptPlaceholder": "输入提示词",
+      "temperature": "温度",
+      "maxTokens": "最大生成标记数"
+    },
+    "webSearch": {
+      "name": "网络搜索",
+      "description": "执行网络搜索获取信息",
+      "queryLabel": "搜索查询",
+      "queryPlaceholder": "输入搜索词",
+      "provider": "搜索提供商",
+      "resultCount": "结果数量"
+    },
+    "documentQuery": {
+      "name": "文档查询",
+      "description": "在文档中搜索相关内容",
+      "queryLabel": "查询",
+      "queryPlaceholder": "输入查询内容",
+      "fileSource": "文件来源"
+    },
+    "modelSelector": {
+      "name": "模型选择器",
+      "description": "选择要使用的模型",
+      "modelCategory": "模型类别"
+    },
+    "loopControl": {
+      "name": "循环控制",
+      "description": "控制工作流循环执行",
+      "iterations": "迭代次数",
+      "condition": "循环条件"
+    },
+    "custom": {
+      "name": "自定义节点",
+      "description": "创建自定义功能的节点",
+      "codeLabel": "节点代码",
+      "codePlaceholder": "在这里输入自定义代码"
+    },
+    "categories": {
+      "input": "输入节点",
+      "output": "输出节点",
+      "text": "文本处理",
+      "ml": "机器学习",
+      "util": "工具节点",
+      "io": "输入输出",
+      "all": "所有节点",
+      "popular": "热门节点",
+      "new": "最新节点"
+    }
+  },
+  "library": {
+    "node": {
+      "title": "节点库",
+      "search": "搜索节点...",
+      "category": "节点分类",
+      "inputs": "输入",
+      "outputs": "输出",
+      "notFound": "未找到匹配的节点",
+      "tryDifferent": "尝试使用其他关键词"
+    },
+    "model": {
+      "title": "模型库",
+      "search": "搜索模型...",
+      "provider": "提供商",
+      "category": "分类",
+      "parameters": "参数量",
+      "updatedAt": "更新日期",
+      "showInstalled": "仅显示已安装",
+      "install": "安装",
+      "manage": "管理",
+      "notFound": "未找到匹配的模型",
+      "tryDifferent": "尝试更改筛选条件或清除搜索",
+      "categories": {
+        "all": "所有模型",
+        "text": "文本",
+        "image": "图像",
+        "audio": "音频",
+        "embedding": "嵌入",
+        "multimodal": "多模态"
+      }
+    }
+  },
   "mcp": {
     "header": {
       "title": "外部服务管理",
       "close": "关闭"
+    },
+    "settings": {
+      "autoConnect": "自动连接",
+      "retryOnError": "错误时重试",
+      "retryAttempts": "重试次数",
+      "timeoutSeconds": "超时时间 (秒)"
+    },
+    "actions": {
+      "add": "添加服务",
+      "remove": "移除",
+      "edit": "编辑",
+      "enable": "启用",
+      "disable": "禁用"
+    },
+    "form": {
+      "serviceName": "服务名称",
+      "serviceNamePlaceholder": "输入服务名称，如: Bing搜索",
+      "description": "描述",
+      "descriptionPlaceholder": "描述服务的功能和用途",
+      "category": "分类",
+      "categoryDescription": "选择最匹配服务功能的分类",
+      "config": "配置 (JSON格式)",
+      "supportedConfig": "支持的配置项:",
+      "apiKey": "API密钥",
+      "endpoint": "服务端点URL",
+      "options": "其他配置选项"
+    },
+    "filter": {
+      "all": "全部",
+      "search": "搜索",
+      "ai": "AI",
+      "database": "数据库",
+      "custom": "自定义"
+    },
+    "status": {
+      "active": "已激活",
+      "inactive": "未激活",
+      "error": "错误",
+      "configuring": "配置中"
     }
+  },
+  "contextMenu": {
+    "addNode": "添加节点",
+    "paste": "粘贴",
+    "selectAll": "全选",
+    "deleteSelected": "删除所选",
+    "copy": "复制",
+    "cut": "剪切",
+    "group": "创建组",
+    "ungroup": "解除组",
+    "undo": "撤销",
+    "redo": "重做",
+    "basicNodes": "基础节点",
+    "textInput": "文本输入",
+    "llmNodes": "LLM节点",
+    "llmQuery": "LLM查询",
+    "utilityNodes": "工具节点",
+    "webSearch": "网络搜索"
+  },
+  "editor": {
+    "controls": {
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
+      "fitView": "适应视图",
+      "lock": "锁定画布",
+      "unlock": "解锁画布"
+    },
+    "status": {
+      "saved": "已保存",
+      "saving": "保存中...",
+      "unsaved": "未保存",
+      "running": "运行中",
+      "completed": "已完成",
+      "error": "错误"
+    }
+  },
+  "common": {
+    "loading": "加载中",
+    "error": "错误",
+    "success": "成功",
+    "warning": "警告",
+    "info": "信息",
+    "yes": "是",
+    "no": "否",
+    "ok": "确定",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "view": "查看",
+    "search": "搜索",
+    "filter": "筛选",
+    "sort": "排序",
+    "refresh": "刷新",
+    "close": "关闭",
+    "create": "创建",
+    "import": "导入",
+    "export": "导出",
+    "add": "添加",
+    "remove": "删除",
+    "confirm": "确认",
+    "back": "返回",
+    "next": "下一步",
+    "finish": "完成",
+    "noData": "暂无数据",
+    "noResults": "无匹配结果"
   }
 }

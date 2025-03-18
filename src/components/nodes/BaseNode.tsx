@@ -1,6 +1,7 @@
 import React, { memo, useState, useRef, useCallback, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
 import { NodeData } from '../../types';
+import { useTranslation } from '../../utils/i18n';
 
 interface BaseNodeProps {
   id: string;
@@ -10,6 +11,7 @@ interface BaseNodeProps {
 }
 
 const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => {
+  const { t } = useTranslation();
   const { label, inputs = {}, outputs = {}, onChange, connectStatus } = data;
   
   // 节点折叠状态
@@ -205,7 +207,7 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
           <button 
             onClick={toggleCollapsed}
             className="comfy-node-collapse-btn"
-            title={collapsed ? "展开" : "折叠"}
+            title={collapsed ? t('nodes.expand') : t('nodes.collapse')}
           >
             {collapsed ? "+" : "-"}
           </button>
@@ -216,7 +218,7 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
         {/* 输入部分 */}
         {Object.entries(inputs).length > 0 && (
           <div className="comfy-section">
-            <div className="comfy-section-title">输入</div>
+            <div className="comfy-section-title">{t('nodes.inputs')}</div>
             {Object.entries(inputs).map(([key, input]: [string, any], index) => (
               <div key={key} className="comfy-node-row">
                 <Handle
@@ -242,7 +244,7 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
                       value={input.value || ''}
                       onChange={(e) => handleInputChange(key, e.target.value)}
                       className="comfy-node-input"
-                      placeholder={input.placeholder || `输入${key}...`}
+                      placeholder={input.placeholder || t('nodes.inputPlaceholder', { key })}
                       disabled={input.isConnected}
                     />
                   ) : input.type === 'number' ? (
@@ -293,7 +295,7 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
         {/* 输出部分 */}
         {Object.entries(outputs).length > 0 && (
           <div className="comfy-section">
-            <div className="comfy-section-title">输出</div>
+            <div className="comfy-section-title">{t('nodes.outputs')}</div>
             {Object.entries(outputs).map(([key, output]: [string, any], index) => {
               const isExpanded = expandedOutputs[key];
               const outputValue = output.value || '';
@@ -315,12 +317,12 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
                         </span>
                         {needsExpand && (
                           <span className="comfy-expand-toggle">
-                            {isExpanded ? '收起' : '展开'}
+                            {isExpanded ? t('nodes.collapse') : t('nodes.expand')}
                           </span>
                         )}
                       </div>
                     ) : (
-                      <span className="comfy-node-output-empty">未生成数据</span>
+                      <span className="comfy-node-output-empty">{t('nodes.noData')}</span>
                     )}
                   </div>
                   <Handle

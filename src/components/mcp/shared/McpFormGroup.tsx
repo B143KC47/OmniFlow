@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../../utils/i18n';
 
 interface McpFormGroupProps {
   label: string;
@@ -184,21 +185,23 @@ export const ConfigEditor: React.FC<ConfigEditorProps> = ({
   error,
   hasError
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="config-section">
       <div className="config-help">
-        <p>支持的配置项:</p>
+        <p>{t('mcp.form.supportedConfig')}</p>
         <ul>
-          <li><code>apiKey</code>: API密钥</li>
-          <li><code>endpoint</code>: 服务端点URL</li>
-          <li><code>options</code>: 其他配置选项</li>
+          <li><code>apiKey</code>: {t('mcp.form.apiKey')}</li>
+          <li><code>endpoint</code>: {t('mcp.form.endpoint')}</li>
+          <li><code>options</code>: {t('mcp.form.options')}</li>
         </ul>
       </div>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={`config-editor ${hasError ? 'has-error' : ''}`}
-        placeholder='例如:
+        placeholder={`${t('common.example')}:
 {
   "apiKey": "your-api-key",
   "endpoint": "https://api.example.com",
@@ -206,7 +209,7 @@ export const ConfigEditor: React.FC<ConfigEditorProps> = ({
     "timeout": 30000,
     "maxRetries": 3
   }
-}'
+}`}
       />
 
       <style jsx>{`

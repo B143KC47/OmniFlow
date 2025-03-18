@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
+import { useTranslation } from '../utils/i18n';
+import { useSettings } from '../contexts/SettingsContext';
 
 // 动态导入 WorkflowEditor 组件
 const WorkflowEditor = dynamic(
@@ -43,6 +45,10 @@ export const getStaticProps: GetStaticProps = async ({ locale = 'zh' }) => {
 };
 
 const HomePage: React.FC = () => {
+  // 添加语言相关的hooks
+  const { t } = useTranslation();
+  const { settings } = useSettings();
+
   // 使用 useState 来跟踪客户端渲染状态
   const [isClient, setIsClient] = useState(false);
   const [currentWorkflow, setCurrentWorkflow] = useState<Workflow | null>(null);
@@ -76,6 +82,17 @@ const HomePage: React.FC = () => {
       console.error('加载工作流失败:', error);
     }
   }, [isClient]);
+
+  // 监听语言变化
+  useEffect(() => {
+    // 更新document的title
+    document.title = t('app.title');
+    
+    // 更新HTML的lang属性
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = settings.appearance.language;
+    }
+  }, [settings.appearance.language, t]);
 
   // 保存工作流
   const handleSaveWorkflow = (workflow: Workflow) => {
@@ -120,14 +137,13 @@ const HomePage: React.FC = () => {
     const now = Date.now();
     const id = `workflow_${now}`;
     const newWorkflow: Workflow = {
-      id,
-      name: name || '新工作流',
-      description: description || '',
-      nodes: [],
-      edges: [],
-      createdAt: new Date(now),
-      updatedAt: new Date(now),
-    };
+        id,
+        name: name || t('workflow.defaultName'),
+        nodes: [],
+        edges: [],
+        createdAt: new Date(now),
+        updatedAt: new Date(now),
+      };
     
     setCurrentWorkflow(newWorkflow);
   };
@@ -146,7 +162,7 @@ const HomePage: React.FC = () => {
 
   // 删除工作流
   const handleDeleteWorkflow = (workflowId: string) => {
-    if (confirm('确定要删除这个工作流吗？')) {
+    if (confirm(t('workflow.confirmDelete'))) {
       try {
         // 从列表中移除
         const updatedWorkflows = workflows.filter(w => w.id !== workflowId);
@@ -161,7 +177,7 @@ const HomePage: React.FC = () => {
           setCurrentWorkflow(null);
         }
       } catch (error) {
-        console.error('删除工作流失败:', error);
+        console.error(t('workflow.errors.deleteFailed'), error);
       }
     }
   };
@@ -182,7 +198,7 @@ const HomePage: React.FC = () => {
   if (!isClient) {
     return (
       <div className="min-h-screen bg-[#141414] flex items-center justify-center">
-        <div className="text-[#666] text-sm">加载中...</div>
+        <div className="text-[#666] text-sm">{t('common.loading')}</div>
       </div>
     );
   }
@@ -217,7 +233,7 @@ const HomePage: React.FC = () => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              队列历史
+              {t('app.header.queueHistory')}
             </button>
             <button 
               onClick={() => setShowNodeLibrary(true)}
@@ -226,7 +242,7 @@ const HomePage: React.FC = () => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
-              节点库
+              {t('library.node.title')}
             </button>
             <button 
               onClick={() => setShowModelLibrary(true)}
@@ -235,7 +251,7 @@ const HomePage: React.FC = () => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
               </svg>
-              模型库
+              {t('library.model.title')}
             </button>
             <button 
               onClick={() => setShowWorkflowManager(true)}
@@ -244,7 +260,7 @@ const HomePage: React.FC = () => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
               </svg>
-              工作流
+              {t('workflow.management')}
             </button>
           </div>
         </div>
@@ -256,7 +272,7 @@ const HomePage: React.FC = () => {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            新建工作流
+            {t('workflow.newWorkflow')}
           </button>
           <button 
             onClick={() => setShowSettingsModal(true)}
@@ -279,12 +295,12 @@ const HomePage: React.FC = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-[#10a37f]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                我的工作流
+                {t('workflow.myWorkflows')}
               </h2>
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="搜索工作流..."
+                  placeholder={t('workflow.searchPlaceholder')}
                   className="w-full bg-[#141414] border border-[#282828] focus:border-[#10a37f] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#10a37f] placeholder-[#666] transition-all duration-200"
                 />
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 absolute right-3 top-2.5 text-[#666]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -299,7 +315,7 @@ const HomePage: React.FC = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2 text-[#333]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  暂无工作流
+                  {t('workflow.noWorkflow')}
                 </div>
               ) : (
                 <div className="space-y-1">
@@ -344,7 +360,7 @@ const HomePage: React.FC = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                新建工作流
+                {t('workflow.newWorkflow')}
               </button>
             </div>
           </div>

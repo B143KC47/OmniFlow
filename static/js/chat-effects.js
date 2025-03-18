@@ -3,6 +3,42 @@
  * 为聊天界面添加各种动画和视觉增强效果
  */
 
+// 语言资源
+let translations = {
+    'zh-CN': {
+        notificationTitle: '接收消息通知',
+        notificationQuestion: '允许接收新消息和重要更新的通知？',
+        later: '稍后再说',
+        allow: '允许',
+        scrollToTop: '滚动到顶部'
+    },
+    'en': {
+        notificationTitle: 'Receive Notifications',
+        notificationQuestion: 'Allow notifications for new messages and important updates?',
+        later: 'Later',
+        allow: 'Allow',
+        scrollToTop: 'Scroll to Top'
+    }
+};
+
+// 获取当前语言
+function getCurrentLanguage() {
+    // 尝试从localStorage获取语言设置
+    let lang = localStorage.getItem('omniflow-language');
+    // 如果没有设置，检查navigator.language
+    if (!lang) {
+        lang = navigator.language.startsWith('zh') ? 'zh-CN' : 'en';
+    }
+    return lang;
+}
+
+// 翻译辅助函数
+function t(key) {
+    const lang = getCurrentLanguage();
+    const langResources = translations[lang] || translations['en'];
+    return langResources[key] || key;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // 页面淡入效果
     document.body.classList.add('fade-in');
@@ -35,7 +71,46 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 添加浏览器通知支持
     setupNotifications();
+
+    // 监听语言变化事件
+    window.addEventListener('language-changed', function(e) {
+        if (e.detail && e.detail.language) {
+            updateUILanguage(e.detail.language);
+        }
+    });
 });
+
+// 更新UI语言
+function updateUILanguage(language) {
+    // 保存语言设置
+    localStorage.setItem('omniflow-language', language);
+    
+    // 更新可翻译的UI元素
+    const notifTitle = document.querySelector('.notification-content .notification-text h4');
+    if (notifTitle) {
+        notifTitle.textContent = t('notificationTitle');
+    }
+    
+    const notifQuestion = document.querySelector('.notification-content .notification-text p');
+    if (notifQuestion) {
+        notifQuestion.textContent = t('notificationQuestion');
+    }
+    
+    const notifDeny = document.querySelector('.notification-content .notification-deny');
+    if (notifDeny) {
+        notifDeny.textContent = t('later');
+    }
+    
+    const notifAllow = document.querySelector('.notification-content .notification-allow');
+    if (notifAllow) {
+        notifAllow.textContent = t('allow');
+    }
+    
+    const scrollTopBtn = document.querySelector('.scroll-to-top');
+    if (scrollTopBtn) {
+        scrollTopBtn.title = t('scrollToTop');
+    }
+}
 
 // 欢迎页面元素动画
 function animateWelcomeElements() {
@@ -411,7 +486,7 @@ function addScrollToTopButton() {
     const button = document.createElement('button');
     button.className = 'scroll-to-top';
     button.innerHTML = '<i class="fas fa-arrow-up"></i>';
-    button.title = '滚动到顶部';
+    button.title = t('scrollToTop');
     
     document.body.appendChild(button);
     
@@ -607,12 +682,12 @@ function setupNotifications() {
                         <i class="fas fa-bell"></i>
                     </div>
                     <div class="notification-text">
-                        <h4>接收消息通知</h4>
-                        <p>允许接收新消息和重要更新的通知？</p>
+                        <h4>${t('notificationTitle')}</h4>
+                        <p>${t('notificationQuestion')}</p>
                     </div>
                     <div class="notification-actions">
-                        <button class="notification-deny">稍后再说</button>
-                        <button class="notification-allow">允许</button>
+                        <button class="notification-deny">${t('later')}</button>
+                        <button class="notification-allow">${t('allow')}</button>
                     </div>
                 </div>
             `;

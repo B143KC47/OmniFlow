@@ -1,38 +1,75 @@
 # OmniFlow
 
-An advanced node-based workflow editor designed for LLM (Large Language Model) applications, enabling visual construction and execution of complex AI workflows.
- 
-🚧 WORK IN PROGRESS - DEMO ONLY 🚧
+<div align="center">
 
-[中文文档](./README.CN.md)
+![OmniFlow Logo](./docs/images/logo.png) <!-- 假设有logo，如无则移除此行 -->
 
-![OmniFlow Interface](./docs/images/asset1.png)
-![OmniFlow Interface](./docs/images/asset2.png)
-![OmniFlow Interface](./docs/images/asset3.png)
-![OmniFlow Interface](./docs/images/asset4.png)
+**An advanced node-based workflow editor designed for LLM (Large Language Model) applications**
 
+[![Status](https://img.shields.io/badge/status-work%20in%20progress-yellow)](https://github.com/B143KC47/OmniFlow)
+[![License](https://img.shields.io/badge/license-Non--Commercial-red)](./LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-18-blue)](https://reactjs.org/)
 
+[English](./README.md) | [中文文档](./README.CN.md)
 
+</div>
 
+> 🚧 **WORK IN PROGRESS - DEMO ONLY** 🚧
+>
+> OmniFlow is still under active development, and many features are not yet complete. Please be aware that you may encounter bugs and instability during use. Your testing and feedback are welcome and will help us improve the project!
+
+## 📸 Showcase
+
+<div align="center">
+  <img src="./docs/images/asset1.png" alt="OmniFlow Interface" width="49%" />
+  <img src="./docs/images/asset2.png" alt="OmniFlow Interface" width="49%" />
+</div>
+<div align="center">
+  <img src="./docs/images/asset3.png" alt="OmniFlow Interface" width="49%" />
+  <img src="./docs/images/asset4.png" alt="OmniFlow Interface" width="49%" />
+</div>
 
 ## ✨ Features
 
-- 📝 Intuitive drag-and-drop node editor
-- 🤖 Rich node types for various AI tasks
-- 🔄 Real-time workflow execution
-- 🔌 Modular design for easy extension
-- 🌐 Multi-service integration support
-- 🎯 Advanced node routing and control
-- 🎨 Beautiful dark-themed UI
+| Feature | Description |
+|---------|-------------|
+| 📝 **Intuitive Editor** | Drag-and-drop node editor for visual workflow creation |
+| 🤖 **Rich Node Types** | Extensive library of nodes for various AI tasks |
+| 🔄 **Real-time Execution** | Watch your workflows run in real-time |
+| 🔌 **Modular Design** | Easily extend with custom nodes |
+| 🌐 **Multi-service Integration** | Connect with multiple AI services and APIs |
+| 🎯 **Advanced Control Flow** | Complex node routing and conditional execution |
+| 🎨 **Beautiful UI** | Dark-themed, responsive interface |
 
 ## 🔧 Tech Stack
 
-- **Framework**: Next.js 14
-- **UI**: React 18, TailwindCSS
-- **Workflow Engine**: React Flow
-- **State Management**: Zustand
-- **Type System**: TypeScript
-- **I18n**: next-intl
+<table>
+  <tr>
+    <td><b>Framework</b></td>
+    <td>Next.js 14</td>
+  </tr>
+  <tr>
+    <td><b>UI</b></td>
+    <td>React 18, TailwindCSS</td>
+  </tr>
+  <tr>
+    <td><b>Workflow Engine</b></td>
+    <td>React Flow</td>
+  </tr>
+  <tr>
+    <td><b>State Management</b></td>
+    <td>Zustand</td>
+  </tr>
+  <tr>
+    <td><b>Type System</b></td>
+    <td>TypeScript</td>
+  </tr>
+  <tr>
+    <td><b>I18n</b></td>
+    <td>next-intl</td>
+  </tr>
+</table>
 
 ## 🚀 Getting Started
 
@@ -48,19 +85,30 @@ An advanced node-based workflow editor designed for LLM (Large Language Model) a
 # Clone the repository
 git clone https://github.com/yourusername/OmniFlow.git
 
-# Install dependencies
+# Navigate to project directory
 cd OmniFlow
+
+# Install dependencies
 npm install
+# or
+yarn install
 
 # Start development server
 npm run dev
+# or
+yarn dev
 ```
 
-Visit `http://localhost:3000` in your browser.
+Once running, open your browser and visit: `http://localhost:3000`
 
 ## 📖 Documentation
 
-Detailed documentation can be found in the [docs](./docs) directory.
+Detailed documentation can be found in the [docs](./docs) directory, covering:
+
+- User Guide
+- API Reference
+- Node Types
+- Extension Development
 
 ## 🛠️ Development
 
@@ -70,25 +118,27 @@ Detailed documentation can be found in the [docs](./docs) directory.
 OmniFlow/
 ├── src/
 │   ├── components/    # React components
-│   ├── services/     # Business logic services
-│   ├── styles/       # Global styles & themes
-│   ├── types/        # TypeScript definitions
-│   └── utils/        # Utility functions
-├── public/           # Static assets
-└── docs/            # Documentation
+│   ├── services/      # Business logic services
+│   ├── styles/        # Global styles & themes
+│   ├── types/         # TypeScript definitions
+│   └── utils/         # Utility functions
+├── public/            # Static assets
+└── docs/              # Documentation
 ```
 
 ### Available Scripts
 
-- `npm run dev`: Start development server
-- `npm run build`: Build for production
-- `npm run lint`: Run linter
-- `npm test`: Run tests
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run lint` | Run linter |
+| `npm test` | Run tests |
 
 ## ⚠️ License
 
 This project is licensed under a Non-Commercial License - see the [LICENSE](LICENSE) file for details.
-Commercial use is strictly prohibited.
+**Commercial use is strictly prohibited.**
 
 ## 🤝 Contributing
 
@@ -96,8 +146,9 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ## 📫 Contact
 
-- Create an issue: [Issue Tracker](https://github.com/B143KC47/OmniFlow/issues)
-- Email: ltu46166@gmail.com
+- **Issues**: [GitHub Issue Tracker](https://github.com/B143KC47/OmniFlow/issues)
+- **Email**: ltu46166@gmail.com
+- **Twitter**: [@YourTwitterHandle](https://twitter.com/YourTwitterHandle) <!-- 如果有Twitter账号，可以添加 -->
 
 ## 🙏 Acknowledgments
 

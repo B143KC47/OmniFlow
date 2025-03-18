@@ -1,0 +1,299 @@
+{
+  "mcp": {
+    "header": {
+      "title": "External Services Management",
+      "close": "Close"
+    },
+    "settings": {
+      "autoConnect": "Auto Connect",
+      "retryOnError": "Retry on Error",
+      "retryAttempts": "Retry Attempts",
+      "timeoutSeconds": "Timeout (seconds)"
+    },
+    "actions": {
+      "add": "Add Service",
+      "remove": "Remove",
+      "edit": "Edit",
+      "enable": "Enable",
+      "disable": "Disable"
+    },
+    "form": {
+      "serviceName": "Service Name",
+      "serviceNamePlaceholder": "Enter service name, e.g: Bing Search",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the service functionality and purpose",
+      "category": "Category",
+      "categoryDescription": "Choose the category that best matches the service",
+      "config": "Configuration (JSON format)",
+      "supportedConfig": "Supported configuration items:",
+      "apiKey": "API Key",
+      "endpoint": "Service Endpoint URL",
+      "options": "Other configuration options"
+    },
+    "filter": {
+      "all": "All",
+      "search": "Search",
+      "ai": "AI",
+      "database": "Database",
+      "custom": "Custom"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "error": "Error",
+      "configuring": "Configuring"
+    }
+  },
+  "app": {
+    "title": "OmniFlow",
+    "header": {
+      "settings": "Settings",
+      "workflow": "Workflow",
+      "export": "Export",
+      "import": "Import",
+      "help": "Help",
+      "queueHistory": "Queue History"
+    },
+    "loading": "Loading...",
+    "welcome": "Welcome to OmniFlow"
+  },
+  "settings": {
+    "title": "System Settings",
+    "updating": "Updating settings...",
+    "errors": {
+      "saveFailed": "Failed to save settings",
+      "loadFailed": "Failed to load settings",
+      "updateFailed": "Failed to update settings",
+      "invalidValue": "Invalid setting value"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "theme": "Interface Theme",
+      "darkTheme": "Dark Theme",
+      "lightTheme": "Light Theme",
+      "systemTheme": "System",
+      "language": "Language",
+      "reduceAnimations": "Reduce Animations",
+      "showBackgroundPattern": "Show Background Pattern"
+    },
+    "workflow": {
+      "title": "Workflow",
+      "autoSave": "Auto Save Workflow",
+      "autoSaveInterval": "Auto Save Interval (minutes)",
+      "snapToGrid": "Snap Nodes to Grid",
+      "showNodeTooltips": "Show Node Tooltips"
+    },
+    "buttons": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "reset": "Reset to Default"
+    }
+  },
+  "workflow": {
+    "newWorkflow": "New Workflow",
+    "openWorkflow": "Open Workflow",
+    "saveWorkflow": "Save Workflow",
+    "deleteWorkflow": "Delete Workflow",
+    "runWorkflow": "Run Workflow",
+    "stopWorkflow": "Stop Workflow",
+    "noWorkflow": "No Workflows",
+    "noWorkflowDescription": "Create a new workflow or import from a file",
+    "confirmDelete": "Confirm Delete",
+    "confirmDeleteDescription": "This action cannot be undone. Do you want to continue?",
+    "name": "Name",
+    "description": "Description",
+    "createdAt": "Created at",
+    "lastModified": "Last Modified",
+    "importWorkflow": "Import Workflow",
+    "exportWorkflow": "Export Workflow",
+    "createWorkflow": {
+      "title": "Create New Workflow",
+      "nameLabel": "Workflow Name",
+      "namePlaceholder": "Enter workflow name",
+      "descriptionLabel": "Workflow Description",
+      "descriptionPlaceholder": "Briefly describe the purpose of this workflow"
+    },
+    "myWorkflows": "My Workflows",
+    "searchPlaceholder": "Search workflows...",
+    "defaultName": "New Workflow",
+    "errors": {
+      "loadFailed": "Failed to load workflow",
+      "saveFailed": "Failed to save workflow",
+      "deleteFailed": "Failed to delete workflow",
+      "updateFailed": "Failed to update workflow",
+      "rollbackFailed": "Failed to rollback state"
+    }
+  },
+  "nodes": {
+    "common": {
+      "input": "Input",
+      "output": "Output",
+      "settings": "Settings",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "connect": "Connect",
+      "disconnect": "Disconnect",
+      "run": "Run",
+      "configure": "Configure",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "inputs": "Inputs",
+      "outputs": "Outputs"
+    },
+    "textInput": {
+      "name": "Text Input",
+      "description": "Allows user to input text content",
+      "placeholder": "Enter text here"
+    },
+    "llmQuery": {
+      "name": "LLM Query",
+      "description": "Send queries to large language models",
+      "modelLabel": "Select Model",
+      "promptLabel": "Prompt",
+      "promptPlaceholder": "Enter your prompt",
+      "temperature": "Temperature",
+      "maxTokens": "Max Tokens"
+    },
+    "webSearch": {
+      "name": "Web Search",
+      "description": "Perform web searches to retrieve information",
+      "queryLabel": "Search Query",
+      "queryPlaceholder": "Enter search terms",
+      "provider": "Search Provider",
+      "resultCount": "Result Count"
+    },
+    "documentQuery": {
+      "name": "Document Query",
+      "description": "Search for relevant content in documents",
+      "queryLabel": "Query",
+      "queryPlaceholder": "Enter your query",
+      "fileSource": "File Source"
+    },
+    "modelSelector": {
+      "name": "Model Selector",
+      "description": "Select model to use",
+      "modelCategory": "Model Category"
+    },
+    "loopControl": {
+      "name": "Loop Control",
+      "description": "Control workflow loop execution",
+      "iterations": "Iterations",
+      "condition": "Loop Condition"
+    },
+    "custom": {
+      "name": "Custom Node",
+      "description": "Create a node with custom functionality",
+      "codeLabel": "Node Code",
+      "codePlaceholder": "Enter custom code here"
+    },
+    "categories": {
+      "input": "Input Nodes",
+      "output": "Output Nodes",
+      "text": "Text Processing",
+      "ml": "Machine Learning",
+      "util": "Utility",
+      "io": "Input/Output",
+      "all": "All Nodes",
+      "popular": "Popular Nodes",
+      "new": "New Nodes"
+    }
+  },
+  "library": {
+    "node": {
+      "title": "Node Library",
+      "search": "Search nodes...",
+      "category": "Node Category",
+      "inputs": "Inputs",
+      "outputs": "Outputs",
+      "notFound": "No matching nodes found",
+      "tryDifferent": "Try different keywords"
+    },
+    "model": {
+      "title": "Model Library",
+      "search": "Search models...",
+      "provider": "Provider",
+      "category": "Category",
+      "parameters": "Parameters",
+      "updatedAt": "Updated At",
+      "showInstalled": "Show Installed Only",
+      "install": "Install",
+      "manage": "Manage",
+      "notFound": "No matching models found",
+      "tryDifferent": "Try changing your filters or clearing the search",
+      "categories": {
+        "all": "All Models",
+        "text": "Text",
+        "image": "Image",
+        "audio": "Audio",
+        "embedding": "Embedding",
+        "multimodal": "Multimodal"
+      }
+    }
+  },
+  "contextMenu": {
+    "addNode": "Add Node",
+    "paste": "Paste",
+    "selectAll": "Select All",
+    "deleteSelected": "Delete Selected",
+    "copy": "Copy",
+    "cut": "Cut",
+    "group": "Create Group",
+    "ungroup": "Ungroup",
+    "undo": "Undo",
+    "redo": "Redo",
+    "basicNodes": "Basic Nodes",
+    "textInput": "Text Input",
+    "llmNodes": "LLM Nodes",
+    "llmQuery": "LLM Query",
+    "utilityNodes": "Utility Nodes",
+    "webSearch": "Web Search"
+  },
+  "editor": {
+    "controls": {
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
+      "fitView": "Fit View",
+      "lock": "Lock Canvas",
+      "unlock": "Unlock Canvas"
+    },
+    "status": {
+      "saved": "Saved",
+      "saving": "Saving...",
+      "unsaved": "Unsaved",
+      "running": "Running",
+      "completed": "Completed",
+      "error": "Error"
+    }
+  },
+  "common": {
+    "loading": "Loading",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh",
+    "close": "Close",
+    "create": "Create",
+    "import": "Import",
+    "export": "Export",
+    "add": "Add",
+    "remove": "Remove",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "noData": "No Data",
+    "noResults": "No Results"
+  }
+}

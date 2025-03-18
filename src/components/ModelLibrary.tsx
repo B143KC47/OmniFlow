@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import NavModal from './shared/NavModal';
+import { useTranslation } from '../utils/i18n';
 
 interface ModelLibraryProps {
   onClose: () => void;
@@ -18,16 +19,6 @@ interface Model {
   installed?: boolean;
   popular?: boolean;
 }
-
-// 模型分类
-const modelCategories = [
-  { id: 'all', name: '所有模型' },
-  { id: 'text', name: '文本模型' },
-  { id: 'image', name: '图像模型' },
-  { id: 'audio', name: '音频模型' },
-  { id: 'embedding', name: '嵌入模型' },
-  { id: 'multimodal', name: '多模态模型' },
-];
 
 // 模型列表
 const models: Model[] = [
@@ -124,10 +115,21 @@ const models: Model[] = [
 ];
 
 const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [sortBy, setSortBy] = useState<'name' | 'provider' | 'lastUpdated'>('lastUpdated');
   const [showInstalled, setShowInstalled] = useState<boolean>(false);
+
+  // 定义模型分类
+  const modelCategories = [
+    { id: 'all', name: t('library.model.categories.all') },
+    { id: 'text', name: t('library.model.categories.text') },
+    { id: 'image', name: t('library.model.categories.image') },
+    { id: 'audio', name: t('library.model.categories.audio') },
+    { id: 'embedding', name: t('library.model.categories.embedding') },
+    { id: 'multimodal', name: t('library.model.categories.multimodal') },
+  ];
 
   // 模态框标题的图标
   const icon = (
@@ -194,7 +196,7 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
   };
 
   return (
-    <NavModal title="模型库" icon={icon} onClose={onClose}>
+    <NavModal title={t('library.model.title')} icon={icon} onClose={onClose}>
       <div className="flex flex-col h-full">
         {/* 过滤栏 */}
         <div className="flex justify-between items-center mb-6">
@@ -217,7 +219,7 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="搜索模型..."
+                placeholder={t('library.model.search')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-64 bg-[#141414] border border-[#282828] focus:border-[#10a37f] rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#10a37f] placeholder-[#666]"
@@ -235,7 +237,7 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
                 className="w-4 h-4 rounded bg-[#141414] border-[#282828] text-[#10a37f] focus:ring-[#10a37f] focus:ring-offset-0 focus:ring-1"
               />
               <label htmlFor="installed-filter" className="ml-2 text-sm text-[#e0e0e0]">
-                仅显示已安装
+                {t('library.model.showInstalled')}
               </label>
             </div>
           </div>
@@ -247,8 +249,8 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mb-4 text-[#333]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
             </svg>
-            <p className="text-lg font-medium">未找到匹配的模型</p>
-            <p className="text-sm mt-2">尝试更改筛选条件或清除搜索</p>
+            <p className="text-lg font-medium">{t('library.model.notFound')}</p>
+            <p className="text-sm mt-2">{t('library.model.tryDifferent')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -260,7 +262,7 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
                       className={`flex items-center ${sortBy === 'name' ? 'text-[#10a37f]' : ''}`}
                       onClick={() => setSortBy('name')}
                     >
-                      模型名称
+                      {t('workflow.name')}
                       {sortBy === 'name' && (
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -273,7 +275,7 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
                       className={`flex items-center ${sortBy === 'provider' ? 'text-[#10a37f]' : ''}`}
                       onClick={() => setSortBy('provider')}
                     >
-                      提供商
+                      {t('library.model.provider')}
                       {sortBy === 'provider' && (
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -281,14 +283,14 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
                       )}
                     </button>
                   </th>
-                  <th className="py-3 text-left font-medium">类别</th>
-                  <th className="py-3 text-left font-medium">参数量</th>
+                  <th className="py-3 text-left font-medium">{t('library.model.category')}</th>
+                  <th className="py-3 text-left font-medium">{t('library.model.parameters')}</th>
                   <th className="py-3 text-left font-medium">
                     <button 
                       className={`flex items-center ${sortBy === 'lastUpdated' ? 'text-[#10a37f]' : ''}`}
                       onClick={() => setSortBy('lastUpdated')}
                     >
-                      更新日期
+                      {t('library.model.updatedAt')}
                       {sortBy === 'lastUpdated' && (
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -296,7 +298,7 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
                       )}
                     </button>
                   </th>
-                  <th className="py-3 text-right font-medium">操作</th>
+                  <th className="py-3 text-right font-medium">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#1c1c1c]">
@@ -317,10 +319,10 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
                           <div className="flex items-center">
                             <h3 className="text-white font-medium">{model.name}</h3>
                             {model.popular && (
-                              <span className="ml-2 px-1.5 py-0.5 bg-[#ef4444]/10 text-[#ef4444] text-xs rounded">热门</span>
+                              <span className="ml-2 px-1.5 py-0.5 bg-[#ef4444]/10 text-[#ef4444] text-xs rounded">Popular</span>
                             )}
                             {model.installed && (
-                              <span className="ml-2 px-1.5 py-0.5 bg-[#10a37f]/10 text-[#10a37f] text-xs rounded">已安装</span>
+                              <span className="ml-2 px-1.5 py-0.5 bg-[#10a37f]/10 text-[#10a37f] text-xs rounded">Installed</span>
                             )}
                           </div>
                           <p className="text-xs text-[#999] mt-1 max-w-md line-clamp-1">{model.description}</p>
@@ -336,7 +338,7 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
                         model.category === 'embedding' ? 'bg-[#a855f7]/10 text-[#a855f7]' : 
                         'bg-[#ec4899]/10 text-[#ec4899]'
                       }`}>
-                        {getCategoryName(model.category)}
+                        {getCategoryName(model.category, t)}
                       </span>
                     </td>
                     <td className="py-4 text-[#999]">{formatParameters(model.parameters)}</td>
@@ -344,11 +346,11 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
                     <td className="py-4 text-right">
                       {model.installed ? (
                         <button className="px-3 py-1.5 bg-[#141414] hover:bg-[#1c1c1c] border border-[#282828] rounded text-sm transition-all">
-                          管理
+                          {t('library.model.manage')}
                         </button>
                       ) : (
                         <button className="px-3 py-1.5 bg-[#10a37f] hover:bg-[#0fd292] text-white rounded text-sm transition-all">
-                          安装
+                          {t('library.model.install')}
                         </button>
                       )}
                     </td>
@@ -364,13 +366,13 @@ const ModelLibrary: React.FC<ModelLibraryProps> = ({ onClose }) => {
 };
 
 // 获取分类名称
-const getCategoryName = (category: string) => {
+const getCategoryName = (category: string, t: (key: string) => string) => {
   switch (category) {
-    case 'text': return '文本';
-    case 'image': return '图像';
-    case 'audio': return '音频';
-    case 'embedding': return '嵌入';
-    case 'multimodal': return '多模态';
+    case 'text': return t('library.model.categories.text');
+    case 'image': return t('library.model.categories.image');
+    case 'audio': return t('library.model.categories.audio');
+    case 'embedding': return t('library.model.categories.embedding');
+    case 'multimodal': return t('library.model.categories.multimodal');
     default: return category;
   }
 };

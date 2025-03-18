@@ -11,6 +11,20 @@ interface BaseModalProps {
   className?: string;
 }
 
+interface ModalProps {
+  title: string;
+  onClose: () => void;
+  onSave?: () => void; // 添加保存回调
+  children: React.ReactNode;
+  width?: string;
+  height?: string;
+  showCloseButton?: boolean;
+  footer?: React.ReactNode;
+  saveLabel?: string; // 添加保存按钮文本
+  cancelLabel?: string; // 添加取消按钮文本
+  disabled?: boolean; // 添加禁用状态
+}
+
 const BaseModal: React.FC<BaseModalProps> = ({
   title,
   onClose,
@@ -66,24 +80,17 @@ const BaseModal: React.FC<BaseModalProps> = ({
   );
 };
 
-interface ModalProps {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-  width?: string;
-  height?: string;
-  showCloseButton?: boolean;
-  footer?: React.ReactNode;
-}
-
 const Modal: React.FC<ModalProps> = ({
   title,
   onClose,
+  onSave,
   children,
   width,
   height,
   showCloseButton,
-  footer,
+  saveLabel = '保存',
+  cancelLabel = '取消',
+  disabled = false
 }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -96,6 +103,25 @@ const Modal: React.FC<ModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
   
+  const footer = onSave ? (
+    <>
+      <button
+        onClick={onClose}
+        className="px-4 py-2 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] rounded text-sm transition-all duration-200"
+        disabled={disabled}
+      >
+        {cancelLabel}
+      </button>
+      <button
+        onClick={onSave}
+        className="px-4 py-2 bg-[#10a37f] hover:bg-[#0fd292] text-white rounded text-sm transition-all duration-200 shadow-lg shadow-[#10a37f]/20"
+        disabled={disabled}
+      >
+        {saveLabel}
+      </button>
+    </>
+  ) : undefined;
+
   return (
     <BaseModal
       title={title}

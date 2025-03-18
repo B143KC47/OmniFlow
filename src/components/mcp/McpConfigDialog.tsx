@@ -3,6 +3,7 @@ import { ServiceProvider } from '../../types/mcp';
 import McpModal from './shared/McpModal';
 import McpFormGroup, { formControlStyles, buttonStyles, ConfigEditor } from './shared/McpFormGroup';
 import { useConfigDialog } from './hooks/useConfigDialog';
+import { useTranslation } from '../../utils/i18n';
 
 interface McpConfigDialogProps {
   provider: ServiceProvider;
@@ -19,6 +20,7 @@ const McpConfigDialog: React.FC<McpConfigDialogProps> = ({
   onSubmit,
   onConfigJsonChange,
 }) => {
+  const { t } = useTranslation();
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
   // 创建初始配置对象
@@ -67,25 +69,25 @@ const McpConfigDialog: React.FC<McpConfigDialogProps> = ({
 
   const renderFooter = () => (
     <>
-      <button className="mcp-cancel-btn" onClick={handleCancel}>取消</button>
+      <button className="mcp-cancel-btn" onClick={handleCancel}>{t('common.cancel')}</button>
       <button 
         className="mcp-submit-btn" 
         onClick={handleSubmit}
         disabled={!isValid}
       >
-        保存
+        {t('common.save')}
       </button>
     </>
   );
 
   return (
     <McpModal
-      title={`编辑 ${provider.name} 配置`}
+      title={t('mcp.form.editConfig', { name: provider.name })}
       onClose={handleCancel}
       footer={renderFooter()}
     >
       <McpFormGroup 
-        label="配置 (JSON格式)" 
+        label={t('mcp.form.config')} 
         error={submitAttempted && error ? error : undefined}
       >
         <ConfigEditor
