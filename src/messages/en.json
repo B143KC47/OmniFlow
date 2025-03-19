@@ -42,7 +42,21 @@
       "inactive": "Inactive",
       "error": "Error",
       "configuring": "Configuring"
-    }
+    },
+    "title": "Model Control Panel",
+    "addProvider": "Add Provider",
+    "configureProvider": "Configure Provider",
+    "deleteProvider": "Delete Provider",
+    "providerName": "Provider Name",
+    "apiKey": "API Key",
+    "endpoint": "Endpoint URL",
+    "timeout": "Timeout (seconds)",
+    "retry": "Retry on error",
+    "retryAttempts": "Retry attempts",
+    "autoConnect": "Auto-connect on startup",
+    "testConnection": "Test Connection",
+    "connectionSuccess": "Connection successful",
+    "connectionError": "Connection failed"
   },
   "app": {
     "title": "OmniFlow",
@@ -55,7 +69,8 @@
       "queueHistory": "Queue History"
     },
     "loading": "Loading...",
-    "welcome": "Welcome to OmniFlow"
+    "welcome": "Welcome to OmniFlow",
+    "locale": "en-US"
   },
   "settings": {
     "title": "System Settings",
@@ -82,7 +97,8 @@
       "autoSaveInterval": "Auto-save interval (minutes)",
       "snapToGrid": "Snap nodes to grid",
       "showNodeTooltips": "Show node tooltips",
-      "gridSize": "Grid size"
+      "gridSize": "Grid size",
+      "management": "Model management"
     },
     "theme": {
       "label": "Theme",
@@ -155,7 +171,48 @@
     "exportToJson": "Export as JSON",
     "importFromJson": "Import from JSON",
     "confirmDelete": "Are you sure you want to delete this workflow?",
-    "cannotUndo": "This action cannot be undone"
+    "confirmDeleteDescription": "This action cannot be undone. Do you want to continue?",
+    "cannotUndo": "This action cannot be undone",
+    "description": "Description",
+    "createdAt": "Created at",
+    "lastModified": "Last modified",
+    "importWorkflow": "Import Workflow",
+    "exportWorkflow": "Export Workflow",
+    "createWorkflow": {
+      "title": "Create New Workflow",
+      "nameLabel": "Workflow Name",
+      "namePlaceholder": "Enter workflow name",
+      "descriptionLabel": "Workflow Description",
+      "descriptionPlaceholder": "Briefly describe what this workflow does"
+    },
+    "myWorkflows": "My Workflows",
+    "management": "Workflow Management",
+    "searchPlaceholder": "Search workflows...",
+    "defaultName": "New Workflow",
+    "defaultDescription": "Workflow with {{nodes}} nodes",
+    "filterByTag": "Filter by tag",
+    "favorites": "Favorites",
+    "noMatchingWorkflows": "No matching workflows",
+    "noMatchingWorkflowsDescription": "Try changing your filters or clearing the search",
+    "nodeCount": "{{count}} nodes",
+    "edgeCount": "{{count}} connections",
+    "tags": {
+      "textGeneration": "Text Generation",
+      "imageGeneration": "Image Generation",
+      "dataAnalysis": "Data Analysis",
+      "textSummary": "Text Summary",
+      "translation": "Translation",
+      "search": "Search",
+      "questionAnswering": "Question Answering",
+      "workflow": "Workflow"
+    },
+    "errors": {
+      "loadFailed": "Failed to load workflow",
+      "saveFailed": "Failed to save workflow",
+      "deleteFailed": "Failed to delete workflow",
+      "updateFailed": "Failed to update workflow",
+      "rollbackFailed": "Failed to rollback state"
+    }
   },
   "nodes": {
     "common": {
@@ -165,36 +222,88 @@
       "preview": "Preview",
       "execute": "Execute",
       "delete": "Delete",
-      "duplicate": "Duplicate"
+      "duplicate": "Duplicate",
+      "connect": "Connect",
+      "disconnect": "Disconnect",
+      "run": "Run",
+      "configure": "Configure",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "inputs": "Inputs",
+      "outputs": "Outputs"
     },
     "categories": {
       "input": "Input",
+      "output": "Output",
+      "text": "Text Processing",
+      "ml": "Machine Learning",
+      "util": "Utility",
+      "io": "Input/Output",
+      "all": "All Nodes",
+      "popular": "Popular",
+      "new": "New",
       "llm": "LLM",
       "document": "Document",
       "search": "Search",
-      "output": "Output",
       "utility": "Utility"
     },
     "textInput": {
-      "title": "Text Input",
-      "placeholder": "Enter your text here...",
-      "label": "Input label"
+      "name": "Text Input",
+      "description": "Allows users to input text content",
+      "placeholder": "Enter text here"
     },
     "llmQuery": {
-      "title": "LLM Query",
-      "modelSelect": "Select model",
-      "systemPrompt": "System prompt",
+      "name": "LLM Query",
+      "description": "Send queries to large language models",
+      "modelLabel": "Select model",
+      "promptLabel": "Prompt",
+      "promptPlaceholder": "Enter prompt",
       "temperature": "Temperature",
-      "maxTokens": "Max tokens"
+      "maxTokens": "Maximum tokens"
     },
     "webSearch": {
-      "title": "Web Search",
+      "name": "Web Search",
+      "description": "Search the web for information",
+      "queryLabel": "Search query",
+      "queryPlaceholder": "Enter search terms",
       "provider": "Search provider",
-      "query": "Search query",
-      "results": "Results count"
+      "resultCount": "Result count"
+    },
+    "documentQuery": {
+      "name": "Document Query",
+      "description": "Search for relevant content in documents",
+      "queryLabel": "Query",
+      "queryPlaceholder": "Enter query",
+      "fileSource": "File source"
+    },
+    "modelSelector": {
+      "name": "Model Selector",
+      "description": "Select models to use",
+      "modelCategory": "Model category"
+    },
+    "loopControl": {
+      "name": "Loop Control",
+      "description": "Control workflow iteration",
+      "iterations": "Iterations",
+      "condition": "Loop condition"
+    },
+    "custom": {
+      "name": "Custom Node",
+      "description": "Create custom functionality node",
+      "codeLabel": "Node code",
+      "codePlaceholder": "Enter custom code here"
     }
   },
   "library": {
+    "node": {
+      "title": "Node Library",
+      "search": "Search nodes...",
+      "category": "Node category",
+      "inputs": "Inputs",
+      "outputs": "Outputs",
+      "notFound": "No matching nodes found",
+      "tryDifferent": "Try a different search term"
+    },
     "model": {
       "title": "Model Library",
       "notFound": "No matching models found",
@@ -250,6 +359,14 @@
       "nodeAdded": "Node added",
       "nodeRemoved": "Node removed",
       "executed": "Execution complete"
+    },
+    "status": {
+      "saved": "Saved",
+      "saving": "Saving...",
+      "unsaved": "Unsaved",
+      "running": "Running",
+      "completed": "Completed",
+      "error": "Error"
     }
   },
   "common": {
@@ -265,22 +382,25 @@
     "actions": "Actions",
     "ok": "OK",
     "yes": "Yes",
-    "no": "No"
-  },
-  "mcp": {
-    "title": "Model Control Panel",
-    "addProvider": "Add Provider",
-    "configureProvider": "Configure Provider",
-    "deleteProvider": "Delete Provider",
-    "providerName": "Provider Name",
-    "apiKey": "API Key",
-    "endpoint": "Endpoint URL",
-    "timeout": "Timeout (seconds)",
-    "retry": "Retry on error",
-    "retryAttempts": "Retry attempts",
-    "autoConnect": "Auto-connect on startup",
-    "testConnection": "Test Connection",
-    "connectionSuccess": "Connection successful",
-    "connectionError": "Connection failed"
+    "no": "No",
+    "loading": "Loading",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "view": "View",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh",
+    "close": "Close",
+    "import": "Import",
+    "export": "Export",
+    "add": "Add",
+    "remove": "Remove",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "noData": "No data",
+    "noResults": "No results"
   }
 }
