@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![OmniFlow Logo](./docs/images/logo.png) <!-- 假设有logo，如无则移除此行 -->
+![OmniFlow Logo](./docs/images/logo.svg) 
 
 **An advanced node-based workflow editor designed for LLM (Large Language Model) applications**
 

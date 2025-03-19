@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="100" viewBox="0 0 320 100">
+  <defs>
+    <!-- 玻璃效果滤镜 -->
+    <filter id="glass" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feColorMatrix in="blur" type="matrix" 
+        values="1 0 0 0 0 
+                0 1 0 0 0 
+                0 0 1 0 0 
+                0 0 0 18 -7" 
+        result="glassy" />
+      <feComposite in="SourceGraphic" in2="glassy" operator="atop" />
+    </filter>
+    
+    <!-- 绿色渐变 -->
+    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3CDF85" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#0D9B55" stop-opacity="0.8" />
+    </linearGradient>
+    
+    <!-- 黑色渐变 -->
+    <linearGradient id="darkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2A2A2A" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#121212" stop-opacity="0.85" />
+    </linearGradient>
+    
+    <!-- 背景高光效果 -->
+    <radialGradient id="highlight" cx="50%" cy="50%" r="75%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  
+  <g transform="translate(60, 50)">
+    <!-- 背景六边形 - 黑色 -->
+    <path d="M0,-40 L34.64,-20 L34.64,20 L0,40 L-34.64,20 L-34.64,-20 Z" 
+      fill="url(#darkGradient)" 
+      stroke="#1a1a1a" 
+      stroke-width="1.5"
+      filter="url(#glass)" />
+      
+    <!-- 中间六边形 - 绿色 -->
+    <path d="M0,-30 L25.98,-15 L25.98,15 L0,30 L-25.98,15 L-25.98,-15 Z" 
+      fill="url(#greenGradient)" 
+      stroke="#0D9B55" 
+      stroke-width="1"
+      filter="url(#glass)" />
+      
+    <!-- 内部六边形 - 黑色 -->
+    <path d="M0,-15 L12.99,-7.5 L12.99,7.5 L0,15 L-12.99,7.5 L-12.99,-7.5 Z" 
+      fill="#121212" 
+      stroke="#3CDF85" 
+      stroke-width="0.75" />
+      
+    <!-- 装饰性连接线 - 代表"Flow" -->
+    <path d="M-17,0 C-12,-8 12,8 17,0" 
+      fill="none" 
+      stroke="#3CDF85" 
+      stroke-width="1.5"
+      stroke-linecap="round" />
+      
+    <!-- 点缀小六边形 -->
+    <path d="M0,-5 L4.33,-2.5 L4.33,2.5 L0,5 L-4.33,2.5 L-4.33,-2.5 Z" 
+      fill="#3CDF85" 
+      opacity="0.8" 
+      transform="translate(0, 0)" />
+      
+    <!-- 高光效果 -->
+    <path d="M0,-40 L34.64,-20 L34.64,20 L0,40 L-34.64,20 L-34.64,-20 Z" 
+      fill="url(#highlight)" />
+  </g>
+  
+  <!-- 文字部分 -->
+  <g transform="translate(125, 57)">
+    <!-- Omni 文字 -->
+    <text font-family="'Segoe UI', Arial, sans-serif" font-size="28" font-weight="600" fill="#1a1a1a">
+      Omni
+    </text>
+    
+    <!-- Flow 文字 -->
+    <text x="76" font-family="'Segoe UI', Arial, sans-serif" font-size="28" font-weight="600" fill="#0D9B55">
+      Flow
+    </text>
+    
+    <!-- 装饰性横线 -->
+    <path d="M0,14 L135,14" 
+      stroke="url(#greenGradient)"
+      stroke-width="2" 
+      stroke-linecap="round"
+      opacity="0.7" />
+      
+    <!-- 极客风格装饰点 -->
+    <circle cx="-8" cy="0" r="2" fill="#3CDF85" />
+    <circle cx="145" cy="0" r="2" fill="#3CDF85" />
+  </g>
+</svg>
