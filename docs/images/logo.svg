@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="100" viewBox="0 0 320 100">
   <defs>
+    <!-- 添加背景渐变 -->
+    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5f5f5" stop-opacity="1" />
+      <stop offset="100%" stop-color="#e0e0e0" stop-opacity="1" />
+    </linearGradient>
+    
     <!-- 玻璃效果滤镜 -->
     <filter id="glass" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="1.5" result="blur" />
@@ -30,6 +36,9 @@
       <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
     </radialGradient>
   </defs>
+  
+  <!-- 背景矩形 -->
+  <rect x="0" y="0" width="320" height="100" fill="url(#backgroundGradient)" rx="5" ry="5" />
   
   <g transform="translate(60, 50)">
     <!-- 背景六边形 - 黑色 -->
