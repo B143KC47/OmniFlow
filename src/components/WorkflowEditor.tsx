@@ -378,7 +378,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
                       : 'comfy-button-primary'
                   )}
                 >
-                  {t('workflow.execute')}
+                  {t('workflow.runWorkflow')}
                 </button>
                 <button
                   onClick={handleStop}
@@ -390,20 +390,20 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
                       : 'comfy-button-danger'
                   )}
                 >
-                  {t('workflow.stop')}
+                  {t('workflow.stopWorkflow')}
                 </button>
                 <button
                   onClick={handleSaveWorkflow}
                   disabled={executionState?.isRunning}
                   className="comfy-button comfy-button-secondary"
                 >
-                  {t('workflow.save')}
+                  {t('workflow.saveWorkflow')}
                 </button>
                 <button
                   onClick={handleShowMcpManager}
                   className="comfy-button comfy-button-secondary"
                 >
-                  {t('workflow.manageExternalServices')}
+                  {t('mcp.header.title')}
                 </button>
               </div>
 

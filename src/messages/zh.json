@@ -10,7 +10,8 @@
       "queueHistory": "队列历史"
     },
     "loading": "加载中...",
-    "welcome": "欢迎使用 OmniFlow"
+    "welcome": "欢迎使用 OmniFlow",
+    "locale": "zh-CN"
   },
   "settings": {
     "title": "系统设置",
@@ -36,12 +37,39 @@
       "autoSave": "自动保存工作流",
       "autoSaveInterval": "自动保存间隔 (分钟)",
       "snapToGrid": "节点对齐网格",
-      "showNodeTooltips": "显示节点提示"
+      "showNodeTooltips": "显示节点提示",
+      "management": "模型管理"
     },
     "buttons": {
       "save": "保存",
       "cancel": "取消",
       "reset": "恢复默认"
+    },
+    "gridSize": {
+      "label": "网格大小"
+    },
+    "nodeTooltips": {
+      "label": "节点提示",
+      "show": "悬停时显示提示"
+    },
+    "autoSave": {
+      "label": "自动保存",
+      "enable": "启用自动保存"
+    },
+    "autoSaveInterval": {
+      "label": "自动保存间隔",
+      "minutes": "分钟"
+    },
+    "other": "其他",
+    "about": {
+      "title": "关于"
+    },
+    "connectionStyle": {
+      "label": "连接线样式",
+      "bezier": "曲线（贝塞尔）",
+      "straight": "直线",
+      "step": "阶梯线",
+      "smoothstep": "平滑阶梯"
     }
   },
   "workflow": {
@@ -69,15 +97,42 @@
       "descriptionPlaceholder": "简要描述此工作流的用途"
     },
     "myWorkflows": "我的工作流",
+    "management": "工作流管理",
     "searchPlaceholder": "搜索工作流...",
     "defaultName": "新工作流",
+    "defaultDescription": "包含 {{nodes}} 个节点的工作流",
+    "filterByTag": "按标签筛选",
+    "favorites": "收藏夹",
+    "noMatchingWorkflows": "没有匹配的工作流",
+    "noMatchingWorkflowsDescription": "尝试更改筛选条件或清除搜索",
+    "nodeCount": "{{count}} 个节点",
+    "edgeCount": "{{count}} 个连接",
+    "tags": {
+      "textGeneration": "文本生成",
+      "imageGeneration": "图像生成",
+      "dataAnalysis": "数据分析",
+      "textSummary": "文本摘要",
+      "translation": "翻译",
+      "search": "搜索",
+      "questionAnswering": "问答",
+      "workflow": "工作流"
+    },
     "errors": {
       "loadFailed": "加载工作流失败",
       "saveFailed": "保存工作流失败",
       "deleteFailed": "删除工作流失败",
       "updateFailed": "更新工作流失败",
       "rollbackFailed": "回滚状态失败"
-    }
+    },
+    "created": "创建时间",
+    "lastEdit": "最后编辑",
+    "actions": "操作",
+    "untitled": "未命名工作流",
+    "saveAs": "另存为",
+    "exportToJson": "导出为JSON",
+    "importFromJson": "从JSON导入",
+    "confirmDelete": "确定要删除这个工作流吗？",
+    "cannotUndo": "此操作无法撤销"
   },
   "nodes": {
     "common": {
@@ -93,7 +148,9 @@
       "collapse": "折叠",
       "expand": "展开",
       "inputs": "输入",
-      "outputs": "输出"
+      "outputs": "输出",
+      "preview": "预览",
+      "execute": "执行"
     },
     "textInput": {
       "name": "文本输入",
@@ -150,7 +207,11 @@
       "io": "输入输出",
       "all": "所有节点",
       "popular": "热门节点",
-      "new": "最新节点"
+      "new": "最新节点",
+      "llm": "大语言模型",
+      "document": "文档",
+      "search": "搜索",
+      "utility": "工具"
     }
   },
   "library": {
@@ -228,7 +289,21 @@
       "inactive": "未激活",
       "error": "错误",
       "configuring": "配置中"
-    }
+    },
+    "title": "模型控制面板",
+    "addProvider": "添加提供商",
+    "configureProvider": "配置提供商",
+    "deleteProvider": "删除提供商",
+    "providerName": "提供商名称",
+    "apiKey": "API密钥",
+    "endpoint": "端点URL",
+    "timeout": "超时时间（秒）",
+    "retry": "错误时重试",
+    "retryAttempts": "重试次数",
+    "autoConnect": "启动时自动连接",
+    "testConnection": "测试连接",
+    "connectionSuccess": "连接成功",
+    "connectionError": "连接失败"
   },
   "contextMenu": {
     "addNode": "添加节点",
@@ -254,7 +329,8 @@
       "zoomOut": "缩小",
       "fitView": "适应视图",
       "lock": "锁定画布",
-      "unlock": "解锁画布"
+      "unlock": "解锁画布",
+      "clear": "清空画布"
     },
     "status": {
       "saved": "已保存",
@@ -263,6 +339,13 @@
       "running": "运行中",
       "completed": "已完成",
       "error": "错误"
+    },
+    "notifications": {
+      "saved": "工作流已保存",
+      "error": "操作失败",
+      "nodeAdded": "节点已添加",
+      "nodeRemoved": "节点已移除",
+      "executed": "执行完成"
     }
   },
   "common": {
@@ -294,6 +377,9 @@
     "next": "下一步",
     "finish": "完成",
     "noData": "暂无数据",
-    "noResults": "无匹配结果"
+    "noResults": "无匹配结果",
+    "apply": "应用",
+    "actions": "操作",
+    "reset": "重置"
   }
 }

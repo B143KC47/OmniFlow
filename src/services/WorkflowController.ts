@@ -106,7 +106,7 @@ class WorkflowController {
     }
 
     this.state.isRunning = false;
-    this.state.error = new Error('工作流执行被手动停止');
+    this.state.error = new Error("工作流已手动停止");
     this.notifyStateChange();
   }
 
@@ -131,4 +131,4 @@ class WorkflowController {
   }
 }
 
-export default WorkflowController; 
+export default WorkflowController;

@@ -27,6 +27,8 @@ export interface NodeData {
   inputs: Record<string, any>;
   outputs: Record<string, any>;
   onChange?: (nodeId: string, data: any) => void;
+  status?: 'idle' | 'running' | 'completed' | 'error' | 'connected';
+  connectStatus?: 'compatible' | 'incompatible' | null;
 }
 
 export interface Node {
@@ -55,4 +57,4 @@ export interface Workflow {
   edges: Edge[];
   createdAt: Date;
   updatedAt: Date;
-} 
+}

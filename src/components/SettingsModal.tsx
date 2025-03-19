@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useSettings } from '../contexts/SettingsContext';
 import Modal from './shared/Modal';
 import { useTranslation } from '../utils/i18n';
@@ -6,11 +6,12 @@ import { AppSettings } from '../contexts/SettingsContext';
 
 interface SettingsModalProps {
   onClose: () => void;
+  onSave?: (settings: AppSettings) => void;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
-  const { t, changeLanguage, isLoading } = useTranslation();
-  const { settings, updateCategorySettings, isUpdating } = useSettings();
+const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
+  const { t, changeLanguage, isLoading, language, supportedLanguages } = useTranslation();
+  const { settings, updateCategorySettings, resetSettings, isUpdating } = useSettings();
   const [error, setError] = useState<string | null>(null);
   
   // 本地设置状态，用于表单 - 使用扁平化的结构方便UI操作
@@ -25,6 +26,21 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
     snapToGrid: settings.workflow.snapToGrid,
     gridSize: settings.workflow.gridSize
   });
+
+  // 当settings变化时更新本地状态
+  useEffect(() => {
+    setLocalSettings({
+      theme: settings.appearance.theme,
+      language: settings.appearance.language,
+      reduceAnimations: settings.appearance.reduceAnimations,
+      showBackgroundPattern: settings.appearance.showBackgroundPattern,
+      autoSave: settings.workflow.autoSave,
+      autoSaveInterval: settings.workflow.autoSaveInterval,
+      showNodeTooltips: settings.workflow.showNodeTooltips,
+      snapToGrid: settings.workflow.snapToGrid,
+      gridSize: settings.workflow.gridSize
+    });
+  }, [settings]);
   
   // 处理设置更改
   const handleChange = (key: string, value: any) => {
@@ -32,17 +48,28 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
       ...localSettings,
       [key]: value
     });
+
+    // 如果是语言更改，立即应用变更以提供即时反馈
+    if (key === 'language' && value !== settings.appearance.language) {
+      handleLanguageChange(value);
+    }
+  };
+
+  // 处理语言变更
+  const handleLanguageChange = async (newLanguage: string) => {
+    try {
+      setError(null);
+      await changeLanguage(newLanguage as 'zh-CN' | 'en-US');
+    } catch (error) {
+      console.error('语言切换失败:', error);
+      setError(t('settings.errors.updateFailed'));
+    }
   };
   
   // 保存设置
   const handleSave = useCallback(async () => {
     try {
       setError(null);
-      
-      // 如果语言发生变化，需要更新语言
-      if (settings.appearance.language !== localSettings.language) {
-        await changeLanguage(localSettings.language);
-      }
       
       // 更新外观相关的设置
       updateCategorySettings('appearance', {
@@ -61,20 +88,49 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
         gridSize: localSettings.gridSize
       });
       
-      // 等待所有更新完成
+      // 如果提供了onSave回调，则调用它
+      if (onSave) {
+        onSave({
+          appearance: {
+            ...settings.appearance,
+            theme: localSettings.theme,
+            language: localSettings.language,
+            reduceAnimations: localSettings.reduceAnimations,
+            showBackgroundPattern: localSettings.showBackgroundPattern
+          },
+          workflow: {
+            ...settings.workflow,
+            autoSave: localSettings.autoSave,
+            autoSaveInterval: localSettings.autoSaveInterval,
+            showNodeTooltips: localSettings.showNodeTooltips,
+            snapToGrid: localSettings.snapToGrid,
+            gridSize: localSettings.gridSize
+          },
+          mcp: { ...settings.mcp }
+        });
+      }
+      
+      // 等待所有更新完成后关闭模态框
       await Promise.resolve();
       onClose();
     } catch (error) {
       console.error('保存设置失败:', error);
       setError(t('settings.errors.saveFailed'));
     }
-  }, [localSettings, settings.appearance.language, updateCategorySettings, changeLanguage, onClose, t]);
-  
-  // 语言选项
-  const languageOptions = [
-    { value: 'en-US', label: 'English' },
-    { value: 'zh-CN', label: '中文' }
-  ];
+  }, [localSettings, settings, updateCategorySettings, onSave, onClose, t]);
+
+  // 重置设置
+  const handleReset = useCallback(async () => {
+    try {
+      setError(null);
+      resetSettings();
+      await Promise.resolve();
+      // 不关闭模态框，让用户可以看到重置后的设置
+    } catch (error) {
+      console.error('重置设置失败:', error);
+      setError(t('settings.errors.updateFailed'));
+    }
+  }, [resetSettings, t]);
   
   // 主题选项
   const themeOptions = [
@@ -91,6 +147,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
     { value: 'smoothstep', label: t('settings.connectionStyle.smoothstep') }
   ];
 
+  const isProcessing = isLoading || isUpdating;
+
   return (
     <Modal
       title={t('settings.title')}
@@ -98,10 +156,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
       onSave={handleSave}
       saveLabel={t('common.save')}
       cancelLabel={t('common.cancel')}
-      disabled={isLoading || isUpdating}
+      disabled={isProcessing}
     >
       <div className="settings-modal">
-        {(isLoading || isUpdating) && (
+        {isProcessing && (
           <div className="settings-loading-overlay">
             <div className="settings-loading-spinner"></div>
             <div className="settings-loading-text">{t('settings.updating')}</div>
@@ -118,7 +176,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
         )}
 
         <div className="settings-section">
-          <h3 className="settings-section-title">{t('settings.appearance')}</h3>
+          <h3 className="settings-section-title">{t('settings.appearance.title')}</h3>
           
           <div className="settings-field">
             <label htmlFor="theme">{t('settings.theme.label')}:</label>
@@ -127,6 +185,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 id="theme"
                 value={localSettings.theme}
                 onChange={(e) => handleChange('theme', e.target.value)}
+                disabled={isProcessing}
               >
                 {themeOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -144,10 +203,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 id="language"
                 value={localSettings.language}
                 onChange={(e) => handleChange('language', e.target.value)}
+                disabled={isProcessing}
               >
-                {languageOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
+                {Object.entries(supportedLanguages).map(([code, name]) => (
+                  <option key={code} value={code}>
+                    {name}
                   </option>
                 ))}
               </select>
@@ -164,6 +224,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 type="checkbox"
                 checked={localSettings.reduceAnimations}
                 onChange={(e) => handleChange('reduceAnimations', e.target.checked)}
+                disabled={isProcessing}
               />
               <span className="checkbox-label">
                 {t('settings.animations.reduce')}
@@ -181,6 +242,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 type="checkbox"
                 checked={localSettings.showBackgroundPattern}
                 onChange={(e) => handleChange('showBackgroundPattern', e.target.checked)}
+                disabled={isProcessing}
               />
               <span className="checkbox-label">
                 {t('settings.background.show')}
@@ -190,7 +252,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
         </div>
 
         <div className="settings-section">
-          <h3 className="settings-section-title">{t('settings.workflow')}</h3>
+          <h3 className="settings-section-title">{t('settings.workflow.title')}</h3>
           
           <div className="settings-field">
             <label htmlFor="snapToGrid">
@@ -202,6 +264,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 type="checkbox"
                 checked={localSettings.snapToGrid}
                 onChange={(e) => handleChange('snapToGrid', e.target.checked)}
+                disabled={isProcessing}
               />
               <span className="checkbox-label">
                 {t('settings.nodeSnapToGrid.enable')}
@@ -223,6 +286,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                   value={localSettings.gridSize}
                   onChange={(e) => handleChange('gridSize', parseInt(e.target.value, 10))}
                   className="grid-size-input"
+                  disabled={isProcessing}
                 />
                 <span className="unit">px</span>
               </div>
@@ -239,6 +303,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 type="checkbox"
                 checked={localSettings.showNodeTooltips}
                 onChange={(e) => handleChange('showNodeTooltips', e.target.checked)}
+                disabled={isProcessing}
               />
               <span className="checkbox-label">
                 {t('settings.nodeTooltips.show')}
@@ -260,6 +325,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 type="checkbox"
                 checked={localSettings.autoSave}
                 onChange={(e) => handleChange('autoSave', e.target.checked)}
+                disabled={isProcessing}
               />
               <span className="checkbox-label">
                 {t('settings.autoSave.enable')}
@@ -281,11 +347,22 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                   value={localSettings.autoSaveInterval}
                   onChange={(e) => handleChange('autoSaveInterval', parseInt(e.target.value, 10))}
                   className="interval-input"
+                  disabled={isProcessing}
                 />
                 <span className="unit">{t('settings.autoSaveInterval.minutes')}</span>
               </div>
             </div>
           )}
+
+          <div className="settings-field settings-reset-button">
+            <button 
+              onClick={handleReset}
+              className="reset-button"
+              disabled={isProcessing}
+            >
+              {t('settings.buttons.reset')}
+            </button>
+          </div>
         </div>
 
         <div className="settings-section settings-section-about">
@@ -303,6 +380,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             flex-direction: column;
             gap: 1.5rem;
             padding: 1rem;
+            position: relative;
           }
           
           .settings-section {
@@ -348,6 +426,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             color: var(--text-primary);
             border: 1px solid var(--border-color);
             width: 100%;
+          }
+          
+          .settings-field-control select:disabled,
+          .settings-field-control input:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
           }
           
           .settings-field-control input[type="checkbox"] {
@@ -405,6 +489,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             justify-content: center;
             align-items: center;
             z-index: 9999;
+            border-radius: 6px;
           }
           
           .settings-loading-spinner {
@@ -434,6 +519,35 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           
           .settings-error-message svg {
             margin-right: 0.5rem;
+            flex-shrink: 0;
+            width: 1.25rem;
+            height: 1.25rem;
+          }
+
+          .settings-reset-button {
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+          }
+
+          .reset-button {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+          }
+
+          .reset-button:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+          }
+
+          .reset-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
           }
           
           @keyframes spin {

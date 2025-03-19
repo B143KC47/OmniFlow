@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import { useTranslation } from '../utils/i18n';
 import { useSettings } from '../contexts/SettingsContext';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 // 动态导入 WorkflowEditor 组件
 const WorkflowEditor = dynamic(
@@ -86,13 +87,15 @@ const HomePage: React.FC = () => {
   // 监听语言变化
   useEffect(() => {
     // 更新document的title
-    document.title = t('app.title');
+    if (isClient) {
+      document.title = t('app.title');
+    }
     
     // 更新HTML的lang属性
     if (typeof document !== 'undefined') {
       document.documentElement.lang = settings.appearance.language;
     }
-  }, [settings.appearance.language, t]);
+  }, [settings.appearance.language, t, isClient]);
 
   // 保存工作流
   const handleSaveWorkflow = (workflow: Workflow) => {
@@ -198,7 +201,7 @@ const HomePage: React.FC = () => {
   if (!isClient) {
     return (
       <div className="min-h-screen bg-[#141414] flex items-center justify-center">
-        <div className="text-[#666] text-sm">{t('common.loading')}</div>
+        <div className="text-[#666] text-sm">loading</div>
       </div>
     );
   }
@@ -283,6 +286,7 @@ const HomePage: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </button>
+          <LanguageSwitcher minimal />
         </div>
       </header>
 
@@ -401,7 +405,15 @@ const HomePage: React.FC = () => {
       {showQueueHistory && <QueueHistory onClose={() => setShowQueueHistory(false)} />}
 
       {/* 节点库模态框 */}
-      {showNodeLibrary && <NodeLibrary onClose={() => setShowNodeLibrary(false)} />}
+      {showNodeLibrary && (
+        <NodeLibrary 
+          onClose={() => setShowNodeLibrary(false)} 
+          onSelectNode={(nodeType) => {
+            // 选择节点后关闭模态框
+            setShowNodeLibrary(false);
+          }}
+        />
+      )}
 
       {/* 模型库模态框 */}
       {showModelLibrary && <ModelLibrary onClose={() => setShowModelLibrary(false)} />}

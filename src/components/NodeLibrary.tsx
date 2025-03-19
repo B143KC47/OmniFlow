@@ -99,7 +99,7 @@ const NodeLibrary: React.FC<NodeLibraryProps> = ({ onClose, onSelectNode }) => {
         icon: 'loop'
       },
       {
-        id: NodeType.CUSTOM_NODE,
+        id: NodeType.CUSTOM,
         name: t('nodes.custom.name'),
         description: t('nodes.custom.description'),
         category: 'advanced',

@@ -10,32 +10,66 @@ let translations = {
         notificationQuestion: '允许接收新消息和重要更新的通知？',
         later: '稍后再说',
         allow: '允许',
-        scrollToTop: '滚动到顶部'
+        scrollToTop: '滚动到顶部',
+        loading: '加载中...',
+        newMessage: '新消息',
+        codeBlockCopied: '代码已复制',
+        codeBlockCopy: '复制代码',
+        expandMessage: '展开消息',
+        collapseMessage: '收起消息',
+        messageFrom: '来自',
+        retryButton: '重试',
+        cancelButton: '取消'
     },
-    'en': {
+    'en-US': {
         notificationTitle: 'Receive Notifications',
         notificationQuestion: 'Allow notifications for new messages and important updates?',
         later: 'Later',
         allow: 'Allow',
-        scrollToTop: 'Scroll to Top'
+        scrollToTop: 'Scroll to Top',
+        loading: 'Loading...',
+        newMessage: 'New Message',
+        codeBlockCopied: 'Code copied',
+        codeBlockCopy: 'Copy code',
+        expandMessage: 'Expand message',
+        collapseMessage: 'Collapse message',
+        messageFrom: 'From',
+        retryButton: 'Retry',
+        cancelButton: 'Cancel'
     }
 };
 
 // 获取当前语言
 function getCurrentLanguage() {
-    // 尝试从localStorage获取语言设置
-    let lang = localStorage.getItem('omniflow-language');
-    // 如果没有设置，检查navigator.language
-    if (!lang) {
-        lang = navigator.language.startsWith('zh') ? 'zh-CN' : 'en';
+    // 优先从HTML的data-language属性获取设置
+    if (typeof document !== 'undefined') {
+        const htmlLang = document.documentElement.getAttribute('data-language');
+        if (htmlLang) {
+            return htmlLang;
+        }
     }
-    return lang;
+    
+    // 如果属性不存在，尝试从localStorage获取语言设置
+    let lang = localStorage.getItem('app-settings');
+    if (lang) {
+        try {
+            const settings = JSON.parse(lang);
+            if (settings.appearance && settings.appearance.language) {
+                return settings.appearance.language;
+            }
+        } catch (e) {
+            console.error('解析存储的语言设置失败:', e);
+        }
+    }
+    
+    // 回退到navigator.language
+    return navigator.language.startsWith('zh') ? 'zh-CN' : 'en-US';
 }
 
 // 翻译辅助函数
 function t(key) {
     const lang = getCurrentLanguage();
-    const langResources = translations[lang] || translations['en'];
+    const langResources = translations[lang] || translations['en-US'];
     return langResources[key] || key;
 }
 
@@ -78,11 +112,14 @@ document.addEventListener('DOMContentLoaded', function() {
             updateUILanguage(e.detail.language);
         }
     });
+    
+    // 初始化时更新UI语言
+    updateUILanguage(getCurrentLanguage());
 });
 
 // 更新UI语言
 function updateUILanguage(language) {
-    // 保存语言设置
+    // 保存语言设置到localStorage (用于脚本内部，React应用会使用app-settings)
     localStorage.setItem('omniflow-language', language);
     
     // 更新可翻译的UI元素
@@ -110,6 +147,18 @@ function updateUILanguage(language) {
     if (scrollTopBtn) {
         scrollTopBtn.title = t('scrollToTop');
     }
+    
+    // 更新代码块按钮文本
+    const copyButtons = document.querySelectorAll('.code-copy-button');
+    copyButtons.forEach(btn => {
+        btn.textContent = t('codeBlockCopy');
+    });
+    
+    // 更新加载提示文本
+    const loadingElements = document.querySelectorAll('.loading-text');
+    loadingElements.forEach(el => {
+        el.textContent = t('loading');
+    });
 }
 
 // 欢迎页面元素动画
@@ -477,35 +526,47 @@ function addScrollIndicatorStyle() {
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        
+        /* 新增的全局国际化支持样式 */
+        [data-i18n]:empty:before {
+            content: attr(data-i18n);
+            opacity: 0.7;
+        }
+        
+        .code-copy-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        pre:hover .code-copy-button {
+            opacity: 1;
+        }
     `;
     document.head.appendChild(style);
 }
 
 // 添加滚动到顶部功能
 function addScrollToTopButton() {
-    const button = document.createElement('button');
-    button.className = 'scroll-to-top';
-    button.innerHTML = '<i class="fas fa-arrow-up"></i>';
-    button.title = t('scrollToTop');
+    const scrollTopBtn = document.createElement('button');
+    scrollTopBtn.className = 'scroll-to-top';
+    scrollTopBtn.title = t('scrollToTop');
+    scrollTopBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
     
-    document.body.appendChild(button);
+    // 为按钮添加波纹效果支持
+    scrollTopBtn.setAttribute('role', 'button');
+    scrollTopBtn.dataset.buttonType = 'action';
     
-    // 根据滚动位置显示/隐藏按钮
-    window.addEventListener('scroll', function() {
-        if (window.pageYOffset > 300) {
-            button.classList.add('visible');
-        } else {
-            button.classList.remove('visible');
-        }
-    });
-    
-    // 点击滚动到顶部
-    button.addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
+    document.body.appendChild(scrollTopBtn);
     
     // 添加样式
     const style = document.createElement('style');
@@ -517,283 +578,227 @@ function addScrollToTopButton() {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background-color: var(--primary-color);
+            background-color: var(--primary-color, #10a37f);
             color: white;
-            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            border: none;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             opacity: 0;
             visibility: hidden;
-            transform: scale(0.8);
-            transition: all 0.3s ease;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background-color 0.2s ease;
             z-index: 100;
+            overflow: hidden; /* 为波纹效果添加 */
         }
         
         .scroll-to-top.visible {
             opacity: 1;
             visibility: visible;
-            transform: scale(1);
+            transform: translateY(0);
         }
         
         .scroll-to-top:hover {
-            background-color: var(--primary-dark);
+            background-color: var(--primary-dark, #0c8c6a);
         }
     `;
+    
     document.head.appendChild(style);
+    
+    // 添加滚动监听
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 200) {
+            scrollTopBtn.classList.add('visible');
+        } else {
+            scrollTopBtn.classList.remove('visible');
+        }
+    });
+    
+    // 添加点击事件
+    scrollTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
 }
 
 // 为代码块添加特殊效果
 function enhanceCodeBlocks() {
-    // 观察器：观察DOM变化以处理新添加的代码块
-    const observer = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-            if (mutation.type === 'childList' && mutation.addedNodes.length) {
-                mutation.addedNodes.forEach(node => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const codeBlocks = node.querySelectorAll('pre code');
-                        codeBlocks.forEach(addCodeBlockEnhancements);
-                    }
+    // 寻找所有代码块
+    const codeBlocks = document.querySelectorAll('pre code');
+    
+    codeBlocks.forEach(block => {
+        // 添加复制按钮
+        const pre = block.parentElement;
+        if (pre && !pre.querySelector('.code-copy-button')) {
+            const copyButton = document.createElement('button');
+            copyButton.className = 'code-copy-button';
+            copyButton.textContent = t('codeBlockCopy');
+            
+            copyButton.addEventListener('click', function() {
+                // 复制代码到剪贴板
+                const code = block.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = t('codeBlockCopied');
+                    
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 1500);
                 });
-            }
-        });
+            });
+            
+            pre.style.position = 'relative';
+            pre.appendChild(copyButton);
+        }
     });
-    
-    // 观察整个文档的变化
-    observer.observe(document.body, { childList: true, subtree: true });
-    
-    // 处理已存在的代码块
-    document.querySelectorAll('pre code').forEach(addCodeBlockEnhancements);
-}
-
-// 为代码块添加增强效果
-function addCodeBlockEnhancements(codeBlock) {
-    // 检查是否已添加增强效果
-    if (codeBlock.dataset.enhanced) return;
-    codeBlock.dataset.enhanced = 'true';
-    
-    // 添加行号
-    addLineNumbers(codeBlock);
-    
-    // 添加悬停高亮效果
-    addHoverHighlight(codeBlock);
-}
-
-// 为代码块添加行号
-function addLineNumbers(codeBlock) {
-    const code = codeBlock.textContent;
-    const lines = code.split('\n');
-    
-    // 创建行号容器
-    const lineNumbers = document.createElement('div');
-    lineNumbers.className = 'line-numbers';
-    
-    // 为每行添加行号
-    for (let i = 0; i < lines.length; i++) {
-        const lineNumber = document.createElement('span');
-        lineNumber.className = 'line-number';
-        lineNumber.textContent = i + 1;
-        lineNumbers.appendChild(lineNumber);
-    }
-    
-    // 插入行号
-    codeBlock.parentElement.classList.add('with-line-numbers');
-    codeBlock.parentElement.insertBefore(lineNumbers, codeBlock);
-    
-    // 添加必要的样式
-    if (!document.getElementById('code-enhancements-style')) {
-        const style = document.createElement('style');
-        style.id = 'code-enhancements-style';
-        style.textContent = `
-            .with-line-numbers {
-                display: flex;
-                position: relative;
-            }
-            
-            .line-numbers {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                padding: var(--spacing-md) 0;
-                background-color: rgba(0, 0, 0, 0.2);
-                user-select: none;
-                min-width: 30px;
-                text-align: right;
-            }
-            
-            .line-number {
-                font-size: 0.85rem;
-                color: var(--text-secondary);
-                opacity: 0.8;
-                padding: 0 8px;
-                line-height: 1.5;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-}
-
-// 为代码行添加悬停高亮效果
-function addHoverHighlight(codeBlock) {
-    // 将代码分割成行，并为每行添加一个行元素
-    const code = codeBlock.innerHTML;
-    const lines = code.split('\n');
-    let newHtml = '';
-    
-    for (let i = 0; i < lines.length; i++) {
-        newHtml += `<div class="code-line">${lines[i]}</div>`;
-    }
-    
-    codeBlock.innerHTML = newHtml;
-    
-    // 添加必要的样式
-    if (!document.getElementById('code-hover-style')) {
-        const style = document.createElement('style');
-        style.id = 'code-hover-style';
-        style.textContent = `
-            .code-line {
-                transition: background-color 0.15s ease;
-                padding: 0 4px;
-                margin: 0 -4px;
-                border-radius: 2px;
-            }
-            
-            .code-line:hover {
-                background-color: rgba(255, 255, 255, 0.05);
-            }
-        `;
-        document.head.appendChild(style);
-    }
 }
 
 // 添加浏览器通知支持
 function setupNotifications() {
-    if ('Notification' in window && Notification.permission === 'default') {
-        // 稍微延迟请求通知权限
-        setTimeout(() => {
-            // 创建一个温和的通知请求对话框
-            const notifDialog = document.createElement('div');
-            notifDialog.className = 'notification-dialog';
-            notifDialog.innerHTML = `
-                <div class="notification-content">
-                    <div class="notification-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <div class="notification-text">
-                        <h4>${t('notificationTitle')}</h4>
-                        <p>${t('notificationQuestion')}</p>
-                    </div>
-                    <div class="notification-actions">
-                        <button class="notification-deny">${t('later')}</button>
-                        <button class="notification-allow">${t('allow')}</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(notifDialog);
-            
-            // 添加必要的样式
-            const style = document.createElement('style');
-            style.textContent = `
-                .notification-dialog {
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    background-color: var(--background-medium);
-                    border-radius: var(--border-radius-md);
-                    box-shadow: var(--shadow-lg);
-                    padding: var(--spacing-md);
-                    z-index: 9999;
-                    width: 300px;
-                    transform: translateY(100px);
-                    opacity: 0;
-                    transition: transform 0.3s ease, opacity 0.3s ease;
-                    animation: slideIn 0.3s forwards;
-                }
-                
-                @keyframes slideIn {
-                    to { transform: translateY(0); opacity: 1; }
-                }
-                
-                .notification-content {
-                    display: flex;
-                    flex-direction: column;
-                    gap: var(--spacing-md);
-                }
-                
-                .notification-icon {
-                    font-size: 1.5rem;
-                    color: var(--accent-color);
-                    text-align: center;
-                }
-                
-                .notification-text h4 {
-                    margin: 0 0 var(--spacing-xs);
-                    color: var(--text-primary);
-                }
-                
-                .notification-text p {
-                    margin: 0;
-                    color: var(--text-secondary);
-                    font-size: 0.9rem;
-                }
-                
-                .notification-actions {
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: var(--spacing-sm);
-                }
-                
-                .notification-deny {
-                    background: transparent;
-                    border: 1px solid var(--border-color);
-                    padding: var(--spacing-xs) var(--spacing-sm);
-                    border-radius: var(--border-radius-sm);
-                    color: var(--text-primary);
-                    cursor: pointer;
-                }
-                
-                .notification-allow {
-                    background-color: var(--accent-color);
-                    border: none;
-                    padding: var(--spacing-xs) var(--spacing-sm);
-                    border-radius: var(--border-radius-sm);
-                    color: white;
-                    cursor: pointer;
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // 添加按钮事件
-            const denyBtn = notifDialog.querySelector('.notification-deny');
-            const allowBtn = notifDialog.querySelector('.notification-allow');
-            
-            denyBtn.addEventListener('click', () => {
-                notifDialog.style.animation = 'slideOut 0.3s forwards';
-                setTimeout(() => {
-                    document.body.removeChild(notifDialog);
-                }, 300);
-            });
-            
-            allowBtn.addEventListener('click', () => {
-                Notification.requestPermission();
-                notifDialog.style.animation = 'slideOut 0.3s forwards';
-                setTimeout(() => {
-                    document.body.removeChild(notifDialog);
-                }, 300);
-            });
-
-            // 为通知对话框添加关键帧动画
-            const animationStyle = document.createElement('style');
-            animationStyle.textContent = `
-                @keyframes slideOut {
-                    from { transform: translateY(0); opacity: 1; }
-                    to { transform: translateY(20px); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(animationStyle);
-        }, 5000);
+    // 只在浏览器支持通知且用户尚未授予权限时显示
+    if (!('Notification' in window) || Notification.permission !== 'default') {
+        return;
     }
+    
+    // 延迟显示通知请求，避免页面加载时就弹出
+    setTimeout(() => {
+        showNotificationRequest();
+    }, 5000);
+}
+
+// 显示通知请求UI
+function showNotificationRequest() {
+    const notificationContainer = document.createElement('div');
+    notificationContainer.className = 'notification-container';
+    
+    notificationContainer.innerHTML = `
+        <div class="notification-content">
+            <div class="notification-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+            </div>
+            <div class="notification-text">
+                <h4>${t('notificationTitle')}</h4>
+                <p>${t('notificationQuestion')}</p>
+            </div>
+            <div class="notification-actions">
+                <button class="notification-deny">${t('later')}</button>
+                <button class="notification-allow">${t('allow')}</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notificationContainer);
+    
+    // 添加样式
+    const style = document.createElement('style');
+    style.textContent = `
+        .notification-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--background-dark, #1a1a1a);
+            border: 1px solid var(--border-color, #333);
+            border-radius: 8px;
+            padding: 16px;
+            width: 320px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification-content {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--accent-color, #6b57ff);
+            margin-right: 16px;
+        }
+        
+        .notification-text {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .notification-text h4 {
+            margin: 0 0 8px 0;
+            color: var(--text-primary, #e0e0e0);
+            font-size: 16px;
+        }
+        
+        .notification-text p {
+            margin: 0;
+            color: var(--text-secondary, #999);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .notification-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 16px;
+            width: 100%;
+        }
+        
+        .notification-deny, .notification-allow {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .notification-deny {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary, #999);
+        }
+        
+        .notification-deny:hover {
+            color: var(--text-primary, #e0e0e0);
+        }
+        
+        .notification-allow {
+            background: var(--accent-color, #6b57ff);
+            color: white;
+            border: none;
+            margin-left: 8px;
+        }
+        
+        .notification-allow:hover {
+            background: var(--accent-dark, #5546cc);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    `;
+    
+    document.head.appendChild(style);
+    
+    // 绑定按钮事件
+    notificationContainer.querySelector('.notification-deny').addEventListener('click', () => {
+        document.body.removeChild(notificationContainer);
+    });
+    
+    notificationContainer.querySelector('.notification-allow').addEventListener('click', () => {
+        Notification.requestPermission();
+        document.body.removeChild(notificationContainer);
+    });
 }
