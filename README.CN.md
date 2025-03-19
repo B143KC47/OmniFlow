@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![OmniFlow Logo](./docs/images/logo.png) <!-- 可选：如果项目有logo，保留此行；否则移除 -->
+![OmniFlow Logo](./docs/images/logo.svg) 
 
 **一款为大型语言模型（LLM）应用设计的高级、基于节点的工作流编辑器**
 
