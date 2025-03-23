@@ -20,8 +20,8 @@ interface ContextMenuProps {
 
 // 定义上下文菜单项点击时的处理函数
 const handleItemClick = ({ id, props }: ItemParams) => {
-  if (props && props.onAddNode && typeof props.onAddNode === 'function') {
-    props.onAddNode(id, props.position);
+  if (props && props.data && props.data.onAddNode && typeof props.data.onAddNode === 'function') {
+    props.data.onAddNode(id, props.data.position);
   }
 };
 
@@ -77,9 +77,12 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     zIndex: 1000,
   };
 
+  // 创建自定义的道具对象，避免将 onAddNode 直接传递给 DOM
   const menuProps = {
-    onAddNode,
-    position,
+    data: {
+      onAddNode,
+      position,
+    }
   };
 
   return (

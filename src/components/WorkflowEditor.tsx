@@ -423,6 +423,12 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
                   nodeTypes={nodeTypes}
                   fitView
                   className="comfy-flow"
+                  defaultZoom={1}
+                  minZoom={0.1}
+                  maxZoom={2}
+                  defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+                  snapToGrid={true}
+                  snapGrid={[15, 15]}
                 >
                   <Controls className="comfy-controls" />
                   <Background color="#2a2a2a" gap={16} size={1} />

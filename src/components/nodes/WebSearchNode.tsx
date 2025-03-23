@@ -1,6 +1,7 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import BaseNode from './BaseNode';
 import { NodeData } from '../../types';
+import { useTranslation } from '../../utils/i18n';
 
 interface WebSearchNodeProps {
   id: string;
@@ -17,14 +18,26 @@ const WebSearchNode = memo(({
   isConnectable,
   onDataChange
 }: WebSearchNodeProps) => {
-  const initialData: NodeData = {
+  const { t } = useTranslation();
+  
+  // 使用useCallback优化onChange回调函数的性能
+  const handleChange = useCallback((nodeId: string, newData: Partial<NodeData>) => {
+    onDataChange({
+      ...data,
+      ...newData,
+    });
+  }, [data, onDataChange]);
+  
+  // 构建完整的节点数据
+  const nodeData: NodeData = {
     ...data,
-    label: '网络搜索',
+    label: data.label || t('nodes.webSearch.name'),
     inputs: {
+      ...data.inputs,
       query: {
         type: 'text',
         value: data.inputs?.query?.value || '',
-        placeholder: '请输入搜索关键词',
+        placeholder: t('nodes.webSearch.queryPlaceholder'),
       },
       maxResults: {
         type: 'number',
@@ -32,28 +45,29 @@ const WebSearchNode = memo(({
         min: 1,
         max: 20,
         step: 1,
+        label: t('nodes.webSearch.resultCount')
       },
       searchEngine: {
         type: 'select',
         value: data.inputs?.searchEngine?.value || 'google',
         options: ['google', 'bing', 'duckduckgo'],
+        label: t('nodes.webSearch.provider')
       },
     },
     outputs: {
+      ...data.outputs,
       results: {
         type: 'text',
         value: data.outputs?.results?.value || '',
       },
     },
-    onChange: (nodeId: string, newData: NodeData) => {
-      onDataChange(newData);
-    }
+    onChange: handleChange
   };
 
   return (
     <BaseNode
       id={id}
-      data={initialData}
+      data={nodeData}
       selected={selected}
       isConnectable={isConnectable}
     />

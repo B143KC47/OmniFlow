@@ -31,6 +31,9 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
   useEffect(() => {
     const node = document.getElementById(`node-${id}`);
     if (node) {
+      // 确保所有节点始终有基本的可见性，不论状态如何
+      node.style.visibility = 'visible';
+      
       if (connectStatus) {
         // 连接状态处理 - 确保节点在连接过程中始终可见
         if (connectStatus === 'compatible') {
@@ -38,21 +41,35 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
           node.style.opacity = '1';
           node.classList.add('connectable');
           node.classList.remove('not-connectable');
+          // 高亮显示兼容节点
+          node.style.boxShadow = '0 0 0 2px var(--primary-color), 0 0 15px rgba(16, 163, 127, 0.7)';
         } else if (connectStatus === 'incompatible') {
-          // 即使不兼容，也不要让节点完全消失
-          node.style.zIndex = '50'; 
-          node.style.opacity = '0.6'; // 提高不兼容节点的透明度，确保可见
+          // 修改: 即使不兼容，也确保节点仍然可见，只是通过视觉效果区分
+          node.style.zIndex = '500'; // 降低但仍然高于默认值
+          node.style.opacity = '0.85'; // 提高透明度，确保更容易被看见
           node.classList.add('not-connectable');
           node.classList.remove('connectable');
+          // 添加轻微的灰色边框，表示不兼容但仍然可见
+          node.style.boxShadow = '0 0 0 1px rgba(90, 90, 90, 0.5), 0 0 5px rgba(90, 90, 90, 0.3)';
         }
       } else {
         // 重置状态，确保节点在正常状态下可见
         node.classList.remove('connectable', 'not-connectable');
         node.style.zIndex = selected ? '100' : '10'; // 确保即使普通状态下节点也高于连接线
         node.style.opacity = '1';
+        // 恢复默认样式 - 根据节点状态
+        node.style.boxShadow = selected ? 
+          '0 0 0 2px var(--primary-color), 0 0 10px rgba(16, 163, 127, 0.5)' : 
+          data.status === 'running' ? 
+            '0 0 0 2px var(--primary-color), 0 0 10px rgba(16, 163, 127, 0.5)' :
+            data.status === 'completed' ? 
+              '0 0 0 2px var(--success-color), 0 0 10px rgba(46, 204, 113, 0.5)' :
+              data.status === 'error' ? 
+                '0 0 0 2px var(--error-color), 0 0 10px rgba(244, 67, 54, 0.5)' :
+                'var(--shadow-md)';
       }
     }
-  }, [connectStatus, id, selected]);
+  }, [connectStatus, id, selected, data.status]);
   
   // 处理输入值变化
   const handleInputChange = (key: string, value: any) => {
@@ -132,11 +149,21 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
   // 为节点类型添加特定的类名
   const getTypeClass = () => {
     const lowerLabel = label.toLowerCase();
-    if (lowerLabel.includes('文本')) return 'node-type-input';
-    if (lowerLabel.includes('llm') || lowerLabel.includes('查询')) return 'node-type-llm';
-    if (lowerLabel.includes('文档')) return 'node-type-document';
-    if (lowerLabel.includes('搜索')) return 'node-type-search';
-    if (lowerLabel.includes('模型')) return 'node-type-model';
+    if (lowerLabel.includes(t('nodes.categories.input').toLowerCase()) || 
+        lowerLabel.includes('input') || 
+        lowerLabel.includes('文本')) return 'node-type-input';
+    if (lowerLabel.includes('llm') || 
+        lowerLabel.includes(t('nodes.llmQuery.name').toLowerCase()) || 
+        lowerLabel.includes('查询')) return 'node-type-llm';
+    if (lowerLabel.includes(t('nodes.documentQuery.name').toLowerCase()) || 
+        lowerLabel.includes('document') || 
+        lowerLabel.includes('文档')) return 'node-type-document';
+    if (lowerLabel.includes(t('nodes.webSearch.name').toLowerCase()) || 
+        lowerLabel.includes('search') || 
+        lowerLabel.includes('搜索')) return 'node-type-search';
+    if (lowerLabel.includes(t('nodes.modelSelector.name').toLowerCase()) || 
+        lowerLabel.includes('model') || 
+        lowerLabel.includes('模型')) return 'node-type-model';
     return 'node-type-utility';
   };
   
@@ -180,11 +207,8 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
         width: nodeSize.width, 
         height: typeof nodeSize.height === 'number' ? `${nodeSize.height}px` : nodeSize.height,
         position: 'relative', // 确保定位正确
-        boxShadow: selected ? '0 0 0 2px var(--primary-color), 0 0 10px rgba(16, 163, 127, 0.5)' : 
-                   data.status === 'running' ? '0 0 0 2px var(--primary-color), 0 0 10px rgba(16, 163, 127, 0.5)' :
-                   data.status === 'completed' ? '0 0 0 2px var(--success-color), 0 0 10px rgba(46, 204, 113, 0.5)' :
-                   data.status === 'error' ? '0 0 0 2px var(--error-color), 0 0 10px rgba(244, 67, 54, 0.5)' :
-                   'var(--shadow-md)',
+        visibility: 'visible', // 确保节点始终可见
+        // 移除boxShadow，因为我们在useEffect中动态设置它
         zIndex: selected ? 100 : 10, // 确保节点始终在连接线之上
         backgroundColor: 'var(--node-color)', // 确保背景是实心的，不透明
         borderRadius: '6px',
@@ -207,7 +231,7 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
           <button 
             onClick={toggleCollapsed}
             className="comfy-node-collapse-btn"
-            title={collapsed ? t('nodes.expand') : t('nodes.collapse')}
+            title={collapsed ? t('nodes.common.expand') : t('nodes.common.collapse')}
           >
             {collapsed ? "+" : "-"}
           </button>
@@ -218,84 +242,89 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
         {/* 输入部分 */}
         {Object.entries(inputs).length > 0 && (
           <div className="comfy-section">
-            <div className="comfy-section-title">{t('nodes.inputs')}</div>
-            {Object.entries(inputs).map(([key, input]: [string, any], index) => (
-              <div key={key} className="comfy-node-row">
-                <Handle
-                  type="target"
-                  position={Position.Left}
-                  id={`input-${key}`}
-                  isConnectable={isConnectable}
-                  className={`comfy-node-handle comfy-node-handle-input ${input.isConnected ? 'connected' : ''} ${connectStatus === 'compatible' ? 'connectable' : ''}`}
-                  style={{
-                    top: `${40 + index * 32}px`,
-                    background: input.type === 'boolean' ? '#ff9800' :
-                             input.type === 'number' ? '#2196f3' :
-                             input.type === 'string' ? '#4caf50' : '#9c27b0',
-                    zIndex: 2000 // 确保连接点始终在最顶层
-                  }}
-                  data-tooltip={`${key} (${input.type})`}
-                />
-                <div className="comfy-node-label" title={key}>{key}</div>
-                <div className="comfy-node-input-wrapper">
-                  {input.type === 'text' ? (
-                    <input
-                      type="text"
-                      value={input.value || ''}
-                      onChange={(e) => handleInputChange(key, e.target.value)}
-                      className="comfy-node-input"
-                      placeholder={input.placeholder || t('nodes.inputPlaceholder', { key })}
-                      disabled={input.isConnected}
-                    />
-                  ) : input.type === 'number' ? (
-                    <div className="comfy-node-number-wrapper">
+            <div className="comfy-section-title">{t('nodes.common.inputs')}</div>
+            {Object.entries(inputs).map(([key, input]: [string, any], index) => {
+              // 如果输入字段有hidden属性且为true，则不显示它
+              if (input.hidden) return null;
+              
+              return (
+                <div key={key} className="comfy-node-row">
+                  <Handle
+                    type="target"
+                    position={Position.Left}
+                    id={`input-${key}`}
+                    isConnectable={isConnectable}
+                    className={`comfy-node-handle comfy-node-handle-input ${input.isConnected ? 'connected' : ''} ${connectStatus === 'compatible' ? 'connectable' : ''}`}
+                    style={{
+                      top: `${40 + index * 32}px`,
+                      background: input.type === 'boolean' ? '#ff9800' :
+                              input.type === 'number' ? '#2196f3' :
+                              input.type === 'string' ? '#4caf50' : '#9c27b0',
+                      zIndex: 2000 // 确保连接点始终在最顶层
+                    }}
+                    data-tooltip={`${input.label || key} (${input.type})`}
+                  />
+                  <div className="comfy-node-label" title={key}>{input.label || key}</div>
+                  <div className="comfy-node-input-wrapper">
+                    {input.type === 'text' ? (
                       <input
-                        type="number"
+                        type="text"
                         value={input.value || ''}
-                        onChange={(e) => handleInputChange(key, parseFloat(e.target.value))}
-                        className="comfy-node-input comfy-node-number"
-                        placeholder={input.placeholder}
-                        min={input.min}
-                        max={input.max}
-                        step={input.step}
+                        onChange={(e) => handleInputChange(key, e.target.value)}
+                        className="comfy-node-input"
+                        placeholder={input.placeholder || t('nodes.common.inputPlaceholder', { field: key })}
                         disabled={input.isConnected}
                       />
-                      <div className="comfy-node-slider-wrapper">
+                    ) : input.type === 'number' ? (
+                      <div className="comfy-node-number-wrapper">
                         <input
-                          type="range"
-                          min={input.min || 0}
-                          max={input.max || 100}
-                          step={input.step || 1}
-                          value={input.value || 0}
+                          type="number"
+                          value={input.value || ''}
                           onChange={(e) => handleInputChange(key, parseFloat(e.target.value))}
-                          className="comfy-node-slider"
+                          className="comfy-node-input comfy-node-number"
+                          placeholder={input.placeholder}
+                          min={input.min}
+                          max={input.max}
+                          step={input.step}
                           disabled={input.isConnected}
                         />
+                        <div className="comfy-node-slider-wrapper">
+                          <input
+                            type="range"
+                            min={input.min || 0}
+                            max={input.max || 100}
+                            step={input.step || 1}
+                            value={input.value || 0}
+                            onChange={(e) => handleInputChange(key, parseFloat(e.target.value))}
+                            className="comfy-node-slider"
+                            disabled={input.isConnected}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ) : input.type === 'select' ? (
-                    <select
-                      value={input.value || ''}
-                      onChange={(e) => handleInputChange(key, e.target.value)}
-                      className="comfy-node-select"
-                      disabled={input.isConnected}
-                    >
-                      {input.options?.map((option: string) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  ) : null}
+                    ) : input.type === 'select' ? (
+                      <select
+                        value={input.value || ''}
+                        onChange={(e) => handleInputChange(key, e.target.value)}
+                        className="comfy-node-select"
+                        disabled={input.isConnected}
+                      >
+                        {input.options?.map((option: string) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
         {/* 输出部分 */}
         {Object.entries(outputs).length > 0 && (
           <div className="comfy-section">
-            <div className="comfy-section-title">{t('nodes.outputs')}</div>
+            <div className="comfy-section-title">{t('nodes.common.outputs')}</div>
             {Object.entries(outputs).map(([key, output]: [string, any], index) => {
               const isExpanded = expandedOutputs[key];
               const outputValue = output.value || '';
@@ -304,7 +333,7 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
               
               return (
                 <div key={key} className="comfy-node-row comfy-node-output-row" style={{ paddingTop: `${index * 4}px` }}>
-                  <div className="comfy-node-label" title={key}>{key}</div>
+                  <div className="comfy-node-label" title={key}>{output.label || key}</div>
                   <div className="comfy-node-output">
                     {outputValue ? (
                       <div 
@@ -317,12 +346,12 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
                         </span>
                         {needsExpand && (
                           <span className="comfy-expand-toggle">
-                            {isExpanded ? t('nodes.collapse') : t('nodes.expand')}
+                            {isExpanded ? t('nodes.common.collapse') : t('nodes.common.expand')}
                           </span>
                         )}
                       </div>
                     ) : (
-                      <span className="comfy-node-output-empty">{t('nodes.noData')}</span>
+                      <span className="comfy-node-output-empty">{t('nodes.common.noData')}</span>
                     )}
                   </div>
                   <Handle
@@ -338,7 +367,7 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
                                 output.type === 'string' ? '#4caf50' : '#9c27b0',
                       zIndex: 2000 // 确保连接点始终在顶层
                     }}
-                    data-tooltip={`${key} (${output.type})`}
+                    data-tooltip={`${output.label || key} (${output.type})`}
                   />
                 </div>
               );

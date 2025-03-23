@@ -148,7 +148,7 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 - **Issues**: [GitHub Issue Tracker](https://github.com/B143KC47/OmniFlow/issues)
 - **Email**: ltu46166@gmail.com
-- **Twitter**: [@YourTwitterHandle](https://twitter.com/YourTwitterHandle) <!-- 如果有Twitter账号，可以添加 -->
+- **Twitter**: [@B14ckc4t1337](https://x.com/B14ckc4t1337) <!-- 如果有Twitter账号，可以添加 -->
 
 ## 🙏 Acknowledgments
 

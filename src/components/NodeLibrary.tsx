@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import NavModal from './shared/NavModal';
 import NodeLibraryNav from './NodeLibraryNav';
 import { NodeType } from '../types';
-import { useTranslation } from '../utils/i18n';
+import { useTranslation, Trans } from '../utils/i18n';
 
 // 节点类型定义
 interface Node {
@@ -117,31 +117,31 @@ const NodeLibrary: React.FC<NodeLibraryProps> = ({ onClose, onSelectNode }) => {
       {
         id: 'input',
         name: t('nodes.categories.input'),
-        description: '用于获取输入的节点',
+        description: t('nodes.categories.inputDescription'),
         nodes: []
       },
       {
         id: 'ai',
         name: 'AI',
-        description: 'AI模型相关节点',
+        description: t('nodes.categories.aiDescription'),
         nodes: []
       },
       {
         id: 'utility',
         name: t('nodes.categories.util'),
-        description: '工具类节点',
+        description: t('nodes.categories.utilDescription'),
         nodes: []
       },
       {
         id: 'flow',
-        name: '工作流控制',
-        description: '控制工作流程的节点',
+        name: t('nodes.categories.flow'),
+        description: t('nodes.categories.flowDescription'),
         nodes: []
       },
       {
         id: 'advanced',
-        name: '高级',
-        description: '高级功能节点',
+        name: t('nodes.categories.advanced'),
+        description: t('nodes.categories.advancedDescription'),
         nodes: []
       }
     ];
@@ -150,14 +150,14 @@ const NodeLibrary: React.FC<NodeLibraryProps> = ({ onClose, onSelectNode }) => {
     const popularCategory: Category = {
       id: 'popular',
       name: t('nodes.categories.popular'),
-      description: '常用节点',
+      description: t('nodes.categories.popularDescription'),
       nodes: []
     };
 
     const newCategory: Category = {
       id: 'new',
       name: t('nodes.categories.new'),
-      description: '新增节点',
+      description: t('nodes.categories.newDescription'),
       nodes: []
     };
 
@@ -193,7 +193,7 @@ const NodeLibrary: React.FC<NodeLibraryProps> = ({ onClose, onSelectNode }) => {
     categories.unshift({
       id: 'all',
       name: t('nodes.categories.all'),
-      description: '所有节点',
+      description: t('nodes.categories.allDescription'),
       nodes: sampleNodes
     });
     

@@ -137,7 +137,41 @@ const NodeSystem = () => {
       onClick={handleCanvasClick}
       onContextMenu={(e) => e.preventDefault()}
     >
-      {/* 渲染所有节点 */}
+      {/* 先渲染连接线，确保它们在节点下方 */}
+      <svg className="connection-layer" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+        {/* 渲染所有连接 */}
+        {connections.map(connection => {
+          const sourceNode = getNodePosition(connection.sourceNodeId);
+          const targetNode = getNodePosition(connection.targetNodeId);
+          return (
+            <Connection
+              key={connection.id}
+              source={sourceNode}
+              target={targetNode}
+              sourcePortId={connection.sourcePortId}
+              targetPortId={connection.targetPortId}
+              onRemove={() => removeConnection(connection.id)}
+            />
+          );
+        })}
+        
+        {/* 渲染正在创建的连接 */}
+        {connectingNode && (
+          <Connection
+            isTemp={true}
+            source={connectingNode.isOutput 
+              ? getNodePosition(connectingNode.nodeId) 
+              : mousePosition}
+            target={connectingNode.isOutput 
+              ? mousePosition 
+              : getNodePosition(connectingNode.nodeId)}
+            sourcePortId={connectingNode.isOutput ? connectingPort : null}
+            targetPortId={connectingNode.isOutput ? null : connectingPort}
+          />
+        )}
+      </svg>
+      
+      {/* 然后渲染节点，确保它们在连接线上方 */}
       {nodes.map(node => (
         <Node
           key={node.id}
@@ -147,37 +181,6 @@ const NodeSystem = () => {
           onRemove={() => removeNode(node.id)}
         />
       ))}
-      
-      {/* 渲染所有连接 */}
-      {connections.map(connection => {
-        const sourceNode = getNodePosition(connection.sourceNodeId);
-        const targetNode = getNodePosition(connection.targetNodeId);
-        return (
-          <Connection
-            key={connection.id}
-            source={sourceNode}
-            target={targetNode}
-            sourcePortId={connection.sourcePortId}
-            targetPortId={connection.targetPortId}
-            onRemove={() => removeConnection(connection.id)}
-          />
-        );
-      })}
-      
-      {/* 渲染正在创建的连接 */}
-      {connectingNode && (
-        <Connection
-          isTemp={true}
-          source={connectingNode.isOutput 
-            ? getNodePosition(connectingNode.nodeId) 
-            : mousePosition}
-          target={connectingNode.isOutput 
-            ? mousePosition 
-            : getNodePosition(connectingNode.nodeId)}
-          sourcePortId={connectingNode.isOutput ? connectingPort : null}
-          targetPortId={connectingNode.isOutput ? null : connectingPort}
-        />
-      )}
     </div>
   );
 };

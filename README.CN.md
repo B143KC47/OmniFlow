@@ -148,7 +148,8 @@ OmniFlow/
 
 - **问题反馈**: [GitHub Issue Tracker](https://github.com/B143KC47/OmniFlow/issues)
 - **邮箱**: ltu46166@gmail.com
-- **Twitter**: [@YourTwitterHandle](https://twitter.com/YourTwitterHandle) <!-- 可选：如果项目有Twitter账号，可以添加 -->
+- **Twitter**: [@B14ckc4t1337](https://x.com/B14ckc4t1337) <!-- 如果有Twitter账号，可以添加 -->
+
 
 ## 🙏 鸣谢
 

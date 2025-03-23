@@ -73,7 +73,7 @@ const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
         left: `${position.x}px`,
         top: `${position.y}px`,
         cursor: isDragging ? 'grabbing' : 'grab',
-        zIndex: isDragging ? 1000 : 1
+        zIndex: 100 // 确保节点始终在连接线上方
       }}
       onMouseDown={handleMouseDown}
     >

@@ -67,23 +67,28 @@ const Node: React.FC<NodeProps> = ({
 
   return (
     <div
-      className={`absolute p-4 rounded-lg shadow-md ${selected ? 'ring-2 ring-blue-500' : ''}`}
+      className={`absolute p-4 rounded-lg shadow-lg ${selected ? 'ring-2 ring-blue-500' : ''}`}
       style={{ 
         left: `${position.x}px`, 
         top: `${position.y}px`,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#2d3748', // 深色背景更容易看见
+        color: '#e2e8f0', // 浅色文字
+        border: '1px solid #4a5568',
         minWidth: '200px',
-        cursor: 'move'
+        cursor: 'move',
+        zIndex: 100, // 确保节点在高层级
+        position: 'absolute', // 确保绝对定位
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' // 增强阴影效果
       }}
       draggable
       onDragStart={(e) => e.dataTransfer.setData('nodeId', id)}
       onDrag={handleDrag}
     >
-      <div className="font-bold mb-2">{data.label || '节点'}</div>
+      <div className="font-bold mb-2 text-lg">{data.label || '节点'}</div>
       {renderNodeContent()}
       <div className="mt-2 flex justify-between">
         <div 
-          className="w-3 h-3 rounded-full bg-gray-400 cursor-pointer"
+          className="w-4 h-4 rounded-full bg-blue-500 cursor-pointer hover:bg-blue-600"
           draggable
           onDragStart={(e) => {
             e.stopPropagation();
@@ -91,7 +96,7 @@ const Node: React.FC<NodeProps> = ({
           }}
         />
         <div 
-          className="w-3 h-3 rounded-full bg-gray-400 cursor-pointer"
+          className="w-4 h-4 rounded-full bg-green-500 cursor-pointer hover:bg-green-600"
           onDrop={(e) => {
             e.preventDefault();
             const sourceId = e.dataTransfer.getData('sourceNodeId');

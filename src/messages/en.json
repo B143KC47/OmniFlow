@@ -230,7 +230,9 @@
       "collapse": "Collapse",
       "expand": "Expand",
       "inputs": "Inputs",
-      "outputs": "Outputs"
+      "outputs": "Outputs",
+      "noData": "No data",
+      "inputPlaceholder": "Enter {field}"
     },
     "categories": {
       "input": "Input",
@@ -245,7 +247,17 @@
       "llm": "LLM",
       "document": "Document",
       "search": "Search",
-      "utility": "Utility"
+      "utility": "Utility",
+      "flow": "Flow Control",
+      "advanced": "Advanced",
+      "inputDescription": "Nodes for input handling",
+      "aiDescription": "AI model nodes",
+      "utilDescription": "Utility tools and helpers",
+      "flowDescription": "Flow control nodes",
+      "advancedDescription": "Advanced functionality nodes",
+      "popularDescription": "Most commonly used nodes",
+      "newDescription": "Recently added nodes",
+      "allDescription": "All available nodes"
     },
     "textInput": {
       "name": "Text Input",
@@ -259,7 +271,9 @@
       "promptLabel": "Prompt",
       "promptPlaceholder": "Enter prompt",
       "temperature": "Temperature",
-      "maxTokens": "Maximum tokens"
+      "maxTokens": "Maximum tokens",
+      "systemPrompt": "System Prompt",
+      "stream": "Stream output"
     },
     "webSearch": {
       "name": "Web Search",
@@ -274,24 +288,35 @@
       "description": "Search for relevant content in documents",
       "queryLabel": "Query",
       "queryPlaceholder": "Enter query",
-      "fileSource": "File source"
+      "fileSource": "File source",
+      "pathPlaceholder": "Enter document path",
+      "maxResults": "Max Results",
+      "similarity": "Similarity Threshold"
     },
     "modelSelector": {
       "name": "Model Selector",
       "description": "Select models to use",
-      "modelCategory": "Model category"
+      "modelCategory": "Model category",
+      "modelName": "Model",
+      "apiKeyPlaceholder": "Enter API Key",
+      "systemPromptPlaceholder": "System Prompt",
+      "temperature": "Temperature",
+      "maxTokens": "Max Tokens",
+      "stream": "Stream"
     },
     "loopControl": {
       "name": "Loop Control",
       "description": "Control workflow iteration",
       "iterations": "Iterations",
-      "condition": "Loop condition"
+      "condition": "Loop condition",
+      "expressionPlaceholder": "Condition expression"
     },
     "custom": {
       "name": "Custom Node",
       "description": "Create custom functionality node",
       "codeLabel": "Node code",
-      "codePlaceholder": "Enter custom code here"
+      "codePlaceholder": "Enter custom code here",
+      "configPlaceholder": "Enter node configuration (JSON format)"
     }
   },
   "library": {
@@ -402,5 +427,38 @@
     "finish": "Finish",
     "noData": "No data",
     "noResults": "No results"
+  },
+  "queue": {
+    "title": "Queue History",
+    "filter": {
+      "all": "All",
+      "running": "Running",
+      "completed": "Completed",
+      "failed": "Failed"
+    },
+    "searchPlaceholder": "Search queues...",
+    "noMatchingJobs": "No matching queue records",
+    "noMatchingJobsDescription": "Try changing your filters or clearing the search",
+    "runtime": "{{minutes}}m {{seconds}}s",
+    "status": {
+      "success": "Success",
+      "running": "Running",
+      "failed": "Failed",
+      "pending": "Pending"
+    },
+    "columns": {
+      "name": "Name",
+      "status": "Status",
+      "startTime": "Start Time",
+      "runtime": "Runtime",
+      "nodeCount": "Node Count",
+      "progress": "Progress"
+    },
+    "actions": {
+      "cancel": "Cancel Task",
+      "view": "View Details",
+      "delete": "Delete Record",
+      "restart": "Restart"
+    }
   }
 }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation, Trans } from '../utils/i18n';
 
 interface NewWorkflowModalProps {
   onClose: () => void;
@@ -6,16 +7,17 @@ interface NewWorkflowModalProps {
 }
 
 const NewWorkflowModal: React.FC<NewWorkflowModalProps> = ({ onClose, onCreateWorkflow }) => {
-  const [name, setName] = useState('新工作流');
+  const { t } = useTranslation();
+  const [name, setName] = useState(t('workflow.defaultName'));
   const [description, setDescription] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState('blank');
   
   // 可用的工作流模板
   const templates = [
-    { id: 'blank', name: '空白工作流', description: '从零开始创建自定义工作流', icon: 'file-earmark' },
-    { id: 'chatbot', name: '聊天机器人', description: '预设基础的聊天机器人流程', icon: 'chat-dots' },
-    { id: 'document-qa', name: '文档问答', description: '创建文档问答工作流', icon: 'file-text' },
-    { id: 'api-integration', name: 'API集成', description: '连接外部服务和API的工作流', icon: 'hdd-network' }
+    { id: 'blank', name: t('workflow.templates.blank'), description: t('workflow.templates.blankDescription'), icon: 'file-earmark' },
+    { id: 'chatbot', name: t('workflow.templates.chatbot'), description: t('workflow.templates.chatbotDescription'), icon: 'chat-dots' },
+    { id: 'document-qa', name: t('workflow.templates.documentQa'), description: t('workflow.templates.documentQaDescription'), icon: 'file-text' },
+    { id: 'api-integration', name: t('workflow.templates.apiIntegration'), description: t('workflow.templates.apiIntegrationDescription'), icon: 'hdd-network' }
   ];
 
   // 处理创建工作流
@@ -33,11 +35,12 @@ const NewWorkflowModal: React.FC<NewWorkflowModalProps> = ({ onClose, onCreateWo
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-[#10a37f]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            创建新工作流
+            <Trans id="workflow.createWorkflow.title" />
           </h2>
           <button 
             onClick={onClose}
             className="text-[#666] hover:text-white transition-colors p-1 rounded-full hover:bg-[#1a1a1a]"
+            aria-label={t("common.close")}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -50,7 +53,7 @@ const NewWorkflowModal: React.FC<NewWorkflowModalProps> = ({ onClose, onCreateWo
             {/* 工作流名称 */}
             <div>
               <label htmlFor="workflow-name" className="block text-sm font-medium text-white mb-1">
-                工作流名称
+                <Trans id="workflow.createWorkflow.nameLabel" />
               </label>
               <input
                 id="workflow-name"
@@ -58,28 +61,28 @@ const NewWorkflowModal: React.FC<NewWorkflowModalProps> = ({ onClose, onCreateWo
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full bg-[#141414] border border-[#282828] focus:border-[#10a37f] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#10a37f] placeholder-[#666] transition-all duration-200"
-                placeholder="输入工作流名称"
+                placeholder={t("workflow.createWorkflow.namePlaceholder")}
               />
             </div>
             
             {/* 工作流描述 */}
             <div>
               <label htmlFor="workflow-description" className="block text-sm font-medium text-white mb-1">
-                工作流描述 (可选)
+                <Trans id="workflow.createWorkflow.descriptionLabel" /> <span className="text-[#666]">({t('common.optional')})</span>
               </label>
               <textarea
                 id="workflow-description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="w-full bg-[#141414] border border-[#282828] focus:border-[#10a37f] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#10a37f] placeholder-[#666] transition-all duration-200 min-h-[80px]"
-                placeholder="描述这个工作流的用途..."
+                placeholder={t("workflow.createWorkflow.descriptionPlaceholder")}
               />
             </div>
 
             {/* 工作流模板选择 */}
             <div>
               <label className="block text-sm font-medium text-white mb-3">
-                选择工作流模板
+                <Trans id="workflow.templates.select" />
               </label>
               <div className="grid grid-cols-2 gap-3">
                 {templates.map((template) => (
@@ -116,7 +119,7 @@ const NewWorkflowModal: React.FC<NewWorkflowModalProps> = ({ onClose, onCreateWo
               onClick={onClose}
               className="px-4 py-2 bg-[#141414] hover:bg-[#1a1a1a] border border-[#282828] rounded text-sm transition-all duration-200"
             >
-              取消
+              <Trans id="common.cancel" />
             </button>
             <button
               onClick={handleCreate}
@@ -125,7 +128,7 @@ const NewWorkflowModal: React.FC<NewWorkflowModalProps> = ({ onClose, onCreateWo
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              创建工作流
+              <Trans id="workflow.createWorkflow.create" />
             </button>
           </div>
         </div>

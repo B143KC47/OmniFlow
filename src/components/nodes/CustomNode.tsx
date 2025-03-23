@@ -1,6 +1,7 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import BaseNode from './BaseNode';
 import { NodeData } from '../../types';
+import { useTranslation } from '../../utils/i18n';
 
 interface CustomNodeProps {
   id: string;
@@ -17,31 +18,47 @@ const CustomNode = memo(({
   isConnectable,
   onDataChange
 }: CustomNodeProps) => {
-  const initialData: NodeData = {
+  const { t } = useTranslation();
+  
+  // 使用useCallback优化onChange回调函数的性能
+  const handleChange = useCallback((nodeId: string, newData: Partial<NodeData>) => {
+    onDataChange({
+      ...data,
+      ...newData,
+    });
+  }, [data, onDataChange]);
+  
+  // 构建完整的节点数据
+  const nodeData: NodeData = {
     ...data,
-    label: data.label || '自定义节点',
+    label: data.label || t('nodes.custom.name'),
     inputs: {
+      ...data.inputs,
       config: {
         type: 'text',
         value: data.inputs?.config?.value || '',
-        placeholder: '请输入节点配置（JSON格式）',
+        placeholder: t('nodes.custom.configPlaceholder', 'Enter node configuration (JSON format)'),
+      },
+      code: {
+        type: 'text',
+        value: data.inputs?.code?.value || '',
+        placeholder: t('nodes.custom.codePlaceholder', 'Enter custom code here'),
       },
     },
     outputs: {
+      ...data.outputs,
       result: {
         type: 'text',
         value: data.outputs?.result?.value || '',
       },
     },
-    onChange: (nodeId: string, newData: NodeData) => {
-      onDataChange(newData);
-    }
+    onChange: handleChange
   };
 
   return (
     <BaseNode
       id={id}
-      data={initialData}
+      data={nodeData}
       selected={selected}
       isConnectable={isConnectable}
     />

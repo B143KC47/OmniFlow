@@ -40,23 +40,30 @@ const Connection = ({
     const sourcePos = getPortPosition(source, sourcePortId, true);
     const targetPos = getPortPosition(target, targetPortId, false);
     
-    // 使用贝塞尔曲线创建平滑路径
+    // 使用贝塞尔曲线创建平滑路径，增加曲率以便更好地避开节点
     const dx = Math.abs(targetPos.x - sourcePos.x);
-    const controlPointOffset = Math.min(dx * 0.5, 150); // 控制曲线弯曲程度
+    const dy = Math.abs(targetPos.y - sourcePos.y);
     
+    // 根据距离动态调整控制点偏移量，距离越远，曲线越平滑
+    const controlPointOffset = Math.min(dx * 0.6, 200); // 增加曲线弯曲程度
+    
+    // 如果两个节点高度差较大，增加垂直方向的曲率
+    const verticalOffset = dy > 50 ? dy * 0.3 : 0;
+    
+    // 创建路径，让连接线的曲率更适合避开节点
     const path = `
       M ${sourcePos.x},${sourcePos.y} 
-      C ${sourcePos.x + controlPointOffset},${sourcePos.y} 
-        ${targetPos.x - controlPointOffset},${targetPos.y} 
+      C ${sourcePos.x + controlPointOffset},${sourcePos.y + verticalOffset} 
+        ${targetPos.x - controlPointOffset},${targetPos.y - verticalOffset} 
         ${targetPos.x},${targetPos.y}
     `;
     
     setPath(path);
     
-    // 计算路径的中点位置（用于放置删除按钮）
+    // 计算路径的中点位置（用于放置删除按钮），稍微偏移以避免覆盖节点
     setMidPoint({
       x: (sourcePos.x + targetPos.x) / 2,
-      y: (sourcePos.y + targetPos.y) / 2
+      y: (sourcePos.y + targetPos.y) / 2 - 10 // 稍微上移，避免遮挡节点
     });
   }, [source, target, sourcePortId, targetPortId]);
 
@@ -66,6 +73,7 @@ const Connection = ({
         d={path}
         className="connection-path"
         fill="none"
+        style={{ pointerEvents: 'stroke' }} // 确保只有线条部分可交互
       />
       
       {!isTemp && onRemove && (

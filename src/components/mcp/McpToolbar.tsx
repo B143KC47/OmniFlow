@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation, Trans } from '../../utils/i18n';
 
 interface McpToolbarProps {
   searchTerm: string;
@@ -15,12 +16,18 @@ const McpToolbar: React.FC<McpToolbarProps> = ({
   onCategoryChange,
   onAddProvider,
 }) => {
+  const { t } = useTranslation();
+  
+  const getCategoryLabel = (category: string): string => {
+    return t(`mcp.filter.${category}`);
+  };
+  
   return (
     <div className="mcp-toolbar">
       <div className="mcp-search">
         <input 
           type="text" 
-          placeholder="搜索服务..." 
+          placeholder={t("common.search")}
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
         />
@@ -28,6 +35,7 @@ const McpToolbar: React.FC<McpToolbarProps> = ({
           <button 
             className="mcp-search-clear" 
             onClick={() => onSearchChange('')}
+            aria-label={t("common.reset")}
           >
             ×
           </button>
@@ -41,17 +49,13 @@ const McpToolbar: React.FC<McpToolbarProps> = ({
             className={`mcp-category-btn ${selectedCategory === category ? 'active' : ''}`}
             onClick={() => onCategoryChange(category)}
           >
-            {category === 'all' ? '全部' :
-             category === 'search' ? '搜索' :
-             category === 'ai' ? 'AI' :
-             category === 'database' ? '数据库' :
-             '自定义'}
+            {getCategoryLabel(category)}
           </button>
         ))}
       </div>
       
       <button className="mcp-add-btn" onClick={onAddProvider}>
-        添加服务
+        <Trans id="mcp.actions.add" />
       </button>
 
       <style jsx>{`

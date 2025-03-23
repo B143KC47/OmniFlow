@@ -1,14 +1,21 @@
 import React from 'react';
+import { useTranslation, Trans } from '../../utils/i18n';
 
 interface McpHeaderProps {
   onClose?: () => void;
 }
 
 const McpHeader: React.FC<McpHeaderProps> = ({ onClose }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="mcp-header">
-      <h2>外部服务管理</h2>
-      <button className="mcp-close-btn" onClick={onClose} aria-label="关闭">×</button>
+      <h2><Trans id="mcp.header.title" /></h2>
+      <button 
+        className="mcp-close-btn" 
+        onClick={onClose} 
+        aria-label={t("mcp.header.close")}
+      >×</button>
       
       <style jsx>{`
         .mcp-header {

@@ -1,6 +1,7 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import BaseNode from './BaseNode';
 import { NodeData } from '../../types';
+import { useTranslation } from '../../utils/i18n';
 
 interface TextInputNodeProps {
   id: string;
@@ -17,41 +18,49 @@ const TextInputNode = memo(({
   isConnectable,
   onDataChange
 }: TextInputNodeProps) => {
-  const initialData: NodeData = {
+  const { t } = useTranslation();
+  
+  // 使用useCallback优化onChange回调函数的性能
+  const handleChange = useCallback((nodeId: string, newData: Partial<NodeData>) => {
+    // 当输入改变时，同步更新输出
+    onDataChange({
+      ...data,
+      ...newData,
+      outputs: {
+        text: {
+          type: 'text',
+          value: newData.inputs?.text?.value || data.inputs?.text?.value || '',
+        }
+      }
+    });
+  }, [data, onDataChange]);
+  
+  // 构建完整的节点数据
+  const nodeData: NodeData = {
     ...data,
-    label: '文本输入',
+    label: data.label || t('nodes.textInput.name'),
     inputs: {
+      ...data.inputs,
       text: {
         type: 'text',
         value: data.inputs?.text?.value || '',
-        placeholder: '请输入文本',
+        placeholder: t('nodes.textInput.placeholder'),
       },
     },
     outputs: {
+      ...data.outputs,
       text: {
         type: 'text',
         value: data.inputs?.text?.value || '',
       }
     },
-    onChange: (nodeId: string, newData: NodeData) => {
-      // 当输入改变时，同步更新输出
-      const updatedData = {
-        ...newData,
-        outputs: {
-          text: {
-            type: 'text',
-            value: newData.inputs?.text?.value || '',
-          }
-        }
-      };
-      onDataChange(updatedData);
-    }
+    onChange: handleChange
   };
 
   return (
     <BaseNode
       id={id}
-      data={initialData}
+      data={nodeData}
       selected={selected}
       isConnectable={isConnectable}
     />

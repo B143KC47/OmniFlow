@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import NavModal from './shared/NavModal';
+import { useTranslation, Trans } from '../utils/i18n';
 
 interface QueueHistoryProps {
   onClose: () => void;
@@ -16,6 +17,7 @@ interface QueueItem {
 }
 
 const QueueHistory: React.FC<QueueHistoryProps> = ({ onClose }) => {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<'all' | 'running' | 'completed' | 'failed'>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -81,7 +83,7 @@ const QueueHistory: React.FC<QueueHistoryProps> = ({ onClose }) => {
 
   // 格式化时间
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('zh-CN', {
+    return date.toLocaleTimeString(t('app.locale'), {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
@@ -96,7 +98,7 @@ const QueueHistory: React.FC<QueueHistoryProps> = ({ onClose }) => {
     const minutes = Math.floor(diffMs / 60000);
     const seconds = Math.floor((diffMs % 60000) / 1000);
     
-    return `${minutes}分 ${seconds}秒`;
+    return t('queue.runtime', { minutes, seconds });
   };
 
   // 获取状态标签
@@ -106,28 +108,28 @@ const QueueHistory: React.FC<QueueHistoryProps> = ({ onClose }) => {
         return (
           <span className="px-2 py-1 rounded-full bg-[#10a37f]/20 text-[#10a37f] text-xs flex items-center">
             <span className="w-2 h-2 bg-[#10a37f] rounded-full mr-1.5"></span>
-            成功
+            <Trans id="queue.status.success" />
           </span>
         );
       case 'running':
         return (
           <span className="px-2 py-1 rounded-full bg-[#3b82f6]/20 text-[#3b82f6] text-xs flex items-center">
             <span className="w-2 h-2 bg-[#3b82f6] rounded-full mr-1.5 animate-pulse"></span>
-            运行中
+            <Trans id="queue.status.running" />
           </span>
         );
       case 'failed':
         return (
           <span className="px-2 py-1 rounded-full bg-[#ef4444]/20 text-[#ef4444] text-xs flex items-center">
             <span className="w-2 h-2 bg-[#ef4444] rounded-full mr-1.5"></span>
-            失败
+            <Trans id="queue.status.failed" />
           </span>
         );
       case 'pending':
         return (
           <span className="px-2 py-1 rounded-full bg-[#eab308]/20 text-[#eab308] text-xs flex items-center">
             <span className="w-2 h-2 bg-[#eab308] rounded-full mr-1.5"></span>
-            等待中
+            <Trans id="queue.status.pending" />
           </span>
         );
       default:
@@ -143,7 +145,7 @@ const QueueHistory: React.FC<QueueHistoryProps> = ({ onClose }) => {
   );
 
   return (
-    <NavModal title="队列历史" icon={icon} onClose={onClose}>
+    <NavModal title={t('app.header.queueHistory')} icon={icon} onClose={onClose}>
       <div className="flex flex-col h-full">
         {/* 工具栏 */}
         <div className="flex justify-between items-center mb-6">
@@ -152,31 +154,31 @@ const QueueHistory: React.FC<QueueHistoryProps> = ({ onClose }) => {
               className={`px-3 py-1.5 text-sm rounded-md transition-all ${filter === 'all' ? 'bg-[#10a37f] text-white' : 'bg-[#141414] text-[#e0e0e0] hover:bg-[#1c1c1c]'}`}
               onClick={() => setFilter('all')}
             >
-              全部
+              <Trans id="queue.filter.all" />
             </button>
             <button 
               className={`px-3 py-1.5 text-sm rounded-md transition-all ${filter === 'running' ? 'bg-[#10a37f] text-white' : 'bg-[#141414] text-[#e0e0e0] hover:bg-[#1c1c1c]'}`}
               onClick={() => setFilter('running')}
             >
-              正在运行
+              <Trans id="queue.filter.running" />
             </button>
             <button 
               className={`px-3 py-1.5 text-sm rounded-md transition-all ${filter === 'completed' ? 'bg-[#10a37f] text-white' : 'bg-[#141414] text-[#e0e0e0] hover:bg-[#1c1c1c]'}`}
               onClick={() => setFilter('completed')}
             >
-              已完成
+              <Trans id="queue.filter.completed" />
             </button>
             <button 
               className={`px-3 py-1.5 text-sm rounded-md transition-all ${filter === 'failed' ? 'bg-[#10a37f] text-white' : 'bg-[#141414] text-[#e0e0e0] hover:bg-[#1c1c1c]'}`}
               onClick={() => setFilter('failed')}
             >
-              失败
+              <Trans id="queue.filter.failed" />
             </button>
           </div>
           <div className="relative">
             <input
               type="text"
-              placeholder="搜索队列..."
+              placeholder={t("queue.searchPlaceholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-64 bg-[#141414] border border-[#282828] focus:border-[#10a37f] rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#10a37f] placeholder-[#666]"
@@ -193,21 +195,21 @@ const QueueHistory: React.FC<QueueHistoryProps> = ({ onClose }) => {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mb-4 text-[#333]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-lg font-medium">无匹配的队列记录</p>
-            <p className="text-sm mt-2">尝试更改筛选条件或清除搜索</p>
+            <p className="text-lg font-medium">{t('queue.noMatchingJobs')}</p>
+            <p className="text-sm mt-2">{t('queue.noMatchingJobsDescription')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-[#282828] text-sm">
               <thead>
                 <tr className="text-[#888]">
-                  <th className="py-3 text-left font-medium">名称</th>
-                  <th className="py-3 text-left font-medium">状态</th>
-                  <th className="py-3 text-left font-medium">开始时间</th>
-                  <th className="py-3 text-left font-medium">运行时间</th>
-                  <th className="py-3 text-left font-medium">节点数量</th>
-                  <th className="py-3 text-center font-medium">进度</th>
-                  <th className="py-3 text-right font-medium">操作</th>
+                  <th className="py-3 text-left font-medium">{t('queue.columns.name')}</th>
+                  <th className="py-3 text-left font-medium">{t('queue.columns.status')}</th>
+                  <th className="py-3 text-left font-medium">{t('queue.columns.startTime')}</th>
+                  <th className="py-3 text-left font-medium">{t('queue.columns.runtime')}</th>
+                  <th className="py-3 text-left font-medium">{t('queue.columns.nodeCount')}</th>
+                  <th className="py-3 text-center font-medium">{t('queue.columns.progress')}</th>
+                  <th className="py-3 text-right font-medium">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#1c1c1c]">
@@ -233,20 +235,29 @@ const QueueHistory: React.FC<QueueHistoryProps> = ({ onClose }) => {
                     <td className="py-4 text-right">
                       <div className="flex justify-end space-x-2">
                         {item.status === 'running' || item.status === 'pending' ? (
-                          <button className="p-1 rounded hover:bg-[#282828] text-[#ef4444] transition-colors">
+                          <button 
+                            className="p-1 rounded hover:bg-[#282828] text-[#ef4444] transition-colors"
+                            title={t('queue.actions.cancel')}
+                          >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                           </button>
                         ) : (
-                          <button className="p-1 rounded hover:bg-[#282828] text-[#10a37f] transition-colors">
+                          <button 
+                            className="p-1 rounded hover:bg-[#282828] text-[#10a37f] transition-colors"
+                            title={t('queue.actions.view')}
+                          >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                           </button>
                         )}
-                        <button className="p-1 rounded hover:bg-[#282828] text-[#666] hover:text-[#fff] transition-colors">
+                        <button 
+                          className="p-1 rounded hover:bg-[#282828] text-[#666] hover:text-[#fff] transition-colors"
+                          title={t('common.delete')}
+                        >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
