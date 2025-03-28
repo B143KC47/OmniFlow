@@ -1,10 +1,58 @@
 .node {
   position: absolute;
   width: 180px;
-  background-color: #ffffff;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  background-color: #2d3748; /* 深色背景更容易看见 */
+  color: #e2e8f0; /* 浅色文字 */
+  border: 1px solid #4a5568;
+  min-width: 200px;
+  cursor: move;
+  padding: 1rem; /* 等同于p-4 */
+  border-radius: 0.5rem; /* 等同于rounded-lg */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* 增强阴影效果 */
+  -webkit-user-select: none; /* Safari 3+ */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none;
+  z-index: 10 !important; /* 确保节点在连接线上方 */
+  transform: translate(-50%, -50%); /* 使节点中心位于指定位置 */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* 节点位置样式通过JS设置，这里提供类名来控制 */
+.node-positioned {
+  left: var(--node-x);
+  top: var(--node-y);
+}
+
+/* 根据节点类型设置不同的样式 */
+.node-text_input {
+  border-left: 3px solid #3b82f6;
+}
+
+.node-llm_query {
+  border-left: 3px solid #10b981;
+}
+
+.node-web_search {
+  border-left: 3px solid #f59e0b;
+}
+
+.node-document_query {
+  border-left: 3px solid #8b5cf6;
+}
+
+.node-model_selector {
+  border-left: 3px solid #ec4899;
+}
+
+.node-custom {
+  border-left: 3px solid #6b7280;
+}
+
+.node-title {
+  font-weight: bold; 
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
 }
 
 .node-header {
@@ -29,6 +77,12 @@
 
 .node-content {
   padding: 10px;
+}
+
+.node-connectors {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: space-between;
 }
 
 .node-port {
@@ -58,4 +112,47 @@
 .port-connector:hover {
   background-color: #4caf50;
   transform: scale(1.2);
+}
+
+/* 节点连接点样式 */
+.node-handle {
+  position: relative;
+  width: 1rem; /* 等同于w-4 */
+  height: 1rem; /* 等同于h-4 */
+  border-radius: 9999px; /* 等同于rounded-full */
+  z-index: 12 !important; /* 确保连接点在节点和线上都可见 */
+}
+
+.node-handle-source {
+  background-color: #3b82f6; /* 蓝色，等同于bg-blue-500 */
+  cursor: grab;
+}
+
+.node-handle-source:hover {
+  background-color: #2563eb; /* 深蓝色，等同于hover:bg-blue-600 */
+}
+
+.node-handle-source:active {
+  cursor: grabbing;
+}
+
+.node-handle-target {
+  background-color: #10b981; /* 绿色，等同于bg-green-500 */
+  cursor: pointer;
+}
+
+.node-handle-target:hover {
+  background-color: #059669; /* 深绿色，等同于hover:bg-green-600 */
+}
+
+/* 确保选中的节点在最顶层并有高亮效果 */
+.node.selected {
+  z-index: 15 !important;
+  box-shadow: 0 0 0 2px #3b82f6; /* 等同于ring-2 ring-blue-500 */
+}
+
+/* 优化拖动中的节点样式 */
+.node.dragging {
+  opacity: 0.8;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
 }

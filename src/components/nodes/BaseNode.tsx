@@ -10,6 +10,20 @@ interface BaseNodeProps {
   isConnectable: boolean;
 }
 
+// 添加 getStatusClass 函数
+function getStatusClass(status?: string): string {
+  switch (status) {
+    case 'running':
+      return 'status-running';
+    case 'error':
+      return 'status-error';
+    case 'completed':
+      return 'status-completed';
+    default:
+      return '';
+  }
+}
+
 const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => {
   const { t } = useTranslation();
   const { label, inputs = {}, outputs = {}, onChange, connectStatus } = data;
@@ -33,6 +47,7 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
     if (node) {
       // 确保所有节点始终有基本的可见性，不论状态如何
       node.style.visibility = 'visible';
+      node.style.display = 'block'; // 确保节点可见
       
       if (connectStatus) {
         // 连接状态处理 - 确保节点在连接过程中始终可见
@@ -44,13 +59,13 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
           // 高亮显示兼容节点
           node.style.boxShadow = '0 0 0 2px var(--primary-color), 0 0 15px rgba(16, 163, 127, 0.7)';
         } else if (connectStatus === 'incompatible') {
-          // 修改: 即使不兼容，也确保节点仍然可见，只是通过视觉效果区分
-          node.style.zIndex = '500'; // 降低但仍然高于默认值
-          node.style.opacity = '0.85'; // 提高透明度，确保更容易被看见
+          // 修改: 即使不兼容，也确保节点仍然可见
+          node.style.zIndex = '500'; // 仍然保持较高的z-index，确保可见
+          node.style.opacity = '0.7'; // 适度降低透明度，但仍然清晰可见
           node.classList.add('not-connectable');
           node.classList.remove('connectable');
-          // 添加轻微的灰色边框，表示不兼容但仍然可见
-          node.style.boxShadow = '0 0 0 1px rgba(90, 90, 90, 0.5), 0 0 5px rgba(90, 90, 90, 0.3)';
+          // 添加红色边框，清晰表示不兼容但保持可见
+          node.style.boxShadow = '0 0 0 2px var(--error-color), 0 0 10px rgba(244, 67, 54, 0.3)';
         }
       } else {
         // 重置状态，确保节点在正常状态下可见
@@ -61,15 +76,15 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
         node.style.boxShadow = selected ? 
           '0 0 0 2px var(--primary-color), 0 0 10px rgba(16, 163, 127, 0.5)' : 
           data.status === 'running' ? 
-            '0 0 0 2px var(--primary-color), 0 0 10px rgba(16, 163, 127, 0.5)' :
-            data.status === 'completed' ? 
-              '0 0 0 2px var(--success-color), 0 0 10px rgba(46, 204, 113, 0.5)' :
-              data.status === 'error' ? 
-                '0 0 0 2px var(--error-color), 0 0 10px rgba(244, 67, 54, 0.5)' :
-                'var(--shadow-md)';
+            '0 0 0 2px var(--primary-color), 0 0 10px rgba(16, 163, 127, 0.4)' :
+          data.status === 'error' ? 
+            '0 0 0 2px var(--error-color), 0 0 10px rgba(244, 67, 54, 0.5)' :
+          data.status === 'completed' ?
+            '0 0 0 2px var(--success-color), 0 0 10px rgba(46, 204, 113, 0.5)' :
+            'var(--shadow-md)'; // 默认阴影
       }
     }
-  }, [connectStatus, id, selected, data.status]);
+  }, [connectStatus, selected, id, data.status]);
   
   // 处理输入值变化
   const handleInputChange = (key: string, value: any) => {
@@ -200,186 +215,185 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
   };
   
   return (
-    <div 
+    <div
       id={`node-${id}`}
-      className={getNodeClasses()} 
-      style={{ 
-        width: nodeSize.width, 
-        height: typeof nodeSize.height === 'number' ? `${nodeSize.height}px` : nodeSize.height,
-        position: 'relative', // 确保定位正确
-        visibility: 'visible', // 确保节点始终可见
-        // 移除boxShadow，因为我们在useEffect中动态设置它
-        zIndex: selected ? 100 : 10, // 确保节点始终在连接线之上
-        backgroundColor: 'var(--node-color)', // 确保背景是实心的，不透明
-        borderRadius: '6px',
-        border: `1px solid ${selected ? 'var(--primary-color)' : 'var(--node-border-color)'}`
+      className={`comfy-node ${getTypeClass()} ${getStatusClass(data.status)}`}
+      style={{
+        width: nodeSize.width,
+        height: nodeSize.height,
+        position: 'relative',
+        zIndex: 10, // 默认Z-index确保可见
+        visibility: 'visible', // 显式设置可见性
       }}
     >
-      {/* 节点头部 */}
-      <div className="comfy-node-header">
-        <div className="comfy-node-title">
-          {label}
-          {data.status && (
-            <span className={`comfy-node-status ${data.status}`}>
-              {data.status === 'running' && '⚙️'}
-              {data.status === 'completed' && '✅'}
-              {data.status === 'error' && '❌'}
-            </span>
-          )}
+      {/* 节点内容 */}
+      <div className="comfy-node-content-wrapper">
+        {/* 节点头部 */}
+        <div className="comfy-node-header">
+          <div className="comfy-node-title">
+            {label}
+            {data.status && (
+              <span className={`comfy-node-status ${data.status}`}>
+                {data.status === 'running' && '⚙️'}
+                {data.status === 'completed' && '✅'}
+                {data.status === 'error' && '❌'}
+              </span>
+            )}
+          </div>
+          <div className="comfy-node-controls">
+            <button 
+              onClick={toggleCollapsed}
+              className="comfy-node-collapse-btn"
+              title={collapsed ? t('nodes.common.expand') : t('nodes.common.collapse')}
+            >
+              {collapsed ? "+" : "-"}
+            </button>
+          </div>
         </div>
-        <div className="comfy-node-controls">
-          <button 
-            onClick={toggleCollapsed}
-            className="comfy-node-collapse-btn"
-            title={collapsed ? t('nodes.common.expand') : t('nodes.common.collapse')}
-          >
-            {collapsed ? "+" : "-"}
-          </button>
-        </div>
-      </div>
-      
-      <div className={`comfy-node-content ${collapsed ? 'collapsed' : ''}`}>
-        {/* 输入部分 */}
-        {Object.entries(inputs).length > 0 && (
-          <div className="comfy-section">
-            <div className="comfy-section-title">{t('nodes.common.inputs')}</div>
-            {Object.entries(inputs).map(([key, input]: [string, any], index) => {
-              // 如果输入字段有hidden属性且为true，则不显示它
-              if (input.hidden) return null;
-              
-              return (
-                <div key={key} className="comfy-node-row">
-                  <Handle
-                    type="target"
-                    position={Position.Left}
-                    id={`input-${key}`}
-                    isConnectable={isConnectable}
-                    className={`comfy-node-handle comfy-node-handle-input ${input.isConnected ? 'connected' : ''} ${connectStatus === 'compatible' ? 'connectable' : ''}`}
-                    style={{
-                      top: `${40 + index * 32}px`,
-                      background: input.type === 'boolean' ? '#ff9800' :
-                              input.type === 'number' ? '#2196f3' :
-                              input.type === 'string' ? '#4caf50' : '#9c27b0',
-                      zIndex: 2000 // 确保连接点始终在最顶层
-                    }}
-                    data-tooltip={`${input.label || key} (${input.type})`}
-                  />
-                  <div className="comfy-node-label" title={key}>{input.label || key}</div>
-                  <div className="comfy-node-input-wrapper">
-                    {input.type === 'text' ? (
-                      <input
-                        type="text"
-                        value={input.value || ''}
-                        onChange={(e) => handleInputChange(key, e.target.value)}
-                        className="comfy-node-input"
-                        placeholder={input.placeholder || t('nodes.common.inputPlaceholder', { field: key })}
-                        disabled={input.isConnected}
-                      />
-                    ) : input.type === 'number' ? (
-                      <div className="comfy-node-number-wrapper">
+        
+        <div className={`comfy-node-content ${collapsed ? 'collapsed' : ''}`}>
+          {/* 输入部分 */}
+          {Object.entries(inputs).length > 0 && (
+            <div className="comfy-section">
+              <div className="comfy-section-title">{t('nodes.common.inputs')}</div>
+              {Object.entries(inputs).map(([key, input]: [string, any], index) => {
+                // 如果输入字段有hidden属性且为true，则不显示它
+                if (input.hidden) return null;
+                
+                return (
+                  <div key={key} className="comfy-node-row">
+                    <Handle
+                      type="target"
+                      position={Position.Left}
+                      id={`input-${key}`}
+                      isConnectable={isConnectable}
+                      className={`comfy-node-handle comfy-node-handle-input ${input.isConnected ? 'connected' : ''} ${connectStatus === 'compatible' ? 'connectable' : ''}`}
+                      style={{
+                        top: `${40 + index * 32}px`,
+                        background: input.type === 'boolean' ? '#ff9800' :
+                                input.type === 'number' ? '#2196f3' :
+                                input.type === 'string' ? '#4caf50' : '#9c27b0',
+                        zIndex: 2000 // 确保连接点始终在最顶层
+                      }}
+                      data-tooltip={`${input.label || key} (${input.type})`}
+                    />
+                    <div className="comfy-node-label" title={key}>{input.label || key}</div>
+                    <div className="comfy-node-input-wrapper">
+                      {input.type === 'text' ? (
                         <input
-                          type="number"
+                          type="text"
                           value={input.value || ''}
-                          onChange={(e) => handleInputChange(key, parseFloat(e.target.value))}
-                          className="comfy-node-input comfy-node-number"
-                          placeholder={input.placeholder}
-                          min={input.min}
-                          max={input.max}
-                          step={input.step}
+                          onChange={(e) => handleInputChange(key, e.target.value)}
+                          className="comfy-node-input"
+                          placeholder={input.placeholder || t('nodes.common.inputPlaceholder', { field: key })}
                           disabled={input.isConnected}
                         />
-                        <div className="comfy-node-slider-wrapper">
+                      ) : input.type === 'number' ? (
+                        <div className="comfy-node-number-wrapper">
                           <input
-                            type="range"
-                            min={input.min || 0}
-                            max={input.max || 100}
-                            step={input.step || 1}
-                            value={input.value || 0}
+                            type="number"
+                            value={input.value || ''}
                             onChange={(e) => handleInputChange(key, parseFloat(e.target.value))}
-                            className="comfy-node-slider"
+                            className="comfy-node-input comfy-node-number"
+                            placeholder={input.placeholder}
+                            min={input.min}
+                            max={input.max}
+                            step={input.step}
                             disabled={input.isConnected}
                           />
+                          <div className="comfy-node-slider-wrapper">
+                            <input
+                              type="range"
+                              min={input.min || 0}
+                              max={input.max || 100}
+                              step={input.step || 1}
+                              value={input.value || 0}
+                              onChange={(e) => handleInputChange(key, parseFloat(e.target.value))}
+                              className="comfy-node-slider"
+                              disabled={input.isConnected}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    ) : input.type === 'select' ? (
-                      <select
-                        value={input.value || ''}
-                        onChange={(e) => handleInputChange(key, e.target.value)}
-                        className="comfy-node-select"
-                        disabled={input.isConnected}
-                      >
-                        {input.options?.map((option: string) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    ) : null}
+                      ) : input.type === 'select' ? (
+                        <select
+                          value={input.value || ''}
+                          onChange={(e) => handleInputChange(key, e.target.value)}
+                          className="comfy-node-select"
+                          disabled={input.isConnected}
+                        >
+                          {input.options?.map((option: string) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-        {/* 输出部分 */}
-        {Object.entries(outputs).length > 0 && (
-          <div className="comfy-section">
-            <div className="comfy-section-title">{t('nodes.common.outputs')}</div>
-            {Object.entries(outputs).map(([key, output]: [string, any], index) => {
-              const isExpanded = expandedOutputs[key];
-              const outputValue = output.value || '';
-              // 判断输出是否需要展开/折叠功能（当内容较长时）
-              const needsExpand = outputValue.length > 50;
-              
-              return (
-                <div key={key} className="comfy-node-row comfy-node-output-row" style={{ paddingTop: `${index * 4}px` }}>
-                  <div className="comfy-node-label" title={key}>{output.label || key}</div>
-                  <div className="comfy-node-output">
-                    {outputValue ? (
-                      <div 
-                        className={`comfy-node-expandable-content ${isExpanded ? 'expanded' : ''}`}
-                        onClick={needsExpand ? () => toggleOutputExpanded(key) : undefined}
-                        style={{ cursor: needsExpand ? 'pointer' : 'default' }}
-                      >
-                        <span className="comfy-node-output-value">
-                          {isExpanded || !needsExpand ? outputValue : `${outputValue.substring(0, 50)}...`}
-                        </span>
-                        {needsExpand && (
-                          <span className="comfy-expand-toggle">
-                            {isExpanded ? t('nodes.common.collapse') : t('nodes.common.expand')}
+                );
+              })}
+            </div>
+          )}
+          {/* 输出部分 */}
+          {Object.entries(outputs).length > 0 && (
+            <div className="comfy-section">
+              <div className="comfy-section-title">{t('nodes.common.outputs')}</div>
+              {Object.entries(outputs).map(([key, output]: [string, any], index) => {
+                const isExpanded = expandedOutputs[key];
+                const outputValue = output.value || '';
+                // 判断输出是否需要展开/折叠功能（当内容较长时）
+                const needsExpand = outputValue.length > 50;
+                
+                return (
+                  <div key={key} className="comfy-node-row comfy-node-output-row" style={{ paddingTop: `${index * 4}px` }}>
+                    <div className="comfy-node-label" title={key}>{output.label || key}</div>
+                    <div className="comfy-node-output">
+                      {outputValue ? (
+                        <div 
+                          className={`comfy-node-expandable-content ${isExpanded ? 'expanded' : ''}`}
+                          onClick={needsExpand ? () => toggleOutputExpanded(key) : undefined}
+                          style={{ cursor: needsExpand ? 'pointer' : 'default' }}
+                        >
+                          <span className="comfy-node-output-value">
+                            {isExpanded || !needsExpand ? outputValue : `${outputValue.substring(0, 50)}...`}
                           </span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="comfy-node-output-empty">{t('nodes.common.noData')}</span>
-                    )}
+                          {needsExpand && (
+                            <span className="comfy-expand-toggle">
+                              {isExpanded ? t('nodes.common.collapse') : t('nodes.common.expand')}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="comfy-node-output-empty">{t('nodes.common.noData')}</span>
+                      )}
+                    </div>
+                    <Handle
+                      type="source"
+                      position={Position.Right}
+                      id={`output-${key}`}
+                      isConnectable={isConnectable}
+                      className={`comfy-node-handle comfy-node-handle-output ${output.isConnected ? 'connected' : ''}`}
+                      style={{
+                        top: `${40 + index * 32}px`,
+                        background: output.type === 'boolean' ? '#ff9800' :
+                                  output.type === 'number' ? '#2196f3' :
+                                  output.type === 'string' ? '#4caf50' : '#9c27b0',
+                        zIndex: 2000 // 确保连接点始终在顶层
+                      }}
+                      data-tooltip={`${output.label || key} (${output.type})`}
+                    />
                   </div>
-                  <Handle
-                    type="source"
-                    position={Position.Right}
-                    id={`output-${key}`}
-                    isConnectable={isConnectable}
-                    className={`comfy-node-handle comfy-node-handle-output ${output.isConnected ? 'connected' : ''}`}
-                    style={{
-                      top: `${40 + index * 32}px`,
-                      background: output.type === 'boolean' ? '#ff9800' :
-                                output.type === 'number' ? '#2196f3' :
-                                output.type === 'string' ? '#4caf50' : '#9c27b0',
-                      zIndex: 2000 // 确保连接点始终在顶层
-                    }}
-                    data-tooltip={`${output.label || key} (${output.type})`}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        )}
-        
-        {/* 大小调整手柄 */}
-        <div 
-          className="comfy-node-resize-handle"
-          onMouseDown={startResize}
-        />
+                );
+              })}
+            </div>
+          )}
+          
+          {/* 大小调整手柄 */}
+          <div 
+            className="comfy-node-resize-handle"
+            onMouseDown={startResize}
+          />
+        </div>
       </div>
 
       {/* 节点背景 - 添加一个半透明遮罩层，确保内容不被遮挡 */}

@@ -38,12 +38,14 @@ const Background = dynamic(
 // 导入样式
 import 'reactflow/dist/style.css';
 
-// 动态导入其他组件
+// 动态导入节点组件
 const TextInputNode = dynamic(() => import('./nodes/TextInputNode'), { ssr: false });
-const LlmQueryNode = dynamic(() => import('./nodes/LlmQueryNode'), { ssr: false });
-const WebSearchNode = dynamic(() => import('./nodes/WebSearchNode'), { ssr: false });
 const DocumentQueryNode = dynamic(() => import('./nodes/DocumentQueryNode'), { ssr: false });
-const CustomNodeComponent = dynamic(() => import('./nodes/CustomNode'), { ssr: false });
+const WebSearchNode = dynamic(() => import('./nodes/WebSearchNode'), { ssr: false });
+const ModelSelectorNode = dynamic(() => import('./nodes/ModelSelectorNode'), { ssr: false });
+const EncoderNode = dynamic(() => import('./nodes/EncoderNode'), { ssr: false });
+const SamplerNode = dynamic(() => import('../components/nodes/SamplerNode'), { ssr: false });
+const CustomNode = dynamic(() => import('./nodes/CustomNode'), { ssr: false });
 const ContextMenu = dynamic(() => import('./ContextMenu'), { ssr: false });
 const McpManager = dynamic(() => import('./McpManager'), { ssr: false });
 
@@ -59,22 +61,27 @@ interface NodeTypes {
   [key: string]: React.ComponentType<any>;
 }
 
-// 节点类型映射表 - 使用字符串字面量
-const nodeTypeMap: Record<string, string> = {
-  'textInput': 'textInput',
-  'llmQuery': 'llmQuery',
-  'webSearch': 'webSearch',
-  'documentQuery': 'documentQuery',
-  'custom': 'custom',
+// 节点类型映射表 - 使用NodeType枚举确保类型一致性
+const nodeTypeMap: Record<string, NodeType> = {
+  [NodeType.TEXT_INPUT]: NodeType.TEXT_INPUT,
+  [NodeType.LLM_QUERY]: NodeType.LLM_QUERY,
+  [NodeType.WEB_SEARCH]: NodeType.WEB_SEARCH,
+  [NodeType.DOCUMENT_QUERY]: NodeType.DOCUMENT_QUERY,
+  [NodeType.MODEL_SELECTOR]: NodeType.MODEL_SELECTOR,
+  [NodeType.CUSTOM]: NodeType.CUSTOM,
+  [NodeType.ENCODER]: NodeType.ENCODER,
+  [NodeType.SAMPLER]: NodeType.SAMPLER,
 };
 
-// 自定义节点类型映射
-const nodeTypes: NodeTypes = {
-  'textInput': TextInputNode,
-  'llmQuery': LlmQueryNode,
-  'webSearch': WebSearchNode,
-  'documentQuery': DocumentQueryNode,
-  'custom': CustomNodeComponent,
+// 注册节点类型
+const nodeTypes = {
+  [NodeType.TEXT_INPUT]: TextInputNode,
+  [NodeType.WEB_SEARCH]: WebSearchNode,
+  [NodeType.DOCUMENT_QUERY]: DocumentQueryNode,
+  [NodeType.MODEL_SELECTOR]: ModelSelectorNode,
+  [NodeType.CUSTOM_NODE]: CustomNode,
+  [NodeType.ENCODER]: EncoderNode,
+  [NodeType.SAMPLER]: SamplerNode,
 };
 
 // 定义节点类型
@@ -93,6 +100,19 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
   // 在客户端挂载后更新状态
   useEffect(() => {
     setIsClient(true);
+    console.log('工作流编辑器初始化完成');
+    
+    // 添加错误处理器，捕获React未捕获的错误
+    const errorHandler = (event: ErrorEvent) => {
+      console.error('全局错误:', event.error);
+      // 这里可以添加错误上报或显示错误通知
+    };
+    
+    window.addEventListener('error', errorHandler);
+    
+    return () => {
+      window.removeEventListener('error', errorHandler);
+    };
   }, []);
 
   // ReactFlow元素状态
@@ -208,33 +228,64 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
 
   // 添加新节点
   const addNode = useCallback((type: string, position: XYPosition) => {
-    // 将菜单项ID转换为节点类型
-    const nodeType = nodeTypeMap[type];
+    console.log(`------节点创建开始------`);
+    console.log(`收到添加节点请求，类型: ${type}，位置: ${position.x}, ${position.y}`);
+
+    // 确定节点类型，先直接使用传入的类型，如果不是有效类型再尝试从nodeTypeMap获取
+    let nodeType = type as NodeType;
+    
+    // 检查nodeType是否有效，如果无效则尝试从映射表获取
+    if (!Object.values(NodeType).includes(nodeType)) {
+      console.log(`类型 ${nodeType} 不是直接的NodeType值，尝试从映射表获取...`);
+      nodeType = nodeTypeMap[type];
+    }
+
     if (!nodeType) {
       console.error(`未知的节点类型: ${type}`);
+      console.log(`可用的节点类型: ${Object.values(NodeType).join(', ')}`);
+      console.log(`------节点创建失败------`);
+      return;
+    }
+
+    console.log(`最终解析的节点类型: ${nodeType}`);
+    
+    // 检查这个节点类型是否有对应的组件
+    if (!nodeTypes[nodeType]) {
+      console.error(`未找到节点类型 "${nodeType}" 对应的组件`);
+      console.log(`已注册的节点类型映射: ${Object.keys(nodeTypes).join(', ')}`);
+      console.log(`------节点创建失败------`);
       return;
     }
 
     // 根据节点类型设置不同的标签
     let label = '未知节点';
-    switch (type) {
-      case 'textInput':
+    switch (nodeType) {
+      case NodeType.TEXT_INPUT:
         label = t('nodes.textInput.name');
         break;
-      case 'llmQuery':
+      case NodeType.LLM_QUERY:
         label = t('nodes.llmQuery.name');
         break;
-      case 'webSearch':
+      case NodeType.WEB_SEARCH:
         label = t('nodes.webSearch.name');
         break;
-      case 'documentQuery':
+      case NodeType.DOCUMENT_QUERY:
         label = t('nodes.documentQuery.name');
         break;
-      case 'custom':
+      case NodeType.MODEL_SELECTOR:
+        label = t('nodes.modelSelector.name');
+        break;
+      case NodeType.CUSTOM:
         label = t('nodes.custom.name');
         break;
+      case NodeType.ENCODER:
+        label = t('nodes.encoder.name');
+        break;
+      case NodeType.SAMPLER:
+        label = t('nodes.sampler.name');
+        break;
       default:
-        label = type;
+        label = `节点-${nodeType}`;
     }
 
     // 创建新节点
@@ -262,6 +313,10 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
 
     // 添加节点
     setNodes(nds => [...nds, newNode]);
+    
+    // 添加调试信息
+    console.log('节点创建成功，节点数据:', newNode);
+    console.log(`------节点创建完成------`);
   }, [setNodes, t]);
 
   // 显示MCP管理器
@@ -344,17 +399,29 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
   const onDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
 
+    // 获取拖放区域的位置信息
     const reactFlowBounds = event.currentTarget.getBoundingClientRect();
+    
+    // 从拖拽数据中获取节点类型和标签信息
     const type = event.dataTransfer.getData('nodeType');
     const label = event.dataTransfer.getData('nodeLabel');
 
-    const position = {
+    console.log(`拖放创建节点 - 类型: ${type}, 标签: ${label}`);
+    
+    if (!type) {
+      console.error('拖放创建节点失败: 未获取到节点类型');
+      return;
+    }
+
+    // 计算放置位置（转换为画布坐标）
+    const position = reactFlowInstance.screenToFlowPosition({
       x: event.clientX - reactFlowBounds.left,
       y: event.clientY - reactFlowBounds.top
-    };
+    });
 
+    // 调用addNode函数创建节点
     addNode(type, position);
-  }, [addNode]);
+  }, [addNode, reactFlowInstance]);
 
   // 只在客户端渲染时显示内容
   if (!isClient) {
@@ -423,16 +490,12 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
                   nodeTypes={nodeTypes}
                   fitView
                   className="comfy-flow"
-                  defaultZoom={1}
                   minZoom={0.1}
                   maxZoom={2}
                   defaultViewport={{ x: 0, y: 0, zoom: 1 }}
                   snapToGrid={true}
                   snapGrid={[15, 15]}
-                >
-                  <Controls className="comfy-controls" />
-                  <Background color="#2a2a2a" gap={16} size={1} />
-                </ReactFlow>
+                />
               </div>
 
               <ContextMenu 

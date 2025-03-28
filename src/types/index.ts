@@ -1,7 +1,6 @@
 // 节点类型枚举
 export enum NodeType {
   TEXT_INPUT = 'TEXT_INPUT',
-  LLM_QUERY = 'LLM_QUERY',
   WEB_SEARCH = 'WEB_SEARCH',
   DOCUMENT_QUERY = 'DOCUMENT_QUERY',
   MODEL_SELECTOR = 'MODEL_SELECTOR',
@@ -111,13 +110,6 @@ export interface Connection {
 // 文本输入节点数据
 export interface TextInputNodeData extends NodeData {
   text: string;
-}
-
-// LLM查询节点数据
-export interface LlmQueryNodeData extends NodeData {
-  prompt: string;
-  model: string;
-  result?: string;
 }
 
 // 网络搜索节点数据

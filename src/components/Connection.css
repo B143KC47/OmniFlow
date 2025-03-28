@@ -2,14 +2,46 @@
   stroke: #4a90e2;
   stroke-width: 2px;
   fill: none;
-  pointer-events: none;
+  pointer-events: stroke; /* 确保只有线条部分可交互 */
   opacity: 0.75; /* 添加半透明效果 */
-  z-index: 5; /* 确保连接线的z-index低于节点 */
+  z-index: 1 !important; /* 确保连接线的z-index低于节点 */
+}
+
+/* 基于状态设置边的样式 */
+.connection-path.compatible {
+  stroke: var(--connection-color, #4a90e2);
+  stroke-dasharray: none;
+}
+
+.connection-path.incompatible {
+  stroke: var(--error-color, #f56c6c);
+  stroke-dasharray: 5, 5;
+}
+
+.connection-path.selected {
+  stroke: var(--connection-hover-color, #9cb3d8);
+  stroke-width: 3px;
+}
+
+.connection-path.animated {
+  stroke-dasharray: 5, 3;
+  animation: flowAnimation 1s infinite linear;
+}
+
+@keyframes flowAnimation {
+  from {
+    stroke-dashoffset: 10;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 .temp-connection .connection-path {
   stroke: #9cb3d8;
   stroke-dasharray: 5, 5;
+  z-index: 1 !important; /* 临时连接线比普通连接线层级高 */
+  pointer-events: none; /* 确保不会阻止与节点的交互 */
 }
 
 .connection-delete-btn {
@@ -25,13 +57,116 @@
 }
 
 /* 确保连接线元素在节点下方 */
-svg.connection-layer {
-  z-index: 5;
+svg.connection-layer,
+.react-flow__edges {
+  z-index: 0 !important; /* 将z-index降低，确保在节点下方 */
   position: relative;
+  pointer-events: none; /* 添加此属性确保连接线不会阻止与节点的交互 */
+}
+
+/* 临时连接线（拖动中）的样式 */
+.react-flow__connection-path {
+  stroke: var(--connection-hover-color, #9cb3d8);
+  stroke-dasharray: 5, 3;
+  stroke-width: 2;
+  opacity: 0.75;
+  pointer-events: none;
 }
 
 /* 确保节点在连接线上方 */
+.react-flow__node,
 .node {
-  z-index: 10;
+  z-index: 10 !important;
   position: relative;
+}
+
+/* 确保节点句柄在节点上方以便可以交互 */
+.react-flow__handle {
+  z-index: 2000 !important; /* 提高句柄的z-index以确保可交互 */
+  pointer-events: all !important; /* 确保句柄可以接收鼠标事件 */
+}
+
+/* 新增样式 */
+.edge-indicator-text {
+  pointer-events: none;
+  font-weight: 500;
+  font-size: 10px;
+}
+
+.edge-label {
+  pointer-events: none;
+  font-weight: 500;
+  font-size: 10px;
+}
+
+.edge-label-background {
+  fill: var(--node-color, #2d3748);
+  fill-opacity: 0.7;
+  stroke: var(--node-border-color, #4a5568);
+  stroke-width: 1;
+  /* 使用两种方式定义圆角，兼容不同浏览器 */
+  rx: 4; /* SVG原生圆角，但Safari不支持 */
+  -webkit-border-radius: 4px; /* Safari支持 */
+  border-radius: 4px; /* 标准写法 */
+}
+
+.edge-indicator {
+  pointer-events: none;
+  z-index: 6;
+}
+
+/* SVG元素样式 */
+.edge-type-indicator {
+  r: 12px;
+  fill: var(--node-color, #2d3748);
+}
+
+.edge-type-indicator.compatible {
+  stroke: var(--success-color, #10b981);
+}
+
+.edge-type-indicator.incompatible {
+  stroke: var(--error-color, #f56c6c);
+}
+
+.edge-indicator-text {
+  pointer-events: none;
+  font-weight: 500;
+  font-size: 10px;
+  text-anchor: middle;
+  alignment-baseline: middle;
+}
+
+.edge-indicator-text.compatible {
+  fill: var(--success-color, #10b981);
+}
+
+.edge-indicator-text.incompatible {
+  fill: var(--error-color, #f56c6c);
+}
+
+.edge-label-rect {
+  x: -40px;
+  y: -10px;
+  width: 80px;
+  height: 20px;
+  fill: var(--node-color, #2d3748);
+  fill-opacity: 0.7;
+  stroke: var(--node-border-color, #4a5568);
+  stroke-width: 1;
+  /* 使用两种方式定义圆角，兼容不同浏览器 */
+  rx: 4; /* SVG原生圆角，但Safari不支持 */
+  -webkit-border-radius: 4px; /* Safari支持 */
+  border-radius: 4px; /* 标准写法 */
+}
+
+.edge-label-text {
+  x: 0;
+  y: 0;
+  text-anchor: middle;
+  alignment-baseline: middle;
+  font-size: 10px;
+  fill: var(--node-text-color, #e2e8f0);
+  font-weight: 500;
+  pointer-events: none;
 }

@@ -20,11 +20,13 @@ const Connection = ({
       const portElement = document.getElementById(portId);
       if (portElement) {
         const portRect = portElement.getBoundingClientRect();
-        const containerRect = document.querySelector('.node-system-container').getBoundingClientRect();
-        return {
-          x: portRect.left - containerRect.left + (isOutput ? portRect.width : 0),
-          y: portRect.top - containerRect.top + portRect.height / 2
-        };
+        const containerRect = document.querySelector('.node-system-container')?.getBoundingClientRect();
+        if (containerRect) {
+          return {
+            x: portRect.left - containerRect.left + (isOutput ? portRect.width : 0),
+            y: portRect.top - containerRect.top + portRect.height / 2
+          };
+        }
       }
     }
     
@@ -45,10 +47,11 @@ const Connection = ({
     const dy = Math.abs(targetPos.y - sourcePos.y);
     
     // 根据距离动态调整控制点偏移量，距离越远，曲线越平滑
-    const controlPointOffset = Math.min(dx * 0.6, 200); // 增加曲线弯曲程度
+    // 确保曲线的弯曲度足够大，避免被节点遮挡
+    const controlPointOffset = Math.max(Math.min(dx * 0.6, 200), 50); // 最小偏移量为50
     
     // 如果两个节点高度差较大，增加垂直方向的曲率
-    const verticalOffset = dy > 50 ? dy * 0.3 : 0;
+    const verticalOffset = Math.max(dy * 0.3, 20); // 最小垂直偏移为20
     
     // 创建路径，让连接线的曲率更适合避开节点
     const path = `
@@ -63,17 +66,28 @@ const Connection = ({
     // 计算路径的中点位置（用于放置删除按钮），稍微偏移以避免覆盖节点
     setMidPoint({
       x: (sourcePos.x + targetPos.x) / 2,
-      y: (sourcePos.y + targetPos.y) / 2 - 10 // 稍微上移，避免遮挡节点
+      y: (sourcePos.y + targetPos.y) / 2 - 15 // 增加上移距离，进一步避开节点
     });
   }, [source, target, sourcePortId, targetPortId]);
 
   return (
-    <g className={`connection ${isTemp ? 'temp-connection' : ''}`} ref={connectionRef}>
+    <g 
+      className={`connection ${isTemp ? 'temp-connection' : ''}`} 
+      ref={connectionRef}
+      style={{ 
+        pointerEvents: isTemp ? 'none' : 'auto',
+        // 临时连接线需要显示在普通连接线上方
+        zIndex: isTemp ? 2 : 1
+      }}
+    >
       <path
         d={path}
         className="connection-path"
         fill="none"
-        style={{ pointerEvents: 'stroke' }} // 确保只有线条部分可交互
+        style={{ 
+          pointerEvents: 'stroke', // 确保只有线条部分可交互
+          strokeDasharray: isTemp ? '5,5' : 'none'
+        }}
       />
       
       {!isTemp && onRemove && (

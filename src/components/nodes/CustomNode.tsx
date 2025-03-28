@@ -34,16 +34,20 @@ const CustomNode = memo(({
     label: data.label || t('nodes.custom.name'),
     inputs: {
       ...data.inputs,
-      config: {
-        type: 'text',
-        value: data.inputs?.config?.value || '',
-        placeholder: t('nodes.custom.configPlaceholder', 'Enter node configuration (JSON format)'),
-      },
       code: {
-        type: 'text',
+        type: 'textarea',
         value: data.inputs?.code?.value || '',
-        placeholder: t('nodes.custom.codePlaceholder', 'Enter custom code here'),
+        placeholder: t('nodes.custom.codePlaceholder'),
+        rows: 10,
+        language: 'javascript'
       },
+      config: {
+        type: 'textarea',
+        value: data.inputs?.config?.value || '{}',
+        placeholder: t('nodes.custom.configPlaceholder'),
+        rows: 5,
+        language: 'json'
+      }
     },
     outputs: {
       ...data.outputs,

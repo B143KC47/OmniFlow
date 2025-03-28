@@ -47,6 +47,6 @@ document.addEventListener('DOMContentLoaded', function() {
   addButtonHoverEffects();
 });
 
-// 将函数添加到全局作用域，而不是使用export (这会导致语法错误)
+// 将函数添加到全局作用域，而不是使用export
 window.addButtonRippleEffect = addButtonRippleEffect;
 window.addButtonHoverEffects = addButtonHoverEffects;
