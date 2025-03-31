@@ -15,11 +15,15 @@
   --bg-input: #141414;
   --bg-hover: #1a1a1a;
   --bg-overlay: rgba(0, 0, 0, 0.75);
+  --card-bg: #141414;  /* 卡片背景色 */
+  --hover-bg: #1c1c1c; /* 悬浮背景色 */
+  --input-bg: #141414; /* 输入框背景色 */
   
   /* Border Colors */
   --border-base: #282828;
   --border-focus: var(--primary-color);
   --border-light: #333333;
+  --border-color: #282828; /* 统一边框颜色 */
   
   /* Text Colors */
   --text-primary: #ffffff;
@@ -27,6 +31,7 @@
   --text-disabled: #666;
   --text-placeholder: #444;
   --text-muted: #888888;
+  --text-color: #e0e0e0; /* 统一文本颜色 */
   
   /* Node Colors */
   --node-color: #0a0a0a;
@@ -36,6 +41,16 @@
   --node-input-bg: #141414;
   --node-input-border: #333;
   --node-input-text: #ffffff;
+  
+  /* 节点类别颜色 */
+  --category-input: #1e88e5;     /* 蓝色 - 输入节点 */
+  --category-llm: #10a37f;       /* 绿色 - LLM节点 */
+  --category-search: #ff9800;    /* 橙色 - 搜索节点 */
+  --category-document: #9c27b0;  /* 紫色 - 文档节点 */
+  --category-output: #f44336;    /* 红色 - 输出节点 */
+  --category-utility: #607d8b;   /* 蓝灰色 - 实用工具节点 */
+  --accent-color: #6b57ff;       /* 紫蓝色 - AI模型节点 */
+  --primary-color-light: rgba(16, 163, 127, 0.3); /* 用于透明效果 */
   
   /* Handle Colors */
   --handle-bg: #141414;

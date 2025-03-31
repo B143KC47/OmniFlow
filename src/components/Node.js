@@ -2,14 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import styles from './Node.module.css';
 
 const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
-  const [position, setPosition] = useState(node.position);
+  // 添加默认值，防止 node 为 undefined
+  const defaultPosition = { x: 0, y: 0 };
+  const [position, setPosition] = useState(node?.position || defaultPosition);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const nodeRef = useRef(null);
 
   // 更新节点位置
   useEffect(() => {
-    node.position = position;
+    if (node) {
+      node.position = position;
+    }
   }, [position, node]);
 
   // 处理拖拽开始
@@ -57,17 +61,22 @@ const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
   // 开始连接
   const handlePortMouseDown = (portId, isOutput, e) => {
     e.stopPropagation();
-    onStartConnecting(node.id, portId, isOutput);
+    onStartConnecting(node?.id, portId, isOutput);
   };
 
   // 结束连接
   const handlePortMouseUp = (portId, isOutput) => {
-    onFinishConnecting(node.id, portId, isOutput);
+    onFinishConnecting(node?.id, portId, isOutput);
   };
 
-  // 为节点添加类型相关的样式
-  const nodeTypeClass = node.type ? styles[`node-${node.type}`] : styles['node-custom'];
+  // 为节点添加类型相关的样式 - 添加防御性检查
+  const nodeTypeClass = node?.type ? styles[`node-${node.type}`] : styles['node-custom'];
   const nodeClasses = `${styles.node} ${nodeTypeClass} ${isDragging ? styles.dragging : ''}`;
+
+  // 如果 node 不存在，返回 null 或一个占位组件
+  if (!node) {
+    return null; // 或者返回一个默认的占位节点
+  }
 
   return (
     <div
@@ -87,7 +96,7 @@ const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
       </div>
       <div className={styles['node-content']}>
         <div className={styles['node-inputs']}>
-          {node.inputs.map(input => (
+          {node.inputs?.map(input => (
             <div 
               key={input.id} 
               className={`${styles['node-port']} ${styles['node-input']}`}
@@ -99,10 +108,10 @@ const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
               />
               <span>Input</span>
             </div>
-          ))}
+          )) || []}
         </div>
         <div className={styles['node-outputs']}>
-          {node.outputs.map(output => (
+          {node.outputs?.map(output => (
             <div 
               key={output.id} 
               className={`${styles['node-port']} ${styles['node-output']}`}
@@ -114,7 +123,7 @@ const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
                 onMouseDown={(e) => handlePortMouseDown(output.id, true, e)}
               />
             </div>
-          ))}
+          )) || []}
         </div>
       </div>
     </div>

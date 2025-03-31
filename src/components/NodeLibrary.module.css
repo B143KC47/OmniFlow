@@ -120,6 +120,52 @@
   border-radius: 0.25rem;
 }
 
+/* 节点类型颜色样式 */
+.nodeColorWrapper :global(.node-color-input) {
+  background-color: rgba(30, 136, 229, 0.15);
+  color: var(--category-input, #1e88e5);
+}
+
+.nodeColorWrapper :global(.node-color-llm) {
+  background-color: rgba(16, 163, 127, 0.15);
+  color: var(--category-llm, #10a37f);
+}
+
+.nodeColorWrapper :global(.node-color-search) {
+  background-color: rgba(255, 152, 0, 0.15);
+  color: var(--category-search, #ff9800);
+}
+
+.nodeColorWrapper :global(.node-color-document) {
+  background-color: rgba(156, 39, 176, 0.15);
+  color: var(--category-document, #9c27b0);
+}
+
+.nodeColorWrapper :global(.node-color-output) {
+  background-color: rgba(244, 67, 54, 0.15);
+  color: var(--category-output, #f44336);
+}
+
+.nodeColorWrapper :global(.node-color-utility) {
+  background-color: rgba(96, 125, 139, 0.15);
+  color: var(--category-utility, #607d8b);
+}
+
+.nodeColorWrapper :global(.node-color-advanced) {
+  background-color: rgba(233, 30, 99, 0.15);
+  color: #e91e63;
+}
+
+.nodeColorWrapper :global(.node-color-processing) {
+  background-color: rgba(121, 85, 72, 0.15);
+  color: #795548;
+}
+
+.nodeColorWrapper :global(.node-color-ai_model) {
+  background-color: rgba(107, 87, 255, 0.15);
+  color: var(--accent-color, #6b57ff);
+}
+
 .nodeBadges {
   display: flex;
   gap: 0.25rem;
