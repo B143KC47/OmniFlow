@@ -35,9 +35,23 @@
   flex-shrink: 0;
 }
 
-/* React Contexify 样式覆盖 */
-.react-contexify__item:hover > .react-contexify__item__content {
-  background-color: transparent;
+/* 包装器类，用于包含全局选择器 */
+.contexify-wrapper {
+  /* 因为我们用这个类作为前缀，它需要存在但不需要特定样式 */
+  display: contents; /* 这会让元素在视觉上"消失"，但子元素仍然会正常渲染 */
+}
+
+/* React Contexify 样式覆盖 - 与本地类结合使用 */
+.contexify-wrapper :global(.react-contexify) {
+  background-color: #1a1a1a;
+  border: 1px solid #282828;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.contexify-wrapper :global(.react-contexify__item:hover > .react-contexify__item__content) {
+  background-color: rgba(16, 163, 127, 0.15);
+  color: #fff;
 }
 
 .react-contexify__item:not(:first-child) {
@@ -54,7 +68,7 @@
   margin: 6px 8px;
 }
 
-.react-contexify__submenu {
+.contexify-wrapper :global(.react-contexify__submenu) {
   margin-top: 0;
   margin-bottom: 0;
   background-color: #1a1a1a;
@@ -63,11 +77,37 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-.react-contexify__submenu-arrow {
+.contexify-wrapper :global(.react-contexify__submenu-arrow) {
   margin-left: 8px;
   color: #666;
 }
 
-.react-contexify__item:hover > .react-contexify__item__content .react-contexify__submenu-arrow {
+.contexify-wrapper :global(.react-contexify__item:hover > .react-contexify__item__content .react-contexify__submenu-arrow) {
   color: #fff;
+}
+
+.submenu {
+  position: relative;
+  color: #e0e0e0;
+}
+
+.contexify-wrapper :global(.react-contexify__item__content) {
+  cursor: pointer;
+  padding: 8px 12px;
+  color: #e0e0e0;
+  font-size: 13px;
+}
+
+.contexify-wrapper :global(.react-contexify__item:hover .react-contexify__item__content) {
+  color: #fff;
+}
+
+.contexify-wrapper :global(.react-contexify__item--disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.contexify-wrapper :global(.react-contexify__item--disabled:hover > .react-contexify__item__content) {
+  background-color: transparent;
+  color: #e0e0e0;
 }
