@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './Node.css';
+import styles from './Node.module.css';
 
 const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
   const [position, setPosition] = useState(node.position);
@@ -14,7 +14,7 @@ const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
 
   // 处理拖拽开始
   const handleMouseDown = (e) => {
-    if (e.target === nodeRef.current || e.target.classList.contains('node-header')) {
+    if (e.target === nodeRef.current || e.target.classList.contains(styles['node-header'])) {
       setIsDragging(true);
       const rect = nodeRef.current.getBoundingClientRect();
       setDragOffset({
@@ -65,10 +65,14 @@ const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
     onFinishConnecting(node.id, portId, isOutput);
   };
 
+  // 为节点添加类型相关的样式
+  const nodeTypeClass = node.type ? styles[`node-${node.type}`] : styles['node-custom'];
+  const nodeClasses = `${styles.node} ${nodeTypeClass} ${isDragging ? styles.dragging : ''}`;
+
   return (
     <div
       ref={nodeRef}
-      className="node"
+      className={nodeClasses}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
@@ -77,36 +81,36 @@ const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
       }}
       onMouseDown={handleMouseDown}
     >
-      <div className="node-header">
+      <div className={styles['node-header']}>
         <span>{node.id}</span>
-        <button className="node-delete-btn" onClick={() => onRemove(node.id)}>×</button>
+        <button className={styles['node-delete-btn']} onClick={() => onRemove(node.id)}>×</button>
       </div>
-      <div className="node-content">
-        <div className="node-inputs">
+      <div className={styles['node-content']}>
+        <div className={styles['node-inputs']}>
           {node.inputs.map(input => (
             <div 
               key={input.id} 
-              className="node-port node-input"
+              className={`${styles['node-port']} ${styles['node-input']}`}
               onMouseUp={() => handlePortMouseUp(input.id, false)}
             >
               <div 
-                className="port-connector"
+                className={styles['port-connector']}
                 onMouseDown={(e) => handlePortMouseDown(input.id, false, e)}
               />
               <span>Input</span>
             </div>
           ))}
         </div>
-        <div className="node-outputs">
+        <div className={styles['node-outputs']}>
           {node.outputs.map(output => (
             <div 
               key={output.id} 
-              className="node-port node-output"
+              className={`${styles['node-port']} ${styles['node-output']}`}
               onMouseUp={() => handlePortMouseUp(output.id, true)}
             >
               <span>Output</span>
               <div 
-                className="port-connector"
+                className={styles['port-connector']}
                 onMouseDown={(e) => handlePortMouseDown(output.id, true, e)}
               />
             </div>

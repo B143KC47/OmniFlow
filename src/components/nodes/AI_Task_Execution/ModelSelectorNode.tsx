@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
-import BaseNode from './BaseNode';
-import { NodeData } from '../../types';
-import { useTranslation } from '../../utils/i18n';
+import BaseNode from '../BaseNode';
+import { NodeData } from '../../../types';
+import { useTranslation } from '../../../utils/i18n';
 
 interface ModelSelectorNodeProps {
   id: string;
@@ -9,6 +9,25 @@ interface ModelSelectorNodeProps {
   selected: boolean;
   isConnectable: boolean;
   onDataChange: (newData: NodeData) => void;
+}
+
+// 定义模型类型接口
+interface BaseModelType {
+  category: string;
+  provider: string;
+  description: string;
+  supportsStreaming: boolean;
+}
+
+// LLM类型模型接口
+interface LlmModelType extends BaseModelType {
+  maxTokens: number;
+  defaultTemp: number;
+}
+
+// 定义一个类型保护函数，用于判断是否为LLM类型模型
+function isLlmModel(model: BaseModelType): model is LlmModelType {
+  return model.category === 'llm' || model.category === 'vision' || model.category === 'multimodal';
 }
 
 // 定义模型分类
@@ -21,7 +40,7 @@ const MODEL_CATEGORIES = [
 ];
 
 // 定义模型信息，包括提供商、参数和描述
-const MODELS = {
+const MODELS: Record<string, BaseModelType | LlmModelType> = {
   // LLM 模型
   'deepseek-chat': {
     category: 'llm',
@@ -131,7 +150,7 @@ const ModelSelectorNode = memo(({
   // 当前选择的模型分类和模型
   const [currentCategory, setCurrentCategory] = useState('llm');
   const [categoryModels, setCategoryModels] = useState<string[]>([]);
-  
+
   // 从所有模型中筛选出指定分类的模型列表
   useEffect(() => {
     const filteredModels = Object.keys(MODELS).filter(
@@ -174,14 +193,21 @@ const ModelSelectorNode = memo(({
     
     // 如果模型变更，自动调整参数到模型最适合的值
     if (modelInfo && modelName !== data.inputs?.model?.value) {
-      // 更新温度参数
-      temperature = modelInfo.defaultTemp || 0.7;
-      
-      // 更新最大令牌数
-      maxTokens = Math.min(
-        maxTokens || 1000,
-        modelInfo.maxTokens || 4096
-      );
+      // 使用类型保护安全访问特定类型模型的属性
+      if (isLlmModel(modelInfo)) {
+        // 更新温度参数
+        temperature = modelInfo.defaultTemp;
+        
+        // 更新最大令牌数
+        maxTokens = Math.min(
+          maxTokens || 1000,
+          modelInfo.maxTokens
+        );
+      } else {
+        // 默认值
+        temperature = 0.7;
+        maxTokens = 1000;
+      }
       
       // 如果模型不支持流式处理，则禁用
       if (!modelInfo.supportsStreaming && streamEnabled === 'true') {
@@ -257,9 +283,13 @@ const ModelSelectorNode = memo(({
   // 动态选项：只显示适合当前模型的选项
   const showSystemPrompt = selectedModel?.category === 'llm';
   const showTemperature = selectedModel?.category === 'llm' || selectedModel?.category === 'vision';
-  const showMaxTokens = !!selectedModel?.maxTokens;
+  const showMaxTokens = isLlmModel(selectedModel);
   const showStreaming = !!selectedModel?.supportsStreaming;
   
+  // 获取默认温度和最大令牌值（使用类型保护）
+  const defaultTemp = isLlmModel(selectedModel) ? selectedModel.defaultTemp : 0.7;
+  const maxTokensValue = isLlmModel(selectedModel) ? selectedModel.maxTokens : 4096;
+
   // 构建完整的节点数据
   const nodeData: NodeData = {
     ...data,
@@ -270,7 +300,8 @@ const ModelSelectorNode = memo(({
         type: 'select',
         value: currentCategory,
         options: MODEL_CATEGORIES.map(category => category.id),
-        label: t('nodes.modelSelector.category', { default: '模型分类' })
+        label: t('nodes.modelSelector.category', { default: '模型分类' }),
+        onChange: (e: React.ChangeEvent<HTMLSelectElement>) => handleCategoryChange(e) // 添加直接绑定
       },
       model: {
         type: 'select',
@@ -293,7 +324,7 @@ const ModelSelectorNode = memo(({
       ...(showTemperature && {
         temperature: {
           type: 'number',
-          value: data.inputs?.temperature?.value || selectedModel?.defaultTemp || 0.7,
+          value: data.inputs?.temperature?.value || defaultTemp,
           min: 0,
           max: 1,
           step: 0.1,
@@ -303,7 +334,7 @@ const ModelSelectorNode = memo(({
       ...(showMaxTokens && {
         maxTokens: {
           type: 'number',
-          value: data.inputs?.maxTokens?.value || Math.min(1000, selectedModel?.maxTokens || 4096),
+          value: data.inputs?.maxTokens?.value || Math.min(1000, maxTokensValue),
           min: 1,
           max: selectedModel?.maxTokens || 4096,
           step: 1,
@@ -346,8 +377,8 @@ const ModelSelectorNode = memo(({
           provider: selectedModel?.provider || '',
           apiKey: data.inputs?.apiKey?.value || '',
           systemPrompt: showSystemPrompt ? (data.inputs?.systemPrompt?.value || 'You are a helpful assistant') : undefined,
-          temperature: showTemperature ? (data.inputs?.temperature?.value || selectedModel?.defaultTemp || 0.7) : undefined,
-          maxTokens: showMaxTokens ? (data.inputs?.maxTokens?.value || Math.min(1000, selectedModel?.maxTokens || 4096)) : undefined,
+          temperature: showTemperature ? (data.inputs?.temperature?.value || defaultTemp) : undefined,
+          maxTokens: showMaxTokens ? (data.inputs?.maxTokens?.value || Math.min(1000, maxTokensValue)) : undefined,
           stream: showStreaming ? (data.inputs?.stream?.value === 'true') : undefined,
         }, null, 2),
       },

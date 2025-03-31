@@ -1,0 +1,26 @@
+/* 
+ * CSS 模块版本 - 确保动态导入可以正常工作
+ * 主要样式已移至 src/styles/globals.css
+ */
+ 
+.default-node {
+  background-color: var(--node-color);
+  border: 1px solid var(--node-border-color);
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.default-node-header {
+  padding: 8px 12px;
+  background-color: var(--node-header-color);
+  color: var(--node-title-color);
+  font-weight: bold;
+  border-bottom: 1px solid var(--node-border-color);
+}
+
+.default-node-content {
+  padding: 12px;
+  color: var(--node-text-color);
+}

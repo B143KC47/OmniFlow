@@ -46,6 +46,29 @@
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.7);
   --glow-primary: 0 0 10px rgba(16, 163, 127, 0.4);
   --glow-accent: 0 0 10px rgba(107, 87, 255, 0.4);
+  
+  /* Node 组件全局变量 (从Node.css迁移) */
+  --node-bg-color: #2d3748;
+  --node-text-color: #e2e8f0;
+  --node-border-color: #4a5568;
+  --node-header-color: #4a90e2;
+  --node-header-text: white;
+  --node-connector-color: #67c23a;
+  --node-connector-hover: #4caf50;
+  --node-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --node-selected-color: #3b82f6;
+  
+  /* NodeLibrary 组件变量 (从NodeLibrary.css迁移) */
+  --node-library-bg: #1e1e1e;
+  --node-library-text: #e0e0e0;
+  --node-library-border: #333;
+  --node-library-item-hover: #2d2d2d;
+  
+  /* NodePalette 组件变量 (从NodePalette.css迁移) */
+  --palette-bg: #1e1e1e;
+  --palette-text: #e0e0e0;
+  --palette-border: #333;
+  --palette-item-hover: #2d2d2d;
 }
 
 html,
@@ -57,717 +80,61 @@ body {
   overflow: hidden;
 }
 
-/* ReactFlow 节点样式覆盖 */
-.react-flow__node {
-  border-radius: 6px;
-  background-color: var(--node-color);
-  border: 1px solid var(--node-border-color);
-  color: var(--node-text-color);
-  box-shadow: var(--shadow-md);
-  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-  font-size: 13px;
-  min-width: 220px;
-  backdrop-filter: blur(4px);
-  z-index: 10 !important;
+/* Node 组件全局样式 (从Node.css迁移) */
+body.dragging-node {
+  cursor: grabbing !important;
 }
 
-.react-flow__node.selected {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 1px var(--primary-color), var(--glow-primary);
-  z-index: 10;
+.node-hover-highlight {
+  box-shadow: 0 0 0 2px var(--node-selected-color);
+  transition: box-shadow 0.2s ease;
 }
 
-.react-flow__node:hover {
-  border-color: var(--primary-color);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+/* NodeLibrary 全局样式 (从NodeLibrary.css迁移) */
+.node-library-container ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-/* 节点连接点和手柄样式 */
-.react-flow__handle {
-  width: 10px;
-  height: 10px;
-  background-color: var(--handle-bg);
-  border: 2px solid var(--handle-color);
-  transition: all 0.15s ease-out;
-  z-index: 12 !important;
+.node-library-container ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
 }
 
-.react-flow__handle:hover {
-  background-color: var(--handle-color);
-  box-shadow: 0 0 0 3px var(--handle-glow);
-  transform: scale(1.2);
+.node-library-container ::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
 }
 
-.react-flow__handle-left {
-  left: -5px;
+.node-library-container ::-webkit-scrollbar-thumb:hover {
+  background: #777;
 }
 
-.react-flow__handle-right {
-  right: -5px;
+/* NodePalette 全局样式 (从NodePalette.css迁移) */
+.node-palette-dragging-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.7;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* 连接线样式 */
-.react-flow__edge-path {
-  stroke: var(--connection-color);
-  stroke-width: 2;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-  transition: all 0.2s ease;
-  transition: stroke 0.2s, stroke-width 0.2s, opacity 0.2s;
-}
-
-.react-flow__edge:hover .react-flow__edge-path {
-  stroke: var(--connection-hover-color);
-  stroke-width: 3;
-  filter: drop-shadow(0 0 4px var(--handle-glow));
-}
-
-.react-flow__edge.selected .react-flow__edge-path {
-  stroke: var(--connection-hover-color);
-  stroke-width: 3;
-  filter: drop-shadow(0 0 4px var(--handle-glow));
-}
-
-.react-flow__edge {
-  z-index: 5 !important;
-}
-
-.react-flow__edge.selected {
-  z-index: 6 !important;
-}
-
-/* 新增的连接线状态样式 */
-.react-flow__edge.valid-connection .react-flow__edge-path {
-  stroke: var(--success-color);
-  stroke-width: 2.5;
-}
-
-.react-flow__edge.invalid-connection .react-flow__edge-path {
-  stroke: var(--error-color);
-  stroke-width: 2;
-  stroke-dasharray: 5;
-}
-
-.react-flow__edge.animated .react-flow__edge-path {
-  stroke-dasharray: 5;
-  animation: flowAnimation 1s linear infinite;
-}
-
-.react-flow__connectionline {
-  stroke: var(--connection-color);
-  stroke-width: 2;
-  stroke-dasharray: 5;
-  animation: flowAnimation 1s linear infinite;
-}
-
-/* 连接处理中的高亮样式 */
-.react-flow__node.connectable {
-  border-color: var(--success-color) !important;
-  box-shadow: 0 0 0 2px var(--success-color), 0 0 15px rgba(46, 204, 113, 0.5) !important;
-  opacity: 1 !important;
-  z-index: 5;
-  transform: scale(1.02);
-}
-
-.react-flow__node.not-connectable {
-  opacity: 0.4 !important;
-}
-
-/* 连接点激活效果 */
-.react-flow__handle.connectingFrom {
-  animation: pulseHandle 1.5s infinite;
-  background-color: var(--primary-color);
-  border-color: white;
-}
-
-.react-flow__handle.connectingTo {
-  animation: pulseHandle 1.5s infinite;
-  background-color: var(--success-color);
-  border-color: white;
-}
-
-@keyframes pulseHandle {
-  0% {
-    box-shadow: 0 0 0 0 rgba(16, 163, 127, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(16, 163, 127, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(16, 163, 127, 0);
-  }
-}
-
-@keyframes flowAnimation {
-  0% {
-    stroke-dashoffset: 10;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* 类型匹配指示器 */
-.type-indicator {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid var(--background-color);
-}
-
-.type-indicator.string {
-  background-color: #4caf50;
-}
-
-.type-indicator.number {
-  background-color: #2196f3;
-}
-
-.type-indicator.boolean {
-  background-color: #ff9800;
-}
-
-.type-indicator.object {
-  background-color: #9c27b0;
-}
-
-.react-flow__background {
+/* NodeSystem 全局样式 (从NodeSystem.css迁移) */
+.circuit-board-bg {
   background-color: var(--background-color);
+  background-image: radial-gradient(#333 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-/* 控制面板 */
-.react-flow__controls {
-  background-color: var(--node-color);
-  border-radius: 6px;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--node-border-color);
-  overflow: hidden;
-  padding: 4px;
-}
-
-.react-flow__controls-button {
-  background-color: var(--node-header-color);
-  border: none;
-  border-radius: 4px;
-  color: var(--node-text-color);
-  margin: 2px;
-  transition: all 0.2s ease;
-}
-
-.react-flow__controls-button:hover {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-/* 节点内部样式 */
-.node-header {
-  background-color: var(--node-header-color);
-  padding: 12px 14px;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  border-bottom: 1px solid var(--node-border-color);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.node-title {
-  color: var(--node-title-color);
-  font-weight: 600;
-  font-size: 13px;
-  margin: 0;
-  letter-spacing: 0.3px;
-}
-
-.node-content {
-  padding: 14px;
-}
-
-.node-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.node-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--node-text-color);
-  margin-right: 10px;
-  flex: 0 0 80px;
-  letter-spacing: 0.2px;
-}
-
-/* 表单元素和输入框样式 */
-.node-input {
-  background-color: var(--node-input-bg);
-  border: 1px solid var(--node-input-border);
-  border-radius: 4px;
-  color: var(--node-input-text);
-  padding: 8px 12px;
-  font-size: 12px;
+.node-system-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  transition: all 0.2s ease;
-}
-
-.node-input:focus {
-  border-color: var(--primary-color);
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.25);
-}
-
-.node-select {
-  background-color: var(--node-input-bg);
-  border: 1px solid var(--node-input-border);
-  border-radius: 4px;
-  color: var(--node-input-text);
-  padding: 8px 12px;
-  font-size: 12px;
-  width: 100%;
-  transition: all 0.2s ease;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310a37f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  background-size: 16px;
-  padding-right: 30px;
-}
-
-.node-select:focus {
-  border-color: var(--primary-color);
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.25);
-}
-
-.node-slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 4px;
-  background: var(--node-input-border);
-  border-radius: 2px;
-  outline: none;
-}
-
-.node-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--primary-color);
-  cursor: pointer;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease;
-}
-
-.node-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 0 0 4px rgba(16, 163, 127, 0.3);
-}
-
-.node-slider::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--primary-color);
-  cursor: pointer;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease;
-  border: none;
-}
-
-.node-slider::-moz-range-progress {
-  background-color: var(--primary-color);
-  height: 4px;
-  border-radius: 2px;
-}
-
-/* 上下文菜单样式 */
-.react-contexify {
-  background-color: var(--node-color);
-  border: 1px solid var(--node-border-color);
-  border-radius: 6px;
-  box-shadow: var(--shadow-lg);
-  padding: 6px 0;
-  min-width: 180px;
-  backdrop-filter: blur(10px);
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
-}
-
-.react-contexify__item {
-  padding: 0;
-  transition: background-color 0.15s ease;
-}
-
-.react-contexify__item__content {
-  color: var(--node-text-color);
-  padding: 8px 14px;
-  font-size: 12px;
   display: flex;
-  align-items: center;
-}
-
-.react-contexify__item:hover > .react-contexify__item__content {
-  background-color: var(--node-header-color);
-  color: var(--node-title-color);
-}
-
-.react-contexify__submenu {
-  margin-right: 8px;
-}
-
-.react-contexify__separator {
-  background-color: var(--node-border-color);
-  height: 1px;
-  margin: 6px 8px;
-}
-
-.comfy-context-menu {
-  background: #2d2d2d;
-  border-radius: 6px;
-  padding: 4px;
-  min-width: 180px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.comfy-menu-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  color: #e5e5e5;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-}
-
-.comfy-menu-item:hover {
-  background-color: #3d3d3d;
-}
-
-.comfy-menu-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
-  color: #9ca3af;
-}
-
-.comfy-menu-item span {
-  font-size: 14px;
-}
-
-/* 按钮样式 */
-.btn {
-  background-color: var(--node-header-color);
-  border: 1px solid var(--node-border-color);
-  border-radius: 4px;
-  color: var(--node-text-color);
-  padding: 8px 14px;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  letter-spacing: 0.3px;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.btn svg {
-  margin-right: 6px;
-}
-
-.btn:hover {
-  background-color: var(--node-color);
-  border-color: var(--primary-color);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.btn-primary {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
-  box-shadow: 0 2px 4px rgba(16, 163, 127, 0.3);
-}
-
-.btn-primary:hover {
-  background-color: var(--secondary-color);
-  border-color: var(--secondary-color);
-  box-shadow: var(--glow-primary), var(--shadow-md);
-}
-
-.btn-secondary {
-  background-color: var(--accent-color);
-  border-color: var(--accent-color);
-  color: white;
-  box-shadow: 0 2px 4px rgba(107, 87, 255, 0.3);
-}
-
-.btn-secondary:hover {
-  background-color: #7e6bff;
-  border-color: #7e6bff;
-  box-shadow: var(--glow-accent), var(--shadow-md);
-}
-
-.btn-success {
-  background-color: var(--success-color);
-  border-color: var(--success-color);
-  color: white;
-  box-shadow: 0 2px 4px rgba(46, 204, 113, 0.3);
-}
-
-.btn-success:hover {
-  background-color: #27ae60;
-  border-color: #27ae60;
-  box-shadow: 0 0 10px rgba(46, 204, 113, 0.4), var(--shadow-md);
-}
-
-.btn-danger {
-  background-color: var(--error-color);
-  border-color: var(--error-color);
-  color: white;
-  box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
-}
-
-.btn-danger:hover {
-  background-color: #e53935;
-  border-color: #e53935;
-  box-shadow: 0 0 10px rgba(244, 67, 54, 0.4), var(--shadow-md);
-}
-
-/* 节点类型样式 */
-.node-type-input .node-header {
-  background: linear-gradient(to right, #1565c0, #1e88e5);
-  border-bottom: none;
-}
-
-.node-type-llm .node-header {
-  background: linear-gradient(to right, #0d8c6d, #10a37f);
-  border-bottom: none;
-}
-
-.node-type-document .node-header {
-  background: linear-gradient(to right, #7b1fa2, #9c27b0);
-  border-bottom: none;
-}
-
-.node-type-search .node-header {
-  background: linear-gradient(to right, #ef6c00, #ff9800);
-  border-bottom: none;
-}
-
-.node-type-output .node-header {
-  background: linear-gradient(to right, #d32f2f, #f44336);
-  border-bottom: none;
-}
-
-.node-type-utility .node-header {
-  background: linear-gradient(to right, #455a64, #607d8b);
-  border-bottom: none;
-}
-
-/* 节点执行状态样式 */
-.node-running {
-  border-color: var(--primary-color) !important;
-  box-shadow: 0 0 0 1px var(--primary-color), var(--glow-primary) !important;
-  animation: pulse 2s infinite;
-}
-
-.node-completed {
-  border-color: var(--success-color) !important;
-  box-shadow: 0 0 0 1px var(--success-color), 0 0 10px rgba(46, 204, 113, 0.4) !important;
-}
-
-.node-error {
-  border-color: var(--error-color) !important;
-  box-shadow: 0 0 0 1px var(--error-color), 0 0 10px rgba(244, 67, 54, 0.4) !important;
-}
-
-/* 动画效果 */
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 1px var(--primary-color), 0 0 0 3px rgba(16, 163, 127, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 0 1px var(--primary-color), 0 0 0 6px rgba(16, 163, 127, 0.2);
-  }
-  100% {
-    box-shadow: 0 0 0 1px var(--primary-color), 0 0 0 3px rgba(16, 163, 127, 0.5);
-  }
-}
-
-/* 滚动条美化 */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0a0a0a;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #303030;
-  border-radius: 4px;
-  border: 2px solid #0a0a0a;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
-}
-
-/* 工作区面板 */
-.workspace-panel {
-  background-color: rgba(20, 20, 20, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--node-border-color);
-  border-radius: 6px;
-  box-shadow: var(--shadow-lg);
-}
-
-.panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--node-border-color);
-}
-
-.panel-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--node-title-color);
-  margin: 0;
-}
-
-.panel-content {
-  padding: 12px 16px;
-}
-
-/* 代码编辑器样式 */
-.code-editor {
-  background: #0e0e0e;
-  border: 1px solid #333;
-  border-radius: 4px;
-  font-family: 'Fira Code', 'Consolas', monospace;
-}
-
-.code-line-numbers {
-  background-color: #0a0a0a;
-  border-right: 1px solid #333;
-  color: #666;
-  text-align: right;
-  padding: 0 8px;
-}
-
-/* 工具提示 */
-.tooltip {
-  background-color: var(--node-color);
-  border: 1px solid var(--node-border-color);
-  border-radius: 4px;
-  padding: 6px 10px;
-  font-size: 12px;
-  color: var(--node-text-color);
-  box-shadow: var(--shadow-md);
-  max-width: 250px;
-}
-
-/* 节点调色板样式 */
-.node-palette {
-  background-color: var(--node-color);
-  border-right: 1px solid var(--node-border-color);
-}
-
-.palette-category {
-  border-bottom: 1px solid var(--node-border-color);
-}
-
-.palette-category-header {
-  background-color: var(--node-header-color);
-  color: var(--node-title-color);
-}
-
-.palette-node {
-  background-color: rgba(26, 26, 26, 0.6);
-  border: 1px solid var(--node-border-color);
-}
-
-.palette-node:hover {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 5px rgba(16, 163, 127, 0.3);
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-  .react-flow__node {
-    min-width: 180px;
-  }
-  
-  .node-header {
-    padding: 10px 12px;
-  }
-  
-  .node-content {
-    padding: 10px;
-  }
-}
-
-/* 连接线指示器应该有较高的z-index */
-.edge-indicator {
-  z-index: 8 !important;
-}
-
-/* 连接线标签容器应该有较高的z-index，但仍低于节点 */
-.edge-label-container {
-  z-index: 7 !important;
-}
-
-/* 确保正在拖动的节点在最上层 */
-.react-flow__node.dragging {
-  z-index: 1000 !important;
-}
-
-/* 确保连接过程中的线条有合适的层级 */
-.react-flow__connection-path {
-  z-index: 9 !important;
-}
-
-/* 提高连接手柄的可视性 */
-.react-flow__handle {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: var(--handle-bg);
-  border: 2px solid var(--handle-border);
-  transition: all 0.2s ease;
-}
-
-.react-flow__handle:hover {
-  transform: scale(1.2);
-  box-shadow: 0 0 0 3px var(--handle-glow);
-}
-
-/* 确保连接线平滑过渡 */
-.react-flow__edge-path {
-  transition: stroke 0.2s, stroke-width 0.2s, opacity 0.2s;
-}
-
-/* 给连接线添加动画效果 */
-.connection-path.animated {
-  stroke-dashoffset: 10;
-  animation: dash 1s linear infinite;
-}
-
-@keyframes dash {
-  to {
-    stroke-dashoffset: 0;
-  }
 }

@@ -2,13 +2,7 @@ import React, { memo, useState, useRef, useCallback, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
 import { NodeData } from '../../types';
 import { useTranslation } from '../../utils/i18n';
-
-interface BaseNodeProps {
-  id: string;
-  data: NodeData;
-  selected: boolean;
-  isConnectable: boolean;
-}
+import { BaseNodeProps } from './NodeInterface';
 
 // 添加 getStatusClass 函数
 function getStatusClass(status?: string): string {
@@ -24,9 +18,11 @@ function getStatusClass(status?: string): string {
   }
 }
 
-const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => {
+const BaseNode = memo(({ id, data, isConnectable, selected, onDataChange }: BaseNodeProps) => {
   const { t } = useTranslation();
-  const { label, inputs = {}, outputs = {}, onChange, connectStatus } = data;
+  // 确保label有默认值，防止未定义错误
+  const { inputs = {}, outputs = {}, connectStatus } = data;
+  const label = data.label || t('nodes.common.untitled');
   
   // 节点折叠状态
   const [collapsed, setCollapsed] = useState(false);
@@ -40,7 +36,7 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
   // 记录是否在调整大小
   const [resizing, setResizing] = useState(false);
   const initialSize = useRef({ x: 0, y: 0, width: 0, height: 0 });
-  
+
   // 优化连接状态处理，解决连接过程中节点消失的问题
   useEffect(() => {
     const node = document.getElementById(`node-${id}`);
@@ -79,7 +75,7 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
             '0 0 0 2px var(--primary-color), 0 0 10px rgba(16, 163, 127, 0.4)' :
           data.status === 'error' ? 
             '0 0 0 2px var(--error-color), 0 0 10px rgba(244, 67, 54, 0.5)' :
-          data.status === 'completed' ?
+          data.status === 'completed' ? 
             '0 0 0 2px var(--success-color), 0 0 10px rgba(46, 204, 113, 0.5)' :
             'var(--shadow-md)'; // 默认阴影
       }
@@ -88,8 +84,9 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
   
   // 处理输入值变化
   const handleInputChange = (key: string, value: any) => {
-    if (onChange) {
-      onChange(id, {
+    if (onDataChange) {
+      onDataChange({
+        ...data,
         inputs: {
           ...inputs,
           [key]: { ...inputs[key], value },
@@ -163,6 +160,9 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
   
   // 为节点类型添加特定的类名
   const getTypeClass = () => {
+    // 确保label已定义且为字符串
+    if (!label) return 'node-type-utility';
+    
     const lowerLabel = label.toLowerCase();
     if (lowerLabel.includes(t('nodes.categories.input').toLowerCase()) || 
         lowerLabel.includes('input') || 
@@ -261,7 +261,7 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
                 if (input.hidden) return null;
                 
                 return (
-                  <div key={key} className="comfy-node-row">
+                  <div key={`input-${id}-${key}`} className="comfy-node-row">
                     <Handle
                       type="target"
                       position={Position.Left}
@@ -282,20 +282,28 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
                       {input.type === 'text' ? (
                         <input
                           type="text"
+                          id={`input-${id}-${key}`}
+                          name={`input-${id}-${key}`}
                           value={input.value || ''}
                           onChange={(e) => handleInputChange(key, e.target.value)}
                           className="comfy-node-input"
                           placeholder={input.placeholder || t('nodes.common.inputPlaceholder', { field: key })}
+                          title={input.label || key} // 添加title属性提升无障碍性
+                          aria-label={input.label || key} // 添加aria-label属性
                           disabled={input.isConnected}
                         />
                       ) : input.type === 'number' ? (
                         <div className="comfy-node-number-wrapper">
                           <input
                             type="number"
+                            id={`number-${id}-${key}`}
+                            name={`number-${id}-${key}`}
                             value={input.value || ''}
                             onChange={(e) => handleInputChange(key, parseFloat(e.target.value))}
                             className="comfy-node-input comfy-node-number"
-                            placeholder={input.placeholder}
+                            placeholder={input.placeholder || `${input.min || 0}-${input.max || 100}`}
+                            title={`${input.label || key}: ${input.min || 0}-${input.max || 100}`} // 添加描述性title
+                            aria-label={input.label || key} // 添加aria-label属性
                             min={input.min}
                             max={input.max}
                             step={input.step}
@@ -304,25 +312,33 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
                           <div className="comfy-node-slider-wrapper">
                             <input
                               type="range"
+                              id={`slider-${id}-${key}`}
+                              name={`slider-${id}-${key}`}
                               min={input.min || 0}
                               max={input.max || 100}
                               step={input.step || 1}
                               value={input.value || 0}
                               onChange={(e) => handleInputChange(key, parseFloat(e.target.value))}
                               className="comfy-node-slider"
+                              title={`${input.label || key}: ${input.min || 0}-${input.max || 100}`} // 添加描述性title
+                              aria-label={`${input.label || key} 滑块`} // 添加aria-label属性
                               disabled={input.isConnected}
                             />
                           </div>
                         </div>
                       ) : input.type === 'select' ? (
                         <select
+                          id={`select-${id}-${key}`}
+                          name={`select-${id}-${key}`}
                           value={input.value || ''}
                           onChange={(e) => handleInputChange(key, e.target.value)}
                           className="comfy-node-select"
                           disabled={input.isConnected}
+                          title={input.label || key} // 添加title属性
+                          aria-label={input.label || key} // 添加aria-label属性
                         >
                           {input.options?.map((option: string) => (
-                            <option key={option} value={option}>
+                            <option key={`${option}-${id}`} value={option}>
                               {option}
                             </option>
                           ))}
@@ -345,11 +361,12 @@ const BaseNode = memo(({ id, data, isConnectable, selected }: BaseNodeProps) => 
                 const needsExpand = outputValue.length > 50;
                 
                 return (
-                  <div key={key} className="comfy-node-row comfy-node-output-row" style={{ paddingTop: `${index * 4}px` }}>
+                  <div key={`output-${id}-${key}`} className="comfy-node-row comfy-node-output-row" style={{ paddingTop: `${index * 4}px` }}>
                     <div className="comfy-node-label" title={key}>{output.label || key}</div>
                     <div className="comfy-node-output">
                       {outputValue ? (
                         <div 
+                          id={`output-content-${id}-${key}`}
                           className={`comfy-node-expandable-content ${isExpanded ? 'expanded' : ''}`}
                           onClick={needsExpand ? () => toggleOutputExpanded(key) : undefined}
                           style={{ cursor: needsExpand ? 'pointer' : 'default' }}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NodeType } from '../types';
-import './NodePalette.css'; // 导入CSS文件
+import styles from './NodePalette.module.css'; // 改为导入 CSS 模块
 
 interface NodePaletteProps {
   // 不再需要onAddNode属性，因为我们现在使用拖放功能
@@ -131,18 +131,18 @@ const NodePalette: React.FC<NodePaletteProps> = () => {
       })).filter(category => category.nodes.length > 0);
 
   return (
-    <div className="comfy-node-palette">
-      <div className="comfy-search-container">
+    <div className={styles['comfy-node-palette']}>
+      <div className={styles['comfy-search-container']}>
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="搜索节点..."
-          className="comfy-search-input"
+          className={styles['comfy-search-input']}
         />
         {searchTerm && (
           <button 
-            className="comfy-search-clear"
+            className={styles['comfy-search-clear']}
             onClick={() => setSearchTerm('')}
           >
             ×
@@ -150,35 +150,35 @@ const NodePalette: React.FC<NodePaletteProps> = () => {
         )}
       </div>
       
-      <div className="comfy-categories">
+      <div className={styles['comfy-categories']}>
         {filteredCategories.map(category => (
-          <div key={category.id} className="comfy-category">
+          <div key={category.id} className={styles['comfy-category']}>
             <div 
-              className="comfy-category-header"
+              className={styles['comfy-category-header']}
               onClick={() => toggleCategory(category.id)}
             >
-              <div className="comfy-category-toggle">
+              <div className={styles['comfy-category-toggle']}>
                 {expandedCategories[category.id] ? '▼' : '►'}
               </div>
-              <div className="comfy-category-name">{category.name}</div>
-              <div className="comfy-category-count">{category.nodes.length}</div>
+              <div className={styles['comfy-category-name']}>{category.name}</div>
+              <div className={styles['comfy-category-count']}>{category.nodes.length}</div>
             </div>
             
             {expandedCategories[category.id] && (
-              <div className="comfy-nodes">
+              <div className={styles['comfy-nodes']}>
                 {category.nodes.map(node => (
                   <div
                     key={node.type}
-                    className="comfy-node"
+                    className={styles['comfy-node']}
                     draggable
                     onDragStart={(e) => handleDragStart(e, node.type, node.label)}
                   >
-                    <div className={`comfy-node-icon node-icon-${node.type.toLowerCase()}`}>
+                    <div className={`${styles['comfy-node-icon']} ${styles[`node-icon-${node.type.toLowerCase()}`]}`}>
                       {node.icon}
                     </div>
-                    <div className="comfy-node-content">
-                      <div className="comfy-node-title">{node.label}</div>
-                      <div className="comfy-node-description">{node.description}</div>
+                    <div className={styles['comfy-node-content']}>
+                      <div className={styles['comfy-node-title']}>{node.label}</div>
+                      <div className={styles['comfy-node-description']}>{node.description}</div>
                     </div>
                   </div>
                 ))}

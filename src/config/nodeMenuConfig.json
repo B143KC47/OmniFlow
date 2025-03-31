@@ -1,0 +1,144 @@
+{
+  "categories": [
+    {
+      "id": "input",
+      "iconId": "puzzle",
+      "titleKey": "contextMenu.categories.input",
+      "nodes": [
+        {
+          "id": "TEXT_INPUT",
+          "nodeType": "TEXT_INPUT",
+          "iconId": "document",
+          "titleKey": "contextMenu.nodes.textInput"
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "iconId": "chip",
+      "titleKey": "contextMenu.categories.ai",
+      "nodes": [
+        {
+          "id": "MODEL_SELECTOR",
+          "nodeType": "MODEL_SELECTOR",
+          "iconId": "model",
+          "titleKey": "contextMenu.nodes.modelSelector"
+        },
+        {
+          "id": "LLM_QUERY",
+          "nodeType": "LLM_QUERY",
+          "iconId": "brain",
+          "titleKey": "contextMenu.nodes.llmQuery"
+        }
+      ]
+    },
+    {
+      "id": "search",
+      "iconId": "search",
+      "titleKey": "contextMenu.categories.search",
+      "nodes": [
+        {
+          "id": "WEB_SEARCH",
+          "nodeType": "WEB_SEARCH",
+          "iconId": "globe",
+          "titleKey": "contextMenu.nodes.webSearch"
+        },
+        {
+          "id": "DOCUMENT_QUERY",
+          "nodeType": "DOCUMENT_QUERY",
+          "iconId": "document-search",
+          "titleKey": "contextMenu.nodes.documentQuery"
+        }
+      ]
+    },
+    {
+      "id": "flow",
+      "iconId": "flow",
+      "titleKey": "contextMenu.categories.flow",
+      "nodes": [
+        {
+          "id": "LOOP_CONTROL",
+          "nodeType": "LOOP_CONTROL",
+          "iconId": "loop",
+          "titleKey": "contextMenu.nodes.loopControl"
+        }
+      ]
+    },
+    {
+      "id": "utility",
+      "iconId": "settings",
+      "titleKey": "contextMenu.categories.utility",
+      "nodes": [
+        {
+          "id": "ENCODER",
+          "nodeType": "ENCODER",
+          "iconId": "encode",
+          "titleKey": "contextMenu.nodes.encoder"
+        },
+        {
+          "id": "SAMPLER",
+          "nodeType": "SAMPLER",
+          "iconId": "chart",
+          "titleKey": "contextMenu.nodes.sampler"
+        }
+      ]
+    },
+    {
+      "id": "advanced",
+      "iconId": "code",
+      "titleKey": "contextMenu.categories.advanced",
+      "nodes": [
+        {
+          "id": "CUSTOM_NODE",
+          "nodeType": "CUSTOM_NODE",
+          "iconId": "code",
+          "titleKey": "contextMenu.nodes.custom"
+        }
+      ]
+    }
+  ],
+  "icons": {
+    "puzzle": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z\" />"
+    },
+    "document": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z\" />"
+    },
+    "chip": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z\" />"
+    },
+    "model": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10\" />"
+    },
+    "search": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\" />"
+    },
+    "globe": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9\" />"
+    },
+    "document-search": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\" />"
+    },
+    "settings": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z\" /><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M15 12a3 3 0 11-6 0 3 3 0 016 0z\" />"
+    },
+    "code": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4\" />"
+    },
+    "encode": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z\" />"
+    },
+    "chart": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3z M9 17l0-6 M12 17l0-10 M15 17l0-4\" />"
+    },
+    "brain": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M7 8.5C7 6.01472 9.01472 4 11.5 4C13.9853 4 16 6.01472 16 8.5C16 10.9853 13.9853 13 11.5 13\" /><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M6 12H8C9.10457 12 10 11.1046 10 10V8C10 6.89543 9.10457 6 8 6H6C4.89543 6 4 6.89543 4 8V10C4 11.1046 4.89543 12 6 12Z\" /><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M17.5 16H15.5C14.3954 16 13.5 16.8954 13.5 18V20C13.5 21.1046 14.3954 22 15.5 22H17.5C18.6046 22 19.5 21.1046 19.5 20V18C19.5 16.8954 18.6046 16 17.5 16Z\" /><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M11.5 13C9.01472 13 7 15.0147 7 17.5C7 19.9853 9.01472 22 11.5 22\" />"
+    },
+    "flow": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5z\" /><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z\" /><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z\" /><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M8 11V9m0 0v-2m0 2h8m0 0V5m0 4v2\" />"
+    },
+    "loop": {
+      "svg": "<path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15\" />"
+    }
+  }
+}

@@ -6,6 +6,10 @@ import '../styles/globals.css';
 import '../styles/nodes.css';
 import '../styles/components/button.css';
 import '../styles/components/input.css';
+import '../components/NodeSystem.css';
+import '../components/NodeLibrary.css'; // 保留 NodeLibrary.css 导入
+import '../components/Node.css'; // 添加 Node.css 导入
+import '../components/NodePalette.css'; // 添加 NodePalette.css 导入
 import 'reactflow/dist/style.css';
 import { SettingsProvider } from '../contexts/SettingsContext';
 import { I18nProvider } from '../utils/i18n';

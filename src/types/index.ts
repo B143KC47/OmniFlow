@@ -4,7 +4,22 @@ export enum NodeType {
   WEB_SEARCH = 'WEB_SEARCH',
   DOCUMENT_QUERY = 'DOCUMENT_QUERY',
   MODEL_SELECTOR = 'MODEL_SELECTOR',
-  CUSTOM_NODE = 'CUSTOM_NODE'
+  LLM_QUERY = 'LLM_QUERY',
+  ENCODER = 'ENCODER',
+  CUSTOM = 'CUSTOM_NODE',
+  SAMPLER = 'SAMPLER',
+  // 添加更多节点类型
+  IMAGE_INPUT = 'IMAGE_INPUT',
+  VIDEO_INPUT = 'VIDEO_INPUT',
+  AUDIO_INPUT = 'AUDIO_INPUT',
+  TEXT_OUTPUT = 'TEXT_OUTPUT',
+  IMAGE_OUTPUT = 'IMAGE_OUTPUT',
+  VIDEO_OUTPUT = 'VIDEO_OUTPUT',
+  AUDIO_OUTPUT = 'AUDIO_OUTPUT',
+  FILE_OUTPUT = 'FILE_OUTPUT',
+  FILE_INPUT = 'FILE_INPUT',
+  NOTE = 'NOTE',
+  LOOP_CONTROL = 'LOOP_CONTROL'
 }
 
 // 通用节点类型定义
@@ -28,12 +43,41 @@ export interface NodeCategory {
   nodes: BaseNode[];
 }
 
-// 工作流节点数据
+// 节点分类类型
+export enum NodeCategoryType {
+  INPUT = 'INPUT',
+  OUTPUT = 'OUTPUT',
+  PROCESSING = 'PROCESSING',
+  AI_MODEL = 'AI_MODEL',
+  FLOW_CONTROL = 'FLOW_CONTROL',
+  DATA_OPERATION = 'DATA_OPERATION',
+  UTILITY = 'UTILITY',
+  CUSTOM = 'CUSTOM'
+}
+
+// 工作流节点数据 - 作为节点的 data 字段
 export interface NodeData {
-  id: string;
-  type: string;
-  position: Position;
-  data: any;
+  label?: string;
+  inputs?: {
+    [key: string]: {
+      type: string;
+      value: any;
+      placeholder?: string;
+      options?: any[];
+      [key: string]: any;
+    };
+  };
+  outputs?: {
+    [key: string]: {
+      type: string;
+      value: any;
+      [key: string]: any;
+    };
+  };
+  onChange?: (nodeId: string, data: any) => void;
+  // 添加状态相关的属性
+  status?: 'idle' | 'running' | 'completed' | 'error' | 'connected';
+  connectStatus?: 'compatible' | 'incompatible' | null;
 }
 
 // 位置接口
@@ -42,15 +86,35 @@ export interface Position {
   y: number;
 }
 
+// 工作流节点接口 - 符合 ReactFlow 节点结构
+export interface WorkflowNode {
+  id: string;
+  type: NodeType | string;
+  position: Position;
+  data: NodeData;
+  selected?: boolean;
+  dragging?: boolean;
+  width?: number;
+  height?: number;
+}
+
 // 工作流定义
 export interface Workflow {
   id: string;
   name: string;
   description?: string;
-  nodes: NodeData[];
+  nodes: WorkflowNode[];
   edges: Edge[];
   createdAt: Date;
   updatedAt: Date;
+  tags?: string[];         // 工作流标签
+  favorite?: boolean;      // 是否收藏
+  lastExecuted?: Date;     // 最后执行时间
+  executionCount?: number; // 执行次数
+  version?: string;        // 版本号
+  author?: string;         // 作者
+  isTemplate?: boolean;    // 是否为模板
+  category?: string;       // 工作流分类
 }
 
 // 边定义
@@ -88,12 +152,12 @@ export interface Settings {
   enableNotifications: boolean;
 }
 
-// 节点接口
+// 节点接口 - 保留用于兼容性
 export interface Node {
   id: string;
-  type: NodeType;
+  type: NodeType;  // 使用枚举类型
   position: { x: number; y: number };
-  data: any;
+  data: NodeData;
   width?: number;
   height?: number;
 }

@@ -1,293 +1,143 @@
-import { Node, Connection, NodeType } from '../types';
+import { Node, Connection } from '../types/index';
 import McpService from './McpService';
+import NodeExecutorFactory from '../core/nodes/NodeExecutorFactory';
+import { NodeExecutorRegistry } from '../core/nodes/NodeExecutorRegistry';
+import { WorkflowExecutionOptions } from '../core/workflow/types';
 
-interface NodeExecutor {
-  execute: (node: Node, inputs: Record<string, any>) => Promise<Record<string, any>>;
-}
-
-interface NodeExecutorMap {
-  [key: string]: NodeExecutor;
-}
-
+/**
+ * 工作流引擎
+ * 负责执行工作流和管理节点执行
+ */
 class WorkflowEngine {
-  private nodeExecutors: NodeExecutorMap;
+  private nodeExecutorFactory: NodeExecutorFactory;
   private mcpService: McpService;
+  private isInitialized: boolean = false;
 
   constructor() {
-    this.nodeExecutors = {} as NodeExecutorMap;
+    this.nodeExecutorFactory = NodeExecutorFactory.getInstance();
     this.mcpService = McpService.getInstance();
-    this.registerDefaultExecutors();
   }
 
-  private registerDefaultExecutors() {
-    // 文本输入节点执行器
-    this.nodeExecutors[NodeType.TEXT_INPUT] = {
-      execute: async (node: Node) => {
-        return {
-          text: node.data.inputs?.text?.value || '',
-        };
-      },
-    };
-
-    // LLM查询节点执行器
-    this.nodeExecutors[NodeType.LLM_QUERY] = {
-      execute: async (node: Node, inputs: Record<string, any>) => {
-        const prompt = node.data.inputs?.prompt?.value || inputs.text || '';
-        const model = node.data.inputs?.model?.value || 'deepseek-chat';
-        const systemPrompt = node.data.inputs?.systemPrompt?.value || 'You are a helpful assistant';
-        const temperature = node.data.inputs?.temperature?.value || 0.7;
-        const maxTokens = node.data.inputs?.maxTokens?.value || 1000;
-        const stream = node.data.inputs?.stream?.value === 'true';
-        
-        // Use the API key from inputs if available (from ModelSelectorNode)
-        const apiKey = inputs.apiKey || '';
-
-        try {
-          // If no API key, use mock response
-          if (!apiKey) {
-            return { text: this.mockLlmCallDeepseek(prompt, model, systemPrompt, temperature, maxTokens, stream) };
-          }
-          
-          // Attempt actual API call for DeepSeek
-          const response = await this.callDeepseekAPI(apiKey, prompt, model, systemPrompt, temperature, maxTokens, stream);
-          return { text: response };
-        } catch (error: unknown) {
-          throw new Error(`LLM查询失败: ${error instanceof Error ? error.message : String(error)}`);
-        }
-      },
-    };
-
-    // 网络搜索节点执行器 - 使用MCP服务
-    this.nodeExecutors[NodeType.WEB_SEARCH] = {
-      execute: async (node: Node, inputs: Record<string, any>) => {
-        const query = node.data.inputs?.query?.value || inputs.text || '';
-        const searchEngine = node.data.inputs?.searchEngine?.value || 'google';
-        const maxResults = node.data.inputs?.maxResults?.value || 5;
-        
-        try {
-          // 使用MCP服务进行网络搜索
-          const searchResults = await this.performWebSearch(query, searchEngine, maxResults);
-          return { text: searchResults };
-        } catch (error: unknown) {
-          throw new Error(`网络搜索失败: ${error instanceof Error ? error.message : String(error)}`);
-        }
-      },
-    };
-
-    // 文档查询节点执行器
-    this.nodeExecutors[NodeType.DOCUMENT_QUERY] = {
-      execute: async (node: Node, inputs: Record<string, any>) => {
-        const query = node.data.inputs?.query?.value || inputs.text || '';
-        const documentPath = node.data.inputs?.path?.value || '';
-        try {
-          // TODO: 实现实际的文档查询
-          const results = await this.mockDocumentQuery(query, documentPath);
-          return { text: results };
-        } catch (error: unknown) {
-          throw new Error(`文档查询失败: ${error instanceof Error ? error.message : String(error)}`);
-        }
-      },
-    };
-
-    // 模型选择器节点执行器
-    this.nodeExecutors[NodeType.MODEL_SELECTOR] = {
-      execute: async (node: Node) => {
-        const model = node.data.inputs?.model?.value || 'deepseek-chat';
-        const apiKey = node.data.inputs?.apiKey?.value || '';
-        const systemPrompt = node.data.inputs?.systemPrompt?.value || 'You are a helpful assistant';
-        const temperature = node.data.inputs?.temperature?.value || 0.7;
-        const maxTokens = node.data.inputs?.maxTokens?.value || 1000;
-        const stream = node.data.inputs?.stream?.value === 'true';
-
-        return {
-          model,
-          apiKey,
-          systemPrompt,
-          temperature,
-          maxTokens,
-          stream
-        };
-      },
-    };
-
-    // 自定义节点执行器
-    this.nodeExecutors[NodeType.CUSTOM] = {
-      execute: async (node: Node, inputs: Record<string, any>) => {
-        const code = node.data.inputs?.code?.value || '';
-        try {
-          // 非常危险，实际应用中应该使用安全的沙箱执行
-          // 这里仅作为示例
-          const processInputs = new Function('inputs', `
-            try {
-              ${code}
-              return { result: "代码执行成功" };
-            } catch (error) {
-              return { error: error.message };
-            }
-          `);
-          const result = processInputs(inputs);
-          return result;
-        } catch (error: unknown) {
-          throw new Error(`自定义代码执行失败: ${error instanceof Error ? error.message : String(error)}`);
-        }
-      },
-    };
-
-    // 编码器节点执行器
-    this.nodeExecutors[NodeType.ENCODER] = {
-      execute: async (node: Node, inputs: Record<string, any>) => {
-        const text = node.data.inputs?.text?.value || inputs.text || '';
-        const model = node.data.inputs?.model?.value || 'clip';
-        try {
-          // TODO: 实现实际的编码过程
-          const embedding = await this.mockEmbedding(text, model);
-          return { embedding };
-        } catch (error: unknown) {
-          throw new Error(`编码失败: ${error instanceof Error ? error.message : String(error)}`);
-        }
-      },
-    };
-  }
-
-  // 使用DeepSeek API调用
-  private async callDeepseekAPI(
-    apiKey: string, 
-    prompt: string,
-    model: string,
-    systemPrompt: string,
-    temperature: number,
-    maxTokens: number,
-    stream: boolean
-  ): Promise<string> {
-    try {
-      // This would be a call to DeepSeek API - here's the code structure
-      // In a browser environment, you would use fetch instead
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: model,
-          messages: [
-            { "role": "system", "content": systemPrompt },
-            { "role": "user", "content": prompt }
-          ],
-          temperature: temperature,
-          max_tokens: maxTokens,
-          stream: stream
-        })
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(`DeepSeek API error: ${error.message || response.statusText}`);
-      }
-
-      if (stream) {
-        // Handle streaming response - in a real implementation this would use proper streaming
-        return "Streaming response started. Check console for messages.";
-      } else {
-        const data = await response.json();
-        return data.choices[0].message.content;
-      }
-    } catch (error) {
-      console.error("DeepSeek API call failed:", error);
-      // Fall back to mock if API call fails
-      return this.mockLlmCallDeepseek(prompt, model, systemPrompt, temperature, maxTokens, stream);
+  /**
+   * 初始化工作流引擎
+   */
+  public initialize(): void {
+    if (this.isInitialized) {
+      return;
     }
+
+    // 注册所有内置执行器
+    NodeExecutorRegistry.registerBuiltinExecutors();
+    
+    this.isInitialized = true;
   }
 
-  // 使用MCP服务执行网络搜索
-  private async performWebSearch(query: string, provider: string, maxResults: number): Promise<string> {
-    try {
-      // 尝试执行搜索
-      const results = await this.mcpService.searchWeb(query, provider, maxResults);
-      
-      // 格式化搜索结果
-      let formattedResults = `搜索查询: "${query}"\n搜索引擎: ${provider}\n\n结果:\n\n`;
-      results.forEach((result, index) => {
-        formattedResults += `${index + 1}. ${result.title}\n`;
-        formattedResults += `   URL: ${result.url}\n`;
-        formattedResults += `   ${result.snippet}\n\n`;
-      });
-      
-      return formattedResults;
-    } catch (error: unknown) {
-      // 搜索失败，回退到模拟搜索
-      console.warn('MCP搜索失败，使用模拟数据:', error);
-      return this.mockWebSearch(query);
+  /**
+   * 执行工作流
+   * @param nodes 节点数据
+   * @param connections 连接数据
+   * @param options 执行选项
+   */
+  public async execute(
+    nodes: Node[], 
+    connections: Connection[],
+    options?: WorkflowExecutionOptions
+  ): Promise<{
+    nodeOutputs: Map<string, Record<string, any>>;
+    nodeInputs: Map<string, Record<string, any>>;
+  }> {
+    if (!this.isInitialized) {
+      this.initialize();
     }
-  }
-
-  // 模拟DeepSeek LLM调用
-  private mockLlmCallDeepseek(
-    prompt: string,
-    model: string,
-    systemPrompt: string,
-    temperature: number,
-    maxTokens: number,
-    stream: boolean
-  ): string {
-    return `模拟DeepSeek响应：
-输入: ${prompt}
-系统提示词: ${systemPrompt}
-模型: ${model}
-温度: ${temperature}
-最大Token数: ${maxTokens}
-流式输出: ${stream}
-
-注意：这是一个模拟响应。实际使用时，请提供有效的DeepSeek API密钥。
-DeepSeek API使用方式:
-\`\`\`python
-from openai import OpenAI
-
-client = OpenAI(api_key="<DeepSeek API Key>", base_url="https://api.deepseek.com")
-
-response = client.chat.completions.create(
-    model="deepseek-chat",
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant"},
-        {"role": "user", "content": "Hello"},
-    ],
-    stream=False
-)
-
-print(response.choices[0].message.content)
-\`\`\``;
-  }
-
-  // 模拟网络搜索
-  private async mockWebSearch(query: string): Promise<string> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return `模拟搜索结果：\n查询：${query}\n结果：这是一些相关的搜索结果...`;
-  }
-
-  // 模拟文档查询
-  private async mockDocumentQuery(query: string, path: string): Promise<string> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return `模拟文档查询结果：\n查询：${query}\n文档：${path}\n结果：这是一些相关的文档内容...`;
-  }
-
-  // 模拟文本嵌入
-  private async mockEmbedding(text: string, model: string): Promise<number[]> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    // 返回一个模拟的向量数组
-    return Array.from({ length: 128 }, () => Math.random());
-  }
-
-  // 注册自定义节点执行器
-  public registerExecutor(type: string, executor: NodeExecutor) {
-    this.nodeExecutors[type] = executor;
-  }
-
-  // 执行工作流
-  public async execute(nodes: Node[], connections: Connection[]) {
+    
+    // 确保节点按依赖关系顺序执行
+    let executionOrder: Node[];
+    
+    if (options?.parallel) {
+      // 如果启用并行执行，则确定可独立执行的节点组
+      // TODO: 实现并行执行逻辑
+      executionOrder = nodes;
+    } else {
+      // 串行执行，按拓扑排序确定执行顺序
+      const nodeIds = this.determineExecutionOrder(nodes, connections);
+      executionOrder = nodeIds.map(id => nodes.find(node => node.id === id)!).filter(Boolean);
+    }
+    
     const nodeOutputs = new Map<string, Record<string, any>>();
     const nodeInputs = new Map<string, Record<string, any>>();
     
-    // 构建连接关系
+    // 构建连接关系映射
+    const nodeConnections = this.buildConnectionsMap(connections);
+    
+    // 执行节点
+    const errorHandling = options?.errorHandling || 'stop';
+    const maxRetries = options?.retryCount || 0;
+    
+    for (const node of executionOrder) {
+      let retryCount = 0;
+      let success = false;
+      
+      while (!success && retryCount <= maxRetries) {
+        try {
+          // 收集节点输入
+          const inputs = this.collectNodeInputs(node.id, nodeConnections, nodeOutputs);
+          nodeInputs.set(node.id, inputs);
+          
+          // 使用执行器工厂执行节点
+          console.log(`执行节点 "${node.data.label || node.id}" (${node.id})...`);
+          const output = await this.nodeExecutorFactory.executeNode(node, inputs);
+          nodeOutputs.set(node.id, output);
+          
+          success = true;
+        } catch (error: unknown) {
+          retryCount++;
+          
+          console.error(
+            `节点 "${node.data.label || node.id}" (${node.id}) 执行失败 ` +
+            `(尝试 ${retryCount}/${maxRetries + 1}):`, 
+            error
+          );
+          
+          // 如果失败但还有重试次数，则继续重试
+          if (retryCount <= maxRetries && errorHandling === 'retry') {
+            console.log(`重试执行节点 ${node.id}...`);
+            continue;
+          }
+          
+          // 处理错误
+          nodeOutputs.set(node.id, { 
+            error: error instanceof Error ? error.message : String(error) 
+          });
+          
+          // 如果错误处理策略是停止，则中止执行
+          if (errorHandling === 'stop') {
+            throw new Error(
+              `节点 "${node.data.label || node.id}" (${node.id}) 执行失败: ` +
+              `${error instanceof Error ? error.message : String(error)}`
+            );
+          }
+          
+          // 否则继续执行下一个节点
+          break;
+        }
+      }
+    }
+    
+    return {
+      nodeOutputs,
+      nodeInputs,
+    };
+  }
+
+  /**
+   * 构建节点连接映射
+   * @param connections 连接列表
+   */
+  private buildConnectionsMap(connections: Connection[]): Map<string, Array<{
+    source: string;
+    sourceHandle: string | null | undefined;
+    targetHandle: string | null | undefined;
+  }>> {
     const nodeConnections = new Map<string, Array<{
       source: string;
       sourceHandle: string | null | undefined;
@@ -308,45 +158,43 @@ print(response.choices[0].message.content)
       }
     });
     
-    // 按顺序执行节点
-    for (const node of nodes) {
-      const executor = this.nodeExecutors[node.type];
-      if (!executor) {
-        console.warn(`未找到节点类型 "${node.type}" 的执行器`);
-        continue;
-      }
-      
-      // 收集节点的输入
-      const inputs: Record<string, any> = {};
-      const nodeConnList = nodeConnections.get(node.id) || [];
-      for (const conn of nodeConnList) {
-        const sourceOutput = nodeOutputs.get(conn.source);
-        if (sourceOutput) {
-          // 将上游节点的输出作为当前节点的输入
-          Object.assign(inputs, sourceOutput);
-        }
-      }
-      
-      nodeInputs.set(node.id, inputs);
-      
-      try {
-        // 执行节点
-        console.log(`执行节点 "${node.data.label}" (${node.id})...`);
-        const output = await executor.execute(node, inputs);
-        nodeOutputs.set(node.id, output);
-      } catch (error: unknown) {
-        console.error(`节点 "${node.data.label}" (${node.id}) 执行失败:`, error);
-        nodeOutputs.set(node.id, { error: error instanceof Error ? error.message : String(error) });
+    return nodeConnections;
+  }
+
+  /**
+   * 收集节点输入
+   * @param nodeId 节点ID
+   * @param nodeConnections 节点连接映射
+   * @param nodeOutputs 节点输出映射
+   */
+  private collectNodeInputs(
+    nodeId: string,
+    nodeConnections: Map<string, Array<{
+      source: string;
+      sourceHandle: string | null | undefined;
+      targetHandle: string | null | undefined;
+    }>>,
+    nodeOutputs: Map<string, Record<string, any>>
+  ): Record<string, any> {
+    const inputs: Record<string, any> = {};
+    const nodeConnList = nodeConnections.get(nodeId) || [];
+    
+    for (const conn of nodeConnList) {
+      const sourceOutput = nodeOutputs.get(conn.source);
+      if (sourceOutput) {
+        // 将上游节点的输出作为当前节点的输入
+        Object.assign(inputs, sourceOutput);
       }
     }
     
-    return {
-      nodeOutputs,
-      nodeInputs,
-    };
+    return inputs;
   }
 
-  // 确定节点执行顺序
+  /**
+   * 确定节点执行顺序 (拓扑排序)
+   * @param nodes 节点列表
+   * @param connections 连接列表
+   */
   private determineExecutionOrder(nodes: Node[], connections: Connection[]): string[] {
     const graph = new Map<string, Set<string>>();
     const inDegree = new Map<string, number>();
@@ -399,30 +247,6 @@ print(response.choices[0].message.content)
     }
 
     return order;
-  }
-
-  // 收集节点输入
-  private collectInputs(
-    node: Node,
-    connections: Connection[],
-    nodeOutputs: Map<string, Record<string, any>>
-  ): Record<string, any> {
-    const inputs: Record<string, any> = {};
-    
-    connections
-      .filter(conn => conn.target === node.id)
-      .forEach(conn => {
-        const sourceOutputs = nodeOutputs.get(conn.source);
-        if (sourceOutputs) {
-          const sourceHandle = conn.sourceHandle?.split('-')[1];
-          const targetHandle = conn.targetHandle?.split('-')[1];
-          if (sourceHandle && targetHandle && sourceOutputs[sourceHandle]) {
-            inputs[targetHandle] = sourceOutputs[sourceHandle];
-          }
-        }
-      });
-
-    return inputs;
   }
 }
 

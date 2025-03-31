@@ -1,0 +1,154 @@
+.comfy-node-palette {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: #eee;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.comfy-search-container {
+  position: relative;
+  padding: 0 0 12px 0;
+}
+
+.comfy-search-input {
+  width: 100%;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: #eee;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.comfy-search-input:focus {
+  outline: none;
+  border-color: #666;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.comfy-search-clear {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.comfy-search-clear:hover {
+  color: #ccc;
+}
+
+.comfy-categories {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.comfy-category {
+  margin-bottom: 4px;
+}
+
+.comfy-category-header {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  background: #333;
+  border-radius: 4px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.comfy-category-header:hover {
+  background: #444;
+}
+
+.comfy-category-toggle {
+  font-size: 10px;
+  margin-right: 6px;
+  color: #aaa;
+}
+
+.comfy-category-name {
+  flex: 1;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.comfy-category-count {
+  background: #444;
+  color: #aaa;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.comfy-nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0 4px 16px;
+}
+
+.comfy-node {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  cursor: move;
+  transition: all 0.2s;
+}
+
+.comfy-node:hover {
+  background: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.comfy-node-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.comfy-node-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.comfy-node-title {
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comfy-node-description {
+  font-size: 10px;
+  color: #aaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 为每种节点类型定义不同的图标颜色 */
+.node-icon-text_input { background-color: #4a6fe3; }
+.node-icon-llm_query { background-color: #4caf50; }
+.node-icon-model_selector { background-color: #00bcd4; }
+.node-icon-web_search { background-color: #ff9800; }
+.node-icon-document_query { background-color: #9c27b0; }
+.node-icon-encoder { background-color: #795548; }
+.node-icon-sampler { background-color: #607d8b; }
+.node-icon-custom { background-color: #e91e63; }

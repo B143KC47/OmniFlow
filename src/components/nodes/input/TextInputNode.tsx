@@ -1,7 +1,7 @@
 import React, { memo, useCallback } from 'react';
-import BaseNode from './BaseNode';
-import { NodeData } from '../../types';
-import { useTranslation } from '../../utils/i18n';
+import BaseNode from '../BaseNode';
+import { NodeData } from '../../../types/index';
+import { useTranslation } from '../../../utils/i18n';
 
 interface TextInputNodeProps {
   id: string;
@@ -63,6 +63,7 @@ const TextInputNode = memo(({
       data={nodeData}
       selected={selected}
       isConnectable={isConnectable}
+      onDataChange={onDataChange}
     />
   );
 });

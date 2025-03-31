@@ -18,6 +18,8 @@ import { NodeData, NodeType, Workflow, Connection as WorkflowConnection } from '
 import WorkflowController, { ExecutionState } from '../services/WorkflowController';
 import McpService from '../services/McpService';
 import { useTranslation } from '../utils/i18n';
+import NodeDiscoveryService from '../services/NodeDiscoveryService';
+import NodeRegistry from '../services/NodeRegistry';
 
 // 使用动态导入避免 SSR 问题
 const ReactFlow = dynamic(
@@ -38,19 +40,9 @@ const Background = dynamic(
 // 导入样式
 import 'reactflow/dist/style.css';
 
-// 动态导入节点组件
-const TextInputNode = dynamic(() => import('./nodes/TextInputNode'), { ssr: false });
-const DocumentQueryNode = dynamic(() => import('./nodes/DocumentQueryNode'), { ssr: false });
-const WebSearchNode = dynamic(() => import('./nodes/WebSearchNode'), { ssr: false });
-const ModelSelectorNode = dynamic(() => import('./nodes/ModelSelectorNode'), { ssr: false });
-const EncoderNode = dynamic(() => import('./nodes/EncoderNode'), { ssr: false });
-const SamplerNode = dynamic(() => import('../components/nodes/SamplerNode'), { ssr: false });
-const CustomNode = dynamic(() => import('./nodes/CustomNode'), { ssr: false });
+// 动态导入其他组件
 const ContextMenu = dynamic(() => import('./ContextMenu'), { ssr: false });
 const McpManager = dynamic(() => import('./McpManager'), { ssr: false });
-
-// 使用 any 类型来避免类型错误
-type CustomNode = any;
 
 interface WorkflowEditorProps {
   initialWorkflow?: Workflow;
@@ -61,46 +53,19 @@ interface NodeTypes {
   [key: string]: React.ComponentType<any>;
 }
 
-// 节点类型映射表 - 使用NodeType枚举确保类型一致性
-const nodeTypeMap: Record<string, NodeType> = {
-  [NodeType.TEXT_INPUT]: NodeType.TEXT_INPUT,
-  [NodeType.LLM_QUERY]: NodeType.LLM_QUERY,
-  [NodeType.WEB_SEARCH]: NodeType.WEB_SEARCH,
-  [NodeType.DOCUMENT_QUERY]: NodeType.DOCUMENT_QUERY,
-  [NodeType.MODEL_SELECTOR]: NodeType.MODEL_SELECTOR,
-  [NodeType.CUSTOM]: NodeType.CUSTOM,
-  [NodeType.ENCODER]: NodeType.ENCODER,
-  [NodeType.SAMPLER]: NodeType.SAMPLER,
-};
-
-// 注册节点类型
-const nodeTypes = {
-  [NodeType.TEXT_INPUT]: TextInputNode,
-  [NodeType.WEB_SEARCH]: WebSearchNode,
-  [NodeType.DOCUMENT_QUERY]: DocumentQueryNode,
-  [NodeType.MODEL_SELECTOR]: ModelSelectorNode,
-  [NodeType.CUSTOM_NODE]: CustomNode,
-  [NodeType.ENCODER]: EncoderNode,
-  [NodeType.SAMPLER]: SamplerNode,
-};
-
-// 定义节点类型
-type CustomFlowNode = FlowNode<NodeData>;
-type CustomEdge = FlowEdge;
-
-// 上下文菜单ID
-const WORKFLOW_MENU_ID = 'workflow-context-menu';
-
 // 内部工作流编辑器组件
 const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
   const { t } = useTranslation();
   // 使用 useState 来跟踪客户端渲染状态
   const [isClient, setIsClient] = useState(false);
+  const [nodeRegistry, setNodeRegistry] = useState<NodeRegistry | null>(null);
+  const [nodeTypes, setNodeTypes] = useState<Record<string, React.ComponentType<any>>>({});
+  const [nodeTypeMap, setNodeTypeMap] = useState<Record<string, string>>({});
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // 在客户端挂载后更新状态
   useEffect(() => {
     setIsClient(true);
-    console.log('工作流编辑器初始化完成');
     
     // 添加错误处理器，捕获React未捕获的错误
     const errorHandler = (event: ErrorEvent) => {
@@ -110,14 +75,46 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     
     window.addEventListener('error', errorHandler);
     
+    // 初始化节点注册表和发现服务
+    const initServices = async () => {
+      try {
+        // 初始化节点注册表
+        const registry = NodeRegistry.getInstance();
+        await registry.initialize();
+        
+        // 初始化节点发现服务
+        const discoveryService = NodeDiscoveryService.getInstance();
+        await discoveryService.initialize(t);
+        
+        // 获取组件映射
+        const components = registry.getNodeComponents();
+        const typeMap = registry.getNodeTypeMap();
+        
+        // 设置状态
+        setNodeRegistry(registry);
+        setNodeTypes(components);
+        setNodeTypeMap(typeMap);
+        setIsInitialized(true);
+        
+        console.log('工作流编辑器初始化完成', {
+          components: Object.keys(components),
+          typeMap: Object.keys(typeMap)
+        });
+      } catch (error) {
+        console.error('初始化节点系统时出错:', error);
+      }
+    };
+    
+    initServices();
+    
     return () => {
       window.removeEventListener('error', errorHandler);
     };
-  }, []);
+  }, [t]);
 
   // ReactFlow元素状态
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<CustomEdge>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<FlowEdge>([]);
   const [executionState, setExecutionState] = useState<ExecutionState | null>(null);
   const [showMcpManager, setShowMcpManager] = useState(false);
   
@@ -136,7 +133,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
   
   // 初始化工作流
   useEffect(() => {
-    if (initialWorkflow) {
+    if (initialWorkflow && isInitialized) {
       // 将保存的工作流节点转换为 ReactFlow 节点
       const reactFlowNodes = initialWorkflow.nodes.map(node => ({
         id: node.id,
@@ -171,7 +168,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
       setNodes(reactFlowNodes);
       setEdges(reactFlowEdges);
     }
-  }, [initialWorkflow, setNodes, setEdges]);
+  }, [initialWorkflow, setNodes, setEdges, isInitialized]);
 
   // 订阅执行状态变化
   useEffect(() => {
@@ -207,8 +204,9 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
         id: edge.id,
         source: edge.source,
         target: edge.target,
-        sourceHandle: edge.sourceHandle,
-        targetHandle: edge.targetHandle,
+        // 修复类型错误：确保 sourceHandle 和 targetHandle 不可能为 null
+        sourceHandle: edge.sourceHandle || undefined,
+        targetHandle: edge.targetHandle || undefined,
       })),
       createdAt: initialWorkflow?.createdAt || new Date(),
       updatedAt: new Date(),
@@ -231,23 +229,20 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     console.log(`------节点创建开始------`);
     console.log(`收到添加节点请求，类型: ${type}，位置: ${position.x}, ${position.y}`);
 
-    // 确定节点类型，先直接使用传入的类型，如果不是有效类型再尝试从nodeTypeMap获取
-    let nodeType = type as NodeType;
-    
-    // 检查nodeType是否有效，如果无效则尝试从映射表获取
-    if (!Object.values(NodeType).includes(nodeType)) {
-      console.log(`类型 ${nodeType} 不是直接的NodeType值，尝试从映射表获取...`);
-      nodeType = nodeTypeMap[type];
-    }
-
-    if (!nodeType) {
-      console.error(`未知的节点类型: ${type}`);
-      console.log(`可用的节点类型: ${Object.values(NodeType).join(', ')}`);
-      console.log(`------节点创建失败------`);
+    if (!nodeRegistry) {
+      console.error('节点注册表未初始化');
       return;
     }
 
-    console.log(`最终解析的节点类型: ${nodeType}`);
+    // 使用节点注册表解析标准节点类型
+    const nodeType = nodeRegistry.resolveNodeType(type);
+    
+    if (!nodeType) {
+      console.error(`未能解析节点类型: ${type}`);
+      return;
+    }
+
+    console.log(`标准化后的节点类型: ${nodeType}`);
     
     // 检查这个节点类型是否有对应的组件
     if (!nodeTypes[nodeType]) {
@@ -258,34 +253,43 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     }
 
     // 根据节点类型设置不同的标签
-    let label = '未知节点';
-    switch (nodeType) {
-      case NodeType.TEXT_INPUT:
-        label = t('nodes.textInput.name');
-        break;
-      case NodeType.LLM_QUERY:
-        label = t('nodes.llmQuery.name');
-        break;
-      case NodeType.WEB_SEARCH:
-        label = t('nodes.webSearch.name');
-        break;
-      case NodeType.DOCUMENT_QUERY:
-        label = t('nodes.documentQuery.name');
-        break;
-      case NodeType.MODEL_SELECTOR:
-        label = t('nodes.modelSelector.name');
-        break;
-      case NodeType.CUSTOM:
-        label = t('nodes.custom.name');
-        break;
-      case NodeType.ENCODER:
-        label = t('nodes.encoder.name');
-        break;
-      case NodeType.SAMPLER:
-        label = t('nodes.sampler.name');
-        break;
-      default:
-        label = `节点-${nodeType}`;
+    let label;
+    // 从 NodeDiscoveryService 获取节点定义
+    const nodeDef = NodeDiscoveryService.getInstance().getNodeDefinitionByType(nodeType);
+    
+    if (nodeDef) {
+      // 如果有节点定义，使用其名称
+      label = nodeDef.name;
+    } else {
+      // 否则根据节点类型生成标签
+      switch (nodeType) {
+        case 'TEXT_INPUT':
+          label = t('nodes.textInput.name');
+          break;
+        case 'WEB_SEARCH':
+          label = t('nodes.webSearch.name');
+          break;
+        case 'DOCUMENT_QUERY':
+          label = t('nodes.documentQuery.name');
+          break;
+        case 'MODEL_SELECTOR':
+          label = t('nodes.modelSelector.name');
+          break;
+        case 'CUSTOM_NODE':
+          label = t('nodes.custom.name');
+          break;
+        case 'ENCODER': 
+          label = t('nodes.encoder.name');
+          break;
+        case 'SAMPLER': 
+          label = t('nodes.sampler.name');
+          break;
+        case 'LLM_QUERY':
+          label = t('nodes.llmQuery.name');
+          break;
+        default:
+          label = `节点-${nodeType}`;
+      }
     }
 
     // 创建新节点
@@ -317,7 +321,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     // 添加调试信息
     console.log('节点创建成功，节点数据:', newNode);
     console.log(`------节点创建完成------`);
-  }, [setNodes, t]);
+  }, [setNodes, t, nodeTypes, nodeRegistry]);
 
   // 显示MCP管理器
   const handleShowMcpManager = useCallback(() => {
@@ -370,7 +374,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
 
   // 处理右键菜单
   const { show } = useContextMenu({
-    id: WORKFLOW_MENU_ID,
+    id: 'workflow-context-menu',
   });
 
   const onContextMenu = useCallback(
@@ -424,8 +428,8 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
   }, [addNode, reactFlowInstance]);
 
   // 只在客户端渲染时显示内容
-  if (!isClient) {
-    return <div className="min-h-screen bg-[#141414]">Loading...</div>;
+  if (!isClient || !isInitialized) {
+    return <div className="min-h-screen bg-[#141414]">正在加载节点库...</div>;
   }
 
   return (
@@ -499,12 +503,8 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
               </div>
 
               <ContextMenu 
-                id={WORKFLOW_MENU_ID}
-                x={0}
-                y={0}
-                onClose={() => {}}
-                onAddNode={addNode}
-                position={{ x: 0, y: 0 }}
+                id="workflow-context-menu"
+                onSelectNode={addNode}
               />
 
               {showMcpManager && (

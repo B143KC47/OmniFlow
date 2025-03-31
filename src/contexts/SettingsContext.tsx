@@ -110,10 +110,13 @@ const deepMerge = <T extends object>(target: T, source: Partial<T>): T => {
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
-      const savedSettings = localStorage.getItem('app-settings');
-      if (savedSettings) {
-        const parsedSettings = JSON.parse(savedSettings);
-        return deepMerge(defaultSettings, parsedSettings);
+      // 添加环境检查，只在浏览器环境中访问 localStorage
+      if (typeof window !== 'undefined') {
+        const savedSettings = localStorage.getItem('app-settings');
+        if (savedSettings) {
+          const parsedSettings = JSON.parse(savedSettings);
+          return deepMerge(defaultSettings, parsedSettings);
+        }
       }
       return defaultSettings;
     } catch (error) {
@@ -127,7 +130,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   // 保存设置到localStorage
   const saveSettings = useCallback((newSettings: AppSettings) => {
     try {
-      localStorage.setItem('app-settings', JSON.stringify(newSettings));
+      // 只在浏览器环境中访问localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('app-settings', JSON.stringify(newSettings));
+      }
       
       // 更新HTML的数据属性
       if (typeof document !== 'undefined') {

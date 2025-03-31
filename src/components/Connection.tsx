@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { EdgeProps, getBezierPath, getStraightPath } from 'reactflow';
-import './Connection.css'; // 导入CSS样式
+import styles from './Connection.module.css'; // 改为导入CSS模块
 
 interface CustomEdgeData {
   sourceType?: string;
@@ -30,10 +30,10 @@ const CustomEdge: FC<EdgeProps> = ({
   // 基于类型或状态设置边的样式类
   const edgeClassName = `
     react-flow__edge-path 
-    connection-path 
-    ${animated ? 'animated' : ''} 
-    ${selected ? 'selected' : ''} 
-    ${isCompatible ? 'compatible' : 'incompatible'}
+    ${styles['connection-path']} 
+    ${animated ? styles.animated : ''} 
+    ${selected ? styles.selected : ''} 
+    ${isCompatible ? styles.compatible : styles.incompatible}
   `.trim();
 
   // 使用优化的贝塞尔曲线路径，增加曲率使连接更明显绕过节点
@@ -64,13 +64,13 @@ const CustomEdge: FC<EdgeProps> = ({
       
       {/* 类型匹配指示器 */}
       {edgeData?.sourceType && edgeData?.targetType && (
-        <g transform={`translate(${midX},${midY})`} className="edge-indicator">
+        <g transform={`translate(${midX},${midY})`} className={styles['edge-indicator']}>
           <circle
-            className={`edge-type-indicator ${isCompatible ? 'compatible' : 'incompatible'}`}
+            className={`${styles['edge-type-indicator']} ${isCompatible ? styles.compatible : styles.incompatible}`}
             strokeWidth={2}
           />
           <text
-            className={`edge-indicator-text ${isCompatible ? 'compatible' : 'incompatible'}`}
+            className={`${styles['edge-indicator-text']} ${isCompatible ? styles.compatible : styles.incompatible}`}
           >
             {isCompatible ? '✓' : '✗'}
           </text>
@@ -79,12 +79,12 @@ const CustomEdge: FC<EdgeProps> = ({
 
       {/* 连接标签 - 添加适当的类名以便CSS控制 */}
       {edgeData?.label && (
-        <g transform={`translate(${labelX},${labelY})`} className="edge-label-container">
+        <g transform={`translate(${labelX},${labelY})`} className={styles['edge-label-container']}>
           <rect 
-            className="edge-label-rect"
+            className={styles['edge-label-rect']}
           />
           <text
-            className="edge-label-text"
+            className={styles['edge-label-text']}
           >
             {edgeData.label}
           </text>

@@ -362,12 +362,24 @@
     "ungroup": "Ungroup",
     "undo": "Undo",
     "redo": "Redo",
-    "basicNodes": "Basic Nodes",
-    "textInput": "Text Input",
-    "llmNodes": "LLM Nodes",
-    "llmQuery": "LLM Query",
-    "utilityNodes": "Utility Nodes",
-    "webSearch": "Web Search"
+    "edit": "Edit",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "categories": {
+      "basic": "Basic Nodes",
+      "ai": "AI Nodes",
+      "search": "Search Nodes",
+      "process": "Processing Nodes"
+    },
+    "nodes": {
+      "textInput": "Text Input",
+      "modelSelector": "Model Selector",
+      "webSearch": "Web Search",
+      "documentQuery": "Document Query",
+      "custom": "Custom Processing",
+      "encoder": "Text Encoder",
+      "sampler": "Data Sampler"
+    }
   },
   "editor": {
     "controls": {

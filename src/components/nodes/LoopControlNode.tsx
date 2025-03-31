@@ -85,14 +85,20 @@ const LoopControlNode = memo(({
           ...data.inputs,
           expression: {
             ...(data.inputs?.expression || {}),
+            type: data.inputs?.expression?.type || 'text',
+            value: data.inputs?.expression?.value || '',
             hidden: conditionType !== 'conditional'
           },
           iterationCount: {
             ...(data.inputs?.iterationCount || {}),
+            type: data.inputs?.iterationCount?.type || 'number',
+            value: data.inputs?.iterationCount?.value || 5,
             hidden: conditionType !== 'count'
           },
           confirmPrompt: {
             ...(data.inputs?.confirmPrompt || {}),
+            type: data.inputs?.confirmPrompt?.type || 'text',
+            value: data.inputs?.confirmPrompt?.value || '',
             hidden: conditionType !== 'confirm'
           }
         }
@@ -166,6 +172,7 @@ const LoopControlNode = memo(({
       data={nodeData}
       selected={selected}
       isConnectable={isConnectable}
+      onDataChange={onDataChange}
     />
   );
 });

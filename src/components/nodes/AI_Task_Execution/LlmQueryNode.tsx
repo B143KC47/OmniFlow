@@ -1,7 +1,7 @@
-import React, { memo, useCallback, useEffect } from 'react';
-import BaseNode from './BaseNode';
-import { NodeData } from '../../types';
-import { useTranslation } from '../../utils/i18n';
+import React, { memo, useCallback, useState, useEffect } from 'react';
+import BaseNode from '../BaseNode';
+import { NodeData } from '../../../types/index';
+import { useTranslation } from '../../../utils/i18n';
 
 interface LlmQueryNodeProps {
   id: string;

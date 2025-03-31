@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import './Connection.css';
+import styles from './Connection.module.css';
 
 const Connection = ({ 
   source, 
@@ -70,9 +70,12 @@ const Connection = ({
     });
   }, [source, target, sourcePortId, targetPortId]);
 
+  // 合并连接的 CSS 类名
+  const connectionClassName = `${styles.connection} ${isTemp ? styles['temp-connection'] : ''}`.trim();
+
   return (
     <g 
-      className={`connection ${isTemp ? 'temp-connection' : ''}`} 
+      className={connectionClassName}
       ref={connectionRef}
       style={{ 
         pointerEvents: isTemp ? 'none' : 'auto',
@@ -82,7 +85,7 @@ const Connection = ({
     >
       <path
         d={path}
-        className="connection-path"
+        className={styles['connection-path']}
         fill="none"
         style={{ 
           pointerEvents: 'stroke', // 确保只有线条部分可交互
@@ -95,7 +98,7 @@ const Connection = ({
           cx={midPoint.x}
           cy={midPoint.y}
           r={8}
-          className="connection-delete-btn"
+          className={styles['connection-delete-btn']}
           onClick={onRemove}
         />
       )}
