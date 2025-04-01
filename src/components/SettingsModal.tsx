@@ -3,6 +3,7 @@ import { useSettings } from '../contexts/SettingsContext';
 import Modal from './shared/Modal';
 import { useTranslation } from '../utils/i18n';
 import { AppSettings } from '../contexts/SettingsContext';
+import styles from './SettingsModal.module.css';
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -158,16 +159,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
       cancelLabel={t('common.cancel')}
       disabled={isProcessing}
     >
-      <div className="settings-modal">
+      <div className={styles.settingsModal}>
         {isProcessing && (
-          <div className="settings-loading-overlay">
-            <div className="settings-loading-spinner"></div>
-            <div className="settings-loading-text">{t('settings.updating')}</div>
+          <div className={styles.loadingOverlay}>
+            <div className={styles.loadingSpinner}></div>
+            <div className={styles.loadingText}>{t('settings.updating')}</div>
           </div>
         )}
         
         {error && (
-          <div className="settings-error-message">
+          <div className={styles.errorMessage}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
@@ -175,12 +176,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
           </div>
         )}
 
-        <div className="settings-section">
-          <h3 className="settings-section-title">{t('settings.appearance.title')}</h3>
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>
+            <svg xmlns="http://www.w3.org/2000/svg" className={styles.sectionIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+            </svg>
+            {t('settings.appearance.title')}
+          </h3>
           
-          <div className="settings-field">
+          <div className={styles.field}>
             <label htmlFor="theme">{t('settings.theme.label')}:</label>
-            <div className="settings-field-control">
+            <div className={styles.fieldControl}>
               <select 
                 id="theme"
                 value={localSettings.theme}
@@ -196,9 +202,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
             </div>
           </div>
           
-          <div className="settings-field">
+          <div className={styles.field}>
             <label htmlFor="language">{t('settings.language.label')}:</label>
-            <div className="settings-field-control">
+            <div className={styles.fieldControl}>
               <select 
                 id="language"
                 value={localSettings.language}
@@ -214,11 +220,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
             </div>
           </div>
           
-          <div className="settings-field">
+          <div className={styles.field}>
             <label htmlFor="reduceAnimations">
               {t('settings.animations.label')}:
             </label>
-            <div className="settings-field-control">
+            <div className={styles.fieldControl}>
               <input 
                 id="reduceAnimations"
                 type="checkbox"
@@ -226,17 +232,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
                 onChange={(e) => handleChange('reduceAnimations', e.target.checked)}
                 disabled={isProcessing}
               />
-              <span className="checkbox-label">
+              <span className={styles.checkboxLabel}>
                 {t('settings.animations.reduce')}
               </span>
             </div>
           </div>
           
-          <div className="settings-field">
+          <div className={styles.field}>
             <label htmlFor="showBackgroundPattern">
               {t('settings.background.label')}:
             </label>
-            <div className="settings-field-control">
+            <div className={styles.fieldControl}>
               <input 
                 id="showBackgroundPattern"
                 type="checkbox"
@@ -244,21 +250,26 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
                 onChange={(e) => handleChange('showBackgroundPattern', e.target.checked)}
                 disabled={isProcessing}
               />
-              <span className="checkbox-label">
+              <span className={styles.checkboxLabel}>
                 {t('settings.background.show')}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="settings-section">
-          <h3 className="settings-section-title">{t('settings.workflow.title')}</h3>
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>
+            <svg xmlns="http://www.w3.org/2000/svg" className={styles.sectionIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            {t('settings.workflow.title')}
+          </h3>
           
-          <div className="settings-field">
+          <div className={styles.field}>
             <label htmlFor="snapToGrid">
               {t('settings.nodeSnapToGrid.label')}:
             </label>
-            <div className="settings-field-control">
+            <div className={styles.fieldControl}>
               <input 
                 id="snapToGrid"
                 type="checkbox"
@@ -266,18 +277,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
                 onChange={(e) => handleChange('snapToGrid', e.target.checked)}
                 disabled={isProcessing}
               />
-              <span className="checkbox-label">
+              <span className={styles.checkboxLabel}>
                 {t('settings.nodeSnapToGrid.enable')}
               </span>
             </div>
           </div>
           
           {localSettings.snapToGrid && (
-            <div className="settings-field">
+            <div className={styles.field}>
               <label htmlFor="gridSize">
                 {t('settings.gridSize.label')}:
               </label>
-              <div className="settings-field-control">
+              <div className={styles.fieldControl}>
                 <input 
                   id="gridSize"
                   type="number"
@@ -285,19 +296,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
                   max="50"
                   value={localSettings.gridSize}
                   onChange={(e) => handleChange('gridSize', parseInt(e.target.value, 10))}
-                  className="grid-size-input"
                   disabled={isProcessing}
                 />
-                <span className="unit">px</span>
+                <span className={styles.unit}>px</span>
               </div>
             </div>
           )}
           
-          <div className="settings-field">
+          <div className={styles.field}>
             <label htmlFor="showNodeTooltips">
               {t('settings.nodeTooltips.label')}:
             </label>
-            <div className="settings-field-control">
+            <div className={styles.fieldControl}>
               <input 
                 id="showNodeTooltips"
                 type="checkbox"
@@ -305,21 +315,26 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
                 onChange={(e) => handleChange('showNodeTooltips', e.target.checked)}
                 disabled={isProcessing}
               />
-              <span className="checkbox-label">
+              <span className={styles.checkboxLabel}>
                 {t('settings.nodeTooltips.show')}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="settings-section">
-          <h3 className="settings-section-title">{t('settings.other')}</h3>
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>
+            <svg xmlns="http://www.w3.org/2000/svg" className={styles.sectionIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            {t('settings.other')}
+          </h3>
           
-          <div className="settings-field">
+          <div className={styles.field}>
             <label htmlFor="autoSave">
               {t('settings.autoSave.label')}:
             </label>
-            <div className="settings-field-control">
+            <div className={styles.fieldControl}>
               <input 
                 id="autoSave"
                 type="checkbox"
@@ -327,18 +342,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
                 onChange={(e) => handleChange('autoSave', e.target.checked)}
                 disabled={isProcessing}
               />
-              <span className="checkbox-label">
+              <span className={styles.checkboxLabel}>
                 {t('settings.autoSave.enable')}
               </span>
             </div>
           </div>
           
           {localSettings.autoSave && (
-            <div className="settings-field">
+            <div className={styles.field}>
               <label htmlFor="autoSaveInterval">
                 {t('settings.autoSaveInterval.label')}:
               </label>
-              <div className="settings-field-control">
+              <div className={styles.fieldControl}>
                 <input 
                   id="autoSaveInterval"
                   type="number"
@@ -346,216 +361,40 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onSave }) => {
                   max="30"
                   value={localSettings.autoSaveInterval}
                   onChange={(e) => handleChange('autoSaveInterval', parseInt(e.target.value, 10))}
-                  className="interval-input"
                   disabled={isProcessing}
                 />
-                <span className="unit">{t('settings.autoSaveInterval.minutes')}</span>
+                <span className={styles.unit}>{t('settings.autoSaveInterval.minutes')}</span>
               </div>
             </div>
           )}
 
-          <div className="settings-field settings-reset-button">
-            <button 
-              onClick={handleReset}
-              className="reset-button"
-              disabled={isProcessing}
-            >
-              {t('settings.buttons.reset')}
-            </button>
+          <div className={`${styles.field} ${styles.resetButton}`}>
+            <label></label>
+            <div className={styles.fieldControl}>
+              <button 
+                onClick={handleReset}
+                className={styles.resetButtonControl}
+                disabled={isProcessing}
+              >
+                {t('settings.buttons.reset')}
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="settings-section settings-section-about">
-          <h3 className="settings-section-title">{t('settings.about.title')}</h3>
-          <div className="about-info">
+        <div className={`${styles.section} ${styles.sectionAbout}`}>
+          <h3 className={styles.sectionTitle}>
+            <svg xmlns="http://www.w3.org/2000/svg" className={styles.sectionIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {t('settings.about.title')}
+          </h3>
+          <div className={styles.aboutInfo}>
             <div>OmniFlow</div>
-            <div className="version">v0.1.0-alpha</div>
-            <div className="copyright">© 2023 OmniFlow Team</div>
+            <div className={styles.version}>v0.1.0-alpha</div>
+            <div className={styles.copyright}>© 2023 OmniFlow Team</div>
           </div>
         </div>
-
-        <style jsx>{`
-          .settings-modal {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            padding: 1rem;
-            position: relative;
-          }
-          
-          .settings-section {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1rem;
-          }
-          
-          .settings-section:last-child {
-            border-bottom: none;
-          }
-          
-          .settings-section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-          }
-          
-          .settings-field {
-            display: flex;
-            align-items: center;
-          }
-          
-          .settings-field label {
-            flex: 1;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-          }
-          
-          .settings-field-control {
-            flex: 2;
-            display: flex;
-            align-items: center;
-          }
-          
-          .settings-field-control select {
-            padding: 0.5rem;
-            border-radius: 4px;
-            background-color: var(--input-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            width: 100%;
-          }
-          
-          .settings-field-control select:disabled,
-          .settings-field-control input:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-          }
-          
-          .settings-field-control input[type="checkbox"] {
-            margin-right: 0.5rem;
-          }
-          
-          .settings-field-control input[type="number"] {
-            padding: 0.5rem;
-            border-radius: 4px;
-            background-color: var(--input-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            width: 80px;
-          }
-          
-          .unit {
-            margin-left: 0.5rem;
-            color: var(--text-secondary);
-          }
-          
-          .checkbox-label {
-            font-size: 0.9rem;
-            color: var(--text-primary);
-          }
-          
-          .settings-section-about {
-            text-align: center;
-          }
-          
-          .about-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-          }
-          
-          .version {
-            color: var(--accent-color);
-          }
-          
-          .copyright {
-            font-size: 0.8rem;
-          }
-
-          .settings-loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            border-radius: 6px;
-          }
-          
-          .settings-loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--accent-color);
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 1rem;
-          }
-          
-          .settings-loading-text {
-            color: #fff;
-            font-size: 0.9rem;
-          }
-          
-          .settings-error-message {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            padding: 0.75rem 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-          }
-          
-          .settings-error-message svg {
-            margin-right: 0.5rem;
-            flex-shrink: 0;
-            width: 1.25rem;
-            height: 1.25rem;
-          }
-
-          .settings-reset-button {
-            justify-content: flex-end;
-            margin-top: 0.5rem;
-          }
-
-          .reset-button {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-          }
-
-          .reset-button:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
-          }
-
-          .reset-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-          }
-          
-          @keyframes spin {
-            to {
-              transform: rotate(360deg);
-            }
-          }
-        `}</style>
       </div>
     </Modal>
   );
