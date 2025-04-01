@@ -83,12 +83,26 @@ class NodeRegistry {
     const componentMap = getNodeComponentMap();
     
     // 遍历节点定义，为每个节点类型创建动态导入
-    Object.entries(componentMap).forEach(([nodeType, component]) => {
+    Object.entries(componentMap).forEach(([nodeType, componentPath]) => {
       // 标准化节点类型
       const normalizedType = this.normalizeNodeType(nodeType);
       
-      // 存储组件
-      this.nodeComponents[normalizedType] = component;
+      // 将路径字符串转换为动态导入的组件
+      if (typeof componentPath === 'string') {
+        console.log(`为节点 ${normalizedType} 创建动态导入，路径: ${componentPath}`);
+        
+        // 创建动态导入组件
+        this.nodeComponents[normalizedType] = dynamic(
+          () => import('../components/ReactFlowNodeRenderer').then(mod => {
+            console.log(`成功加载节点渲染器: ${normalizedType}`);
+            return mod.default;
+          }),
+          { ssr: false }
+        );
+      } else {
+        // 如果已经是组件，直接使用
+        this.nodeComponents[normalizedType] = componentPath;
+      }
       
       // 添加类型映射（小写 -> 标准类型）
       this.nodeTypeMap[normalizedType.toLowerCase()] = normalizedType;
@@ -103,14 +117,14 @@ class NodeRegistry {
   private registerCoreNodes(): void {
     // 设置常用节点的动态导入
     const coreNodeTypes: [string, string][] = [
-      ['TEXT_INPUT', './nodes/input/TextInputNode'],
-      ['WEB_SEARCH', './nodes/WebSearchNode'],
-      ['DOCUMENT_QUERY', './nodes/DocumentQueryNode'],
-      ['MODEL_SELECTOR', './nodes/ai/ModelSelectorNode'],
-      ['LLM_QUERY', './nodes/ai/LlmQueryNode'],
-      ['CUSTOM_NODE', './nodes/CustomNode'],
-      ['ENCODER', './nodes/EncoderNode'],
-      ['SAMPLER', './nodes/SamplerNode'],
+      ['TEXT_INPUT', '../components/nodes/input/TextInputNode'],
+      ['WEB_SEARCH', '../components/nodes/WebSearchNode'],
+      ['DOCUMENT_QUERY', '../components/nodes/DocumentQueryNode'],
+      ['MODEL_SELECTOR', '../components/nodes/ai/ModelSelectorNode'],
+      ['LLM_QUERY', '../components/nodes/ai/LlmQueryNode'],
+      ['CUSTOM_NODE', '../components/nodes/CustomNode'],
+      ['ENCODER', '../components/nodes/EncoderNode'],
+      ['SAMPLER', '../components/nodes/SamplerNode'],
     ];
     
     // 注册核心节点
@@ -119,9 +133,11 @@ class NodeRegistry {
 
       // 如果没有已经注册的组件，使用动态导入
       if (!this.nodeComponents[normalizedType]) {
-        // 使用 NodeWrapper 作为中间层，而不是直接导入可能包含 CSS 的组件
-        this.nodeComponents[normalizedType] = dynamic(() => import(`../components/NodeWrapper`).then(mod => {
-          // 这里默认导出 NodeWrapper，然后在运行时由 NodeWrapper 来加载真正的组件
+        console.log(`正在注册核心节点: ${normalizedType}`);
+        
+        // 使用统一的节点渲染器组件
+        this.nodeComponents[normalizedType] = dynamic(() => import('../components/ReactFlowNodeRenderer').then(mod => {
+          console.log(`成功加载节点组件: ${normalizedType}`);
           return mod.default;
         }), { 
           ssr: false 

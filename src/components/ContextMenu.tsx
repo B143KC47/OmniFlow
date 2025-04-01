@@ -32,11 +32,94 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
 
     initializeNodes();
   }, [t]);
+  
+  // 强制添加一些基本节点类型 - 移到顶层，避免条件渲染后使用 hooks
+  useEffect(() => {
+    if (!isLoading && nodeCategories.length === 0) {
+      console.log('未找到节点类别，添加默认节点类型');
+      // 如果节点发现服务未返回任何类别，添加一些基本节点
+      const basicNodes: NodeCategory[] = [
+        {
+          id: 'input',
+          name: t('categories.input'),
+          description: t('categories.inputDescription') || '输入节点',
+          nodes: [
+            { 
+              id: 'text_input', 
+              type: 'TEXT_INPUT', 
+              name: t('nodes.textInput.name'), 
+              description: t('nodes.textInput.description') || '文本输入节点', 
+              category: 'input',
+              inputs: 0,
+              outputs: 1,
+              icon: 'text'
+            }
+          ]
+        },
+        {
+          id: 'ai',
+          name: t('categories.ai'),
+          description: t('categories.aiDescription') || 'AI节点',
+          nodes: [
+            { 
+              id: 'model_selector', 
+              type: 'MODEL_SELECTOR', 
+              name: t('nodes.modelSelector.name'), 
+              description: t('nodes.modelSelector.description') || '模型选择器', 
+              category: 'ai',
+              inputs: 0,
+              outputs: 1,
+              icon: 'model'
+            },
+            { 
+              id: 'llm_query', 
+              type: 'LLM_QUERY', 
+              name: t('nodes.llmQuery.name'), 
+              description: t('nodes.llmQuery.description') || 'LLM查询', 
+              category: 'ai',
+              inputs: 2,
+              outputs: 1,
+              icon: 'brain'
+            }
+          ]
+        },
+        {
+          id: 'utility',
+          name: t('categories.utility'),
+          description: t('categories.utilityDescription') || '实用工具',
+          nodes: [
+            { 
+              id: 'web_search', 
+              type: 'WEB_SEARCH', 
+              name: t('nodes.webSearch.name'), 
+              description: t('nodes.webSearch.description') || '网络搜索', 
+              category: 'utility',
+              inputs: 1,
+              outputs: 1,
+              icon: 'search'
+            },
+            { 
+              id: 'custom_node', 
+              type: 'CUSTOM_NODE', 
+              name: t('nodes.custom.name'), 
+              description: t('nodes.custom.description') || '自定义节点', 
+              category: 'utility',
+              inputs: 1,
+              outputs: 1,
+              icon: 'code'
+            }
+          ]
+        }
+      ];
+      setNodeCategories(basicNodes);
+    }
+  }, [isLoading, nodeCategories, t]);
 
   // 添加节点处理函数
   const handleAddNode = (nodeType: string, { event }: any) => {
     // 使用鼠标位置作为节点的位置
     const position = { x: event.clientX, y: event.clientY };
+    console.log(`从右键菜单添加节点: ${nodeType}，位置: ${position.x}, ${position.y}`);
     onSelectNode(nodeType, position);
   };
 

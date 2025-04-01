@@ -78,15 +78,93 @@ const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
     return null; // 或者返回一个默认的占位节点
   }
 
+  // 处理节点输入输出的渲染
+  // 我们需要适应inputs可能是对象而不是数组的情况
+  const renderNodeInputs = () => {
+    // 如果inputs是数组，直接使用map
+    if (Array.isArray(node?.inputs)) {
+      return node.inputs.map(input => (
+        <div 
+          key={input.id} 
+          className={`${styles['node-port']} ${styles['node-input']}`}
+          onMouseUp={() => handlePortMouseUp(input.id, false)}
+        >
+          <div 
+            className={styles['port-connector']}
+            onMouseDown={(e) => handlePortMouseDown(input.id, false, e)}
+          />
+          <span>{input.label || 'Input'}</span>
+        </div>
+      ));
+    } 
+    // 如果inputs是对象，将其转换为数组再渲染
+    else if (node?.inputs && typeof node.inputs === 'object') {
+      return Object.entries(node.inputs).map(([key, input]) => (
+        <div 
+          key={key} 
+          className={`${styles['node-port']} ${styles['node-input']}`}
+          onMouseUp={() => handlePortMouseUp(key, false)}
+        >
+          <div 
+            className={styles['port-connector']}
+            onMouseDown={(e) => handlePortMouseDown(key, false, e)}
+          />
+          <span>{input.label || key}</span>
+        </div>
+      ));
+    }
+    
+    // 默认返回空数组
+    return [];
+  };
+
+  // 同样处理输出
+  const renderNodeOutputs = () => {
+    // 如果outputs是数组，直接使用map
+    if (Array.isArray(node?.outputs)) {
+      return node.outputs.map(output => (
+        <div 
+          key={output.id} 
+          className={`${styles['node-port']} ${styles['node-output']}`}
+          onMouseUp={() => handlePortMouseUp(output.id, true)}
+        >
+          <span>{output.label || 'Output'}</span>
+          <div 
+            className={styles['port-connector']}
+            onMouseDown={(e) => handlePortMouseDown(output.id, true, e)}
+          />
+        </div>
+      ));
+    } 
+    // 如果outputs是对象，将其转换为数组再渲染
+    else if (node?.outputs && typeof node.outputs === 'object') {
+      return Object.entries(node.outputs).map(([key, output]) => (
+        <div 
+          key={key} 
+          className={`${styles['node-port']} ${styles['node-output']}`}
+          onMouseUp={() => handlePortMouseUp(key, true)}
+        >
+          <span>{output.label || key}</span>
+          <div 
+            className={styles['port-connector']}
+            onMouseDown={(e) => handlePortMouseDown(key, true, e)}
+          />
+        </div>
+      ));
+    }
+    
+    // 默认返回空数组
+    return [];
+  };
+
   return (
-    <div
-      ref={nodeRef}
+    <div 
+      ref={nodeRef} 
       className={nodeClasses}
-      style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        cursor: isDragging ? 'grabbing' : 'grab',
-        zIndex: 100 // 确保节点始终在连接线上方
+      style={{ 
+        left: position.x, 
+        top: position.y,
+        zIndex: isDragging ? 1000 : 1
       }}
       onMouseDown={handleMouseDown}
     >
@@ -96,34 +174,10 @@ const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
       </div>
       <div className={styles['node-content']}>
         <div className={styles['node-inputs']}>
-          {node.inputs?.map(input => (
-            <div 
-              key={input.id} 
-              className={`${styles['node-port']} ${styles['node-input']}`}
-              onMouseUp={() => handlePortMouseUp(input.id, false)}
-            >
-              <div 
-                className={styles['port-connector']}
-                onMouseDown={(e) => handlePortMouseDown(input.id, false, e)}
-              />
-              <span>Input</span>
-            </div>
-          )) || []}
+          {renderNodeInputs()}
         </div>
         <div className={styles['node-outputs']}>
-          {node.outputs?.map(output => (
-            <div 
-              key={output.id} 
-              className={`${styles['node-port']} ${styles['node-output']}`}
-              onMouseUp={() => handlePortMouseUp(output.id, true)}
-            >
-              <span>Output</span>
-              <div 
-                className={styles['port-connector']}
-                onMouseDown={(e) => handlePortMouseDown(output.id, true, e)}
-              />
-            </div>
-          )) || []}
+          {renderNodeOutputs()}
         </div>
       </div>
     </div>

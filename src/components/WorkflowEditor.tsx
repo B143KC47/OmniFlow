@@ -63,6 +63,9 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
   const [nodeTypeMap, setNodeTypeMap] = useState<Record<string, string>>({});
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // 使用 useMemo 对 nodeTypes 进行记忆化，避免每次渲染创建新对象
+  const memoizedNodeTypes = useMemo(() => nodeTypes, [nodeTypes]);
+
   // 在客户端挂载后更新状态
   useEffect(() => {
     setIsClient(true);
@@ -245,9 +248,9 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     console.log(`标准化后的节点类型: ${nodeType}`);
     
     // 检查这个节点类型是否有对应的组件
-    if (!nodeTypes[nodeType]) {
+    if (!memoizedNodeTypes[nodeType]) {
       console.error(`未找到节点类型 "${nodeType}" 对应的组件`);
-      console.log(`已注册的节点类型映射: ${Object.keys(nodeTypes).join(', ')}`);
+      console.log(`已注册的节点类型映射: ${Object.keys(memoizedNodeTypes).join(', ')}`);
       console.log(`------节点创建失败------`);
       return;
     }
@@ -292,6 +295,34 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
       }
     }
 
+    // 为不同类型的节点创建默认输入输出
+    const inputs = {};
+    const outputs = {};
+    
+    // 根据节点类型设置不同的默认输入输出
+    switch (nodeType) {
+      case 'TEXT_INPUT':
+        inputs.text = { type: 'text', value: '' };
+        outputs.text = { type: 'text', value: '' };
+        break;
+      case 'WEB_SEARCH':
+        inputs.query = { type: 'text', value: '' };
+        outputs.results = { type: 'text', value: '' };
+        break;
+      case 'MODEL_SELECTOR':
+        inputs.model = { type: 'text', value: 'gpt-4' };
+        outputs.model = { type: 'text', value: 'gpt-4' };
+        break;
+      case 'LLM_QUERY':
+        inputs.prompt = { type: 'text', value: '' };
+        inputs.model = { type: 'text', value: '' };
+        outputs.response = { type: 'text', value: '' };
+        break;
+      default:
+        inputs.input = { type: 'any', value: null };
+        outputs.output = { type: 'any', value: null };
+    }
+
     // 创建新节点
     const newNode = {
       id: uuidv4(),
@@ -299,9 +330,21 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
       position,
       data: {
         label,
-        inputs: {},
-        outputs: {},
+        inputs,
+        outputs,
         onChange: (nodeId: string, data: any) => {
+          // 处理节点删除
+          if (data.deleted) {
+            console.log(`删除节点: ${nodeId}`);
+            setNodes(nds => nds.filter(node => node.id !== nodeId));
+            // 同时删除与该节点相关的边
+            setEdges(eds => eds.filter(edge => 
+              edge.source !== nodeId && edge.target !== nodeId
+            ));
+            return;
+          }
+          
+          // 处理正常的数据更新
           setNodes(nds => 
             nds.map(node => 
               node.id === nodeId 
@@ -321,7 +364,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     // 添加调试信息
     console.log('节点创建成功，节点数据:', newNode);
     console.log(`------节点创建完成------`);
-  }, [setNodes, t, nodeTypes, nodeRegistry]);
+  }, [setNodes, setEdges, t, memoizedNodeTypes, nodeRegistry]);
 
   // 显示MCP管理器
   const handleShowMcpManager = useCallback(() => {
@@ -491,7 +534,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
                   onNodesChange={onNodesChange}
                   onEdgesChange={onEdgesChange}
                   onConnect={onConnect}
-                  nodeTypes={nodeTypes}
+                  nodeTypes={memoizedNodeTypes}
                   fitView
                   className="comfy-flow"
                   minZoom={0.1}

@@ -58,6 +58,8 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
+  width: 16px;
+  height: 16px;
 }
 
 .categoryTabs {

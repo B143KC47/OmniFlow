@@ -136,7 +136,7 @@ const NodeLibrary: React.FC<NodeLibraryProps> = ({ onClose, onSelectNode }) => {
       case 'search':
         return (
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.75} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         );
       case 'document':
@@ -196,7 +196,7 @@ const NodeLibrary: React.FC<NodeLibraryProps> = ({ onClose, onSelectNode }) => {
     <div className={styles.nodeLibrary}>
       {/* 顶部栏 */}
       <div className={styles.header}>
-        <h2 className={styles.title}>{t('library.title')}</h2>
+        <h2 className={styles.title}>{t('library.node.title')}</h2>
         <button 
           onClick={onClose}
           className={styles.closeButton}
@@ -212,7 +212,7 @@ const NodeLibrary: React.FC<NodeLibraryProps> = ({ onClose, onSelectNode }) => {
         <div className={styles.searchContainer}>
           <input
             type="text"
-            placeholder={t('library.searchPlaceholder')}
+            placeholder={t('library.node.search')}
             value={searchTerm}
             onChange={handleSearch}
             className={styles.searchInput}
@@ -224,7 +224,7 @@ const NodeLibrary: React.FC<NodeLibraryProps> = ({ onClose, onSelectNode }) => {
             viewBox="0 0 24 24" 
             stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.75} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
       </div>
@@ -259,7 +259,7 @@ const NodeLibrary: React.FC<NodeLibraryProps> = ({ onClose, onSelectNode }) => {
             <svg xmlns="http://www.w3.org/2000/svg" className={styles.emptyStateIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p>{t('library.noResults')}</p>
+            <p>{t('library.node.notFound')}</p>
           </div>
         </div>
       ) : (

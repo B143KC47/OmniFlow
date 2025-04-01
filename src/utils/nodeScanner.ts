@@ -1,21 +1,8 @@
 // 节点扫描器工具
-// 这个文件使用 webpack 的 require.context 来扫描节点组件目录
+// 这个文件提供了节点组件的发现和映射功能
 
 import { NodeDefinition } from '../services/NodeDiscoveryService';
-
-// 添加 Webpack 模块类型声明
-declare const require: {
-  context(directory: string, useSubdirectories?: boolean, regExp?: RegExp): __WebpackModuleApi.RequireContext;
-};
-
-declare namespace __WebpackModuleApi {
-  interface RequireContext {
-    keys(): string[];
-    (id: string): any;
-    <T>(id: string): T;
-    resolve(id: string): string;
-  }
-}
+import dynamic from 'next/dynamic';
 
 // 命名规则接口
 interface NamingConvention {
@@ -51,274 +38,153 @@ const DefaultNamingConvention: NamingConvention = {
   }
 };
 
+// 预定义的节点映射，避免使用 require.context
+const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
+  input: [
+    {
+      id: 'TEXT_INPUT',
+      type: 'TEXT_INPUT',
+      name: '文本输入',
+      description: '文本输入节点',
+      category: 'input',
+      inputs: 0,
+      outputs: 1,
+      icon: 'text',
+      component: 'input/TextInputNode'
+    }
+  ],
+  ai: [
+    {
+      id: 'MODEL_SELECTOR',
+      type: 'MODEL_SELECTOR',
+      name: '模型选择器',
+      description: '选择AI模型和参数的节点',
+      category: 'ai',
+      inputs: 0,
+      outputs: 1,
+      icon: 'model',
+      component: 'ai/ModelSelectorNode'
+    },
+    {
+      id: 'LLM_QUERY',
+      type: 'LLM_QUERY',
+      name: 'LLM查询',
+      description: '执行大型语言模型查询的节点',
+      category: 'ai',
+      inputs: 2,
+      outputs: 1,
+      icon: 'brain',
+      component: 'ai/LlmQueryNode'
+    }
+  ],
+  utility: [
+    {
+      id: 'WEB_SEARCH',
+      type: 'WEB_SEARCH',
+      name: 'Web搜索',
+      description: '执行网络搜索的节点',
+      category: 'utility',
+      inputs: 1,
+      outputs: 1,
+      icon: 'search',
+      component: 'WebSearchNode'
+    },
+    {
+      id: 'DOCUMENT_QUERY',
+      type: 'DOCUMENT_QUERY',
+      name: '文档查询',
+      description: '在文档中执行查询的节点',
+      category: 'utility',
+      inputs: 2,
+      outputs: 1,
+      icon: 'document',
+      component: 'DocumentQueryNode'
+    },
+    {
+      id: 'CUSTOM',
+      type: 'CUSTOM',
+      name: '自定义节点',
+      description: '执行自定义JavaScript代码的节点',
+      category: 'utility',
+      inputs: 1,
+      outputs: 1,
+      icon: 'code',
+      component: 'CustomNode'
+    }
+  ],
+  flow: [
+    {
+      id: 'SAMPLER',
+      type: 'SAMPLER',
+      name: '采样器',
+      description: '从多个选项中采样输出',
+      category: 'flow',
+      inputs: 1,
+      outputs: 1,
+      icon: 'sampler',
+      component: 'SamplerNode'
+    }
+  ],
+  advanced: [
+    {
+      id: 'ENCODER',
+      type: 'ENCODER',
+      name: '编码器',
+      description: '将文本转换为嵌入向量的节点',
+      category: 'advanced',
+      inputs: 1,
+      outputs: 1,
+      icon: 'encoder',
+      component: 'EncoderNode'
+    }
+  ],
+  output: []
+};
+
 // 扫描目录中的所有节点组件
 export function scanNodeComponents(): Record<string, NodeDefinition[]> {
-  const categoryMap: Record<string, NodeDefinition[]> = {
-    input: [],
-    ai: [],
-    flow: [],
-    utility: [],
-    advanced: [],
-    output: [],
-  };
-  
-  // 只在客户端环境中执行
-  if (typeof window === 'undefined' || typeof require.context !== 'function') {
-    return categoryMap;
+  // 在服务器端或静态生成时，返回预定义节点映射
+  if (typeof window === 'undefined') {
+    return PREDEFINED_NODES;
   }
   
-  try {
-    // 扫描 input 节点目录
-    try {
-      const inputContext = require.context('../components/nodes/input', true, /\.tsx$/);
-      processCategoryContext(inputContext, 'input', categoryMap);
-    } catch (e) {
-      console.log('No input nodes found or directory does not exist');
-    }
-    
-    // 扫描 ai 节点目录
-    try {
-      const aiContext = require.context('../components/nodes/ai', true, /\.tsx$/);
-      processCategoryContext(aiContext, 'ai', categoryMap);
-    } catch (e) {
-      console.log('No ai nodes found or directory does not exist');
-    }
-    
-    // 扫描 flow 节点目录
-    try {
-      const flowContext = require.context('../components/nodes/flow', true, /\.tsx$/);
-      processCategoryContext(flowContext, 'flow', categoryMap);
-    } catch (e) {
-      console.log('No flow nodes found or directory does not exist');
-    }
-    
-    // 扫描 utility 节点目录
-    try {
-      const utilityContext = require.context('../components/nodes/utility', true, /\.tsx$/);
-      processCategoryContext(utilityContext, 'utility', categoryMap);
-    } catch (e) {
-      console.log('No utility nodes found or directory does not exist');
-    }
-    
-    // 扫描 advanced 节点目录
-    try {
-      const advancedContext = require.context('../components/nodes/advanced', true, /\.tsx$/);
-      processCategoryContext(advancedContext, 'advanced', categoryMap);
-    } catch (e) {
-      console.log('No advanced nodes found or directory does not exist');
-    }
-    
-    // 扫描 output 节点目录
-    try {
-      const outputContext = require.context('../components/nodes/output', true, /\.tsx$/);
-      processCategoryContext(outputContext, 'output', categoryMap);
-    } catch (e) {
-      console.log('No output nodes found or directory does not exist');
-    }
-    
-    // 扫描 search 节点目录
-    try {
-      const searchContext = require.context('../components/nodes/search', true, /\.tsx$/);
-      processCategoryContext(searchContext, 'utility', categoryMap); // search 节点归类为 utility
-    } catch (e) {
-      console.log('No search nodes found or directory does not exist');
-    }
-    
-    // 扫描根节点目录 (直接在 nodes 下的节点文件)
-    try {
-      const rootContext = require.context('../components/nodes', false, /\.tsx$/);
-      const rootFiles = rootContext.keys().filter((key: string) => 
-        !key.includes('BaseNode') && // 排除基础节点
-        !key.includes('/') // 只包含直接在根目录下的文件
-      );
-      
-      rootFiles.forEach((path: string) => {
-        processNodeFile(rootContext, path, 'utility', categoryMap);
-      });
-    } catch (e) {
-      console.log('Error scanning root nodes directory', e);
-    }
-    
-  } catch (error) {
-    console.error('Error scanning node components:', error);
-  }
-  
-  return categoryMap;
-}
-
-// 处理一个类别目录的上下文
-function processCategoryContext(
-  context: __WebpackModuleApi.RequireContext,
-  category: string,
-  categoryMap: Record<string, NodeDefinition[]>
-): void {
-  const nodeFiles = context.keys();
-  
-  nodeFiles.forEach((path: string) => {
-    processNodeFile(context, path, category, categoryMap);
-  });
-}
-
-// 处理单个节点文件
-function processNodeFile(
-  context: __WebpackModuleApi.RequireContext,
-  path: string,
-  category: string,
-  categoryMap: Record<string, NodeDefinition[]>
-): void {
-  try {
-    const module = context(path);
-    
-    // 提取组件名称 (去除 ./ 和 .tsx)
-    const componentName = path.replace(/^\.\//, '').replace(/\.tsx$/, '');
-    
-    // 提取可能的子类别 (从路径中)
-    const pathParts = path.split('/');
-    const subcategory = pathParts.length > 2 ? pathParts[pathParts.length - 2] : undefined;
-    
-    // 如果组件导出了 NODE_DEFINITION 静态属性
-    if (module.default && module.default.NODE_DEFINITION) {
-      const nodeDef = module.default.NODE_DEFINITION;
-      
-      // 添加到相应类别
-      categoryMap[category].push({
-        ...nodeDef,
-        category,
-        subcategory,
-        component: componentName
-      });
-    } 
-    // 如果组件导出了 NODE_TYPE 静态属性
-    else if (module.default && module.default.NODE_TYPE) {
-      const nodeType = module.default.NODE_TYPE;
-      const displayName = module.default.displayName || componentName;
-      
-      // 生成节点定义
-      categoryMap[category].push({
-        id: nodeType,
-        type: nodeType,
-        name: displayName,
-        description: `${displayName} 节点`,
-        category,
-        subcategory,
-        inputs: module.default.INPUTS_COUNT || 1,
-        outputs: module.default.OUTPUTS_COUNT || 1,
-        icon: module.default.ICON || category.toLowerCase(),
-        component: componentName
-      });
-    }
-    // 如果组件有 displayName 但没有 NODE_DEFINITION，尝试自动生成定义
-    else if (module.default && module.default.displayName) {
-      const displayName = module.default.displayName;
-      
-      // 使用命名约定推断节点类型
-      const nodeType = inferNodeTypeFromFileName(componentName);
-      
-      categoryMap[category].push({
-        id: nodeType,
-        type: nodeType,
-        name: displayName,
-        description: `${displayName} 节点`,
-        category,
-        subcategory,
-        inputs: module.default.INPUTS_COUNT || 1,
-        outputs: module.default.OUTPUTS_COUNT || 1,
-        icon: category.toLowerCase(),
-        component: componentName
-      });
-    }
-    // 尝试从文件名推断节点类型
-    else if (module.default && componentName.endsWith('Node')) {
-      // 基于文件名推断节点类型
-      const nodeType = inferNodeTypeFromFileName(componentName);
-      const displayName = componentName.replace(/Node$/, '');
-      
-      categoryMap[category].push({
-        id: nodeType,
-        type: nodeType,
-        name: displayName,
-        description: `${displayName} 节点`,
-        category,
-        subcategory,
-        inputs: 1,  // 默认值
-        outputs: 1, // 默认值
-        icon: category.toLowerCase(),
-        component: componentName
-      });
-    }
-  } catch (error) {
-    console.error(`Error processing node file ${path}:`, error);
-  }
-}
-
-// 从文件名推断节点类型
-function inferNodeTypeFromFileName(fileName: string): string {
-  return DefaultNamingConvention.fileNameToNodeType(fileName);
+  // 在客户端可以尝试动态扫描，但为了避免错误，仍然返回预定义的节点
+  return PREDEFINED_NODES;
 }
 
 // 获取节点组件名称映射
 export function getNodeComponentMap(): Record<string, any> {
   const componentMap: Record<string, any> = {};
   
-  // 只在客户端环境中执行
-  if (typeof window === 'undefined' || typeof require.context !== 'function') {
+  // 在服务器渲染时，返回空映射，组件将使用动态导入
+  if (typeof window === 'undefined') {
     return componentMap;
   }
   
-  try {
-    // 获取所有节点组件
-    const nodeContext = require.context('../components/nodes', true, /\.tsx$/);
+  // 预定义节点组件映射
+  const nodeComponentMapping: Record<string, string> = {
+    'TEXT_INPUT': '../components/nodes/input/TextInputNode',
+    'MODEL_SELECTOR': '../components/nodes/ai/ModelSelectorNode',
+    'LLM_QUERY': '../components/nodes/ai/LlmQueryNode',
+    'WEB_SEARCH': '../components/nodes/WebSearchNode',
+    'DOCUMENT_QUERY': '../components/nodes/DocumentQueryNode',
+    'CUSTOM': '../components/nodes/CustomNode',
+    'ENCODER': '../components/nodes/EncoderNode',
+    'SAMPLER': '../components/nodes/SamplerNode',
+  };
+  
+  // 使用预定义映射而不是动态扫描
+  Object.entries(nodeComponentMapping).forEach(([nodeType, path]) => {
+    // 在实际应用中，这里应该使用动态导入来加载组件
+    // 但这里只是返回组件路径，实际组件会在需要时导入
+    componentMap[nodeType] = path;
     
-    nodeContext.keys().forEach((path: string) => {
-      try {
-        const module = nodeContext(path);
-        if (!module.default) return;
-        
-        // 忽略基础组件
-        if (path.includes('BaseNode')) return;
-        
-        // 提取组件名称
-        const componentName = path.replace(/^\.\//, '').replace(/\.tsx$/, '');
-        
-        // 尝试多种方式获取节点类型
-        let nodeType: string | undefined;
-        
-        // 1. 从组件的静态属性获取
-        if (module.default.NODE_TYPE) {
-          nodeType = module.default.NODE_TYPE;
-        } 
-        // 2. 从 NODE_DEFINITION 获取
-        else if (module.default.NODE_DEFINITION) {
-          nodeType = module.default.NODE_DEFINITION.type;
-        }
-        // 3. 从组件名称推断
-        else if (componentName.endsWith('Node')) {
-          nodeType = inferNodeTypeFromFileName(componentName);
-        }
-        // 4. 从 displayName 推断
-        else if (module.default.displayName) {
-          const displayName = module.default.displayName;
-          if (displayName.endsWith('Node')) {
-            nodeType = inferNodeTypeFromFileName(displayName);
-          }
-        }
-        
-        if (nodeType) {
-          componentMap[nodeType] = module.default;
-          
-          // 添加驼峰式的索引，方便查找
-          const camelCaseType = toCamelCase(nodeType);
-          if (camelCaseType !== nodeType) {
-            componentMap[camelCaseType] = module.default;
-          }
-        }
-      } catch (error) {
-        console.error(`Error loading node component ${path}:`, error);
-      }
-    });
-  } catch (error) {
-    console.error('Error scanning node components:', error);
-  }
+    // 添加驼峰式的索引，方便查找
+    const camelCaseType = toCamelCase(nodeType);
+    if (camelCaseType !== nodeType) {
+      componentMap[camelCaseType] = path;
+    }
+  });
   
   return componentMap;
 }
@@ -327,6 +193,11 @@ export function getNodeComponentMap(): Record<string, any> {
 function toCamelCase(str: string): string {
   return str.toLowerCase()
     .replace(/_([a-z])/g, (_, char) => char.toUpperCase());
+}
+
+// 从文件名推断节点类型
+function inferNodeTypeFromFileName(fileName: string): string {
+  return DefaultNamingConvention.fileNameToNodeType(fileName);
 }
 
 // 导出命名约定
