@@ -239,33 +239,57 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
 
     // 使用节点注册表解析标准节点类型
     const nodeType = nodeRegistry.resolveNodeType(type);
+    const actualType = nodeType || type; // 如果解析失败，直接使用原始类型
     
-    if (!nodeType) {
-      console.error(`未能解析节点类型: ${type}`);
-      return;
-    }
-
-    console.log(`标准化后的节点类型: ${nodeType}`);
+    console.log(`节点类型处理结果: ${actualType} (原始类型: ${type})`);
     
     // 检查这个节点类型是否有对应的组件
-    if (!memoizedNodeTypes[nodeType]) {
-      console.error(`未找到节点类型 "${nodeType}" 对应的组件`);
+    if (!memoizedNodeTypes[actualType]) {
+      console.error(`未找到节点类型 "${actualType}" 对应的组件，尝试使用通用节点`);
       console.log(`已注册的节点类型映射: ${Object.keys(memoizedNodeTypes).join(', ')}`);
-      console.log(`------节点创建失败------`);
-      return;
+      
+      // 如果是已知类型但未找到对应组件，可能是因为命名不一致，尝试处理常见的大小写差异
+      let resolvedType = actualType;
+      
+      // 尝试处理可能的大小写差异
+      if (memoizedNodeTypes[actualType.toLowerCase()]) {
+        resolvedType = actualType.toLowerCase();
+        console.log(`找到了小写匹配: ${resolvedType}`);
+      } else if (memoizedNodeTypes[actualType.toUpperCase()]) {
+        resolvedType = actualType.toUpperCase();
+        console.log(`找到了大写匹配: ${resolvedType}`);
+      } 
+      // 尝试处理可能的下划线和驼峰命名差异
+      else if (actualType.includes('_')) {
+        const camelCase = actualType.toLowerCase().replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+        if (memoizedNodeTypes[camelCase]) {
+          resolvedType = camelCase;
+          console.log(`找到了驼峰命名匹配: ${resolvedType}`);
+        }
+      } else {
+        // 转换成下划线形式尝试
+        const underscored = actualType.replace(/([A-Z])/g, '_$1').toUpperCase();
+        if (memoizedNodeTypes[underscored]) {
+          resolvedType = underscored;
+          console.log(`找到了下划线命名匹配: ${resolvedType}`);
+        }
+      }
+      
+      // 更新实际使用的类型
+      actualType = resolvedType;
     }
 
     // 根据节点类型设置不同的标签
     let label;
     // 从 NodeDiscoveryService 获取节点定义
-    const nodeDef = NodeDiscoveryService.getInstance().getNodeDefinitionByType(nodeType);
+    const nodeDef = NodeDiscoveryService.getInstance().getNodeDefinitionByType(actualType);
     
     if (nodeDef) {
       // 如果有节点定义，使用其名称
       label = nodeDef.name;
     } else {
       // 否则根据节点类型生成标签
-      switch (nodeType) {
+      switch (actualType) {
         case 'TEXT_INPUT':
           label = t('nodes.textInput.name');
           break;
@@ -282,51 +306,122 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
           label = t('nodes.custom.name');
           break;
         case 'ENCODER': 
-          label = t('nodes.encoder.name');
+          label = t('nodes.encoder.name') || '文本编码器';
           break;
         case 'SAMPLER': 
-          label = t('nodes.sampler.name');
+          label = t('nodes.sampler.name') || '数据采样器';
           break;
         case 'LLM_QUERY':
           label = t('nodes.llmQuery.name');
           break;
+        case 'IMAGE_INPUT':
+          label = t('nodes.imageInput.name') || '图像输入';
+          break;
+        case 'FILE_INPUT':
+          label = t('nodes.fileInput.name') || '文件输入';
+          break;
+        case 'TEXT_OUTPUT':
+          label = t('nodes.textOutput.name') || '文本输出';
+          break;
+        case 'IMAGE_OUTPUT':
+          label = t('nodes.imageOutput.name') || '图像输出';
+          break;
+        case 'FILE_OUTPUT':
+          label = t('nodes.fileOutput.name') || '文件输出';
+          break;
+        case 'LOOP_CONTROL':
+          label = t('nodes.loopControl.name') || '循环控制';
+          break;
         default:
-          label = `节点-${nodeType}`;
+          label = `节点-${actualType}`;
       }
     }
 
     // 为不同类型的节点创建默认输入输出
-    const inputs = {};
-    const outputs = {};
+    const inputs: Record<string, any> = {};
+    const outputs: Record<string, any> = {};
     
     // 根据节点类型设置不同的默认输入输出
-    switch (nodeType) {
+    switch (actualType) {
       case 'TEXT_INPUT':
-        inputs.text = { type: 'text', value: '' };
+        inputs.text = { type: 'text', value: '', label: t('nodes.textInput.placeholder') };
         outputs.text = { type: 'text', value: '' };
         break;
       case 'WEB_SEARCH':
-        inputs.query = { type: 'text', value: '' };
+        inputs.query = { type: 'text', value: '', label: t('nodes.webSearch.queryLabel') };
+        outputs.results = { type: 'text', value: '' };
+        break;
+      case 'DOCUMENT_QUERY':
+        inputs.query = { type: 'text', value: '', label: t('nodes.documentQuery.queryLabel') };
+        inputs.fileSource = { type: 'text', value: '', label: t('nodes.documentQuery.fileSource') };
+        inputs.maxResults = { type: 'number', value: 5, label: t('nodes.documentQuery.maxResults') };
         outputs.results = { type: 'text', value: '' };
         break;
       case 'MODEL_SELECTOR':
-        inputs.model = { type: 'text', value: 'gpt-4' };
+        inputs.model = { type: 'text', value: 'gpt-4', label: t('nodes.modelSelector.modelName') };
         outputs.model = { type: 'text', value: 'gpt-4' };
         break;
       case 'LLM_QUERY':
-        inputs.prompt = { type: 'text', value: '' };
-        inputs.model = { type: 'text', value: '' };
+        inputs.prompt = { type: 'text', value: '', label: t('nodes.llmQuery.promptLabel') };
+        inputs.model = { type: 'text', value: '', label: t('nodes.llmQuery.modelLabel') };
         outputs.response = { type: 'text', value: '' };
         break;
+      case 'IMAGE_INPUT':
+        inputs.image = { type: 'image', value: null, label: t('nodes.imageInput.upload') || '上传图像' };
+        outputs.image = { type: 'image', value: null };
+        break;
+      case 'FILE_INPUT':
+        inputs.file = { type: 'file', value: null, label: t('nodes.fileInput.upload') || '上传文件' };
+        outputs.fileContent = { type: 'object', value: null };
+        outputs.fileName = { type: 'text', value: '' };
+        outputs.fileType = { type: 'text', value: '' };
+        break;
+      case 'TEXT_OUTPUT':
+        inputs.text = { type: 'text', value: '', label: t('nodes.textOutput.input') || '文本输入' };
+        // 通常输出节点不需要输出端口
+        break;
+      case 'IMAGE_OUTPUT':
+        inputs.image = { type: 'image', value: null, label: t('nodes.imageOutput.input') || '图像输入' };
+        // 通常输出节点不需要输出端口
+        break;
+      case 'FILE_OUTPUT':
+        inputs.file = { type: 'file', value: null, label: t('nodes.fileOutput.input') || '文件输入' };
+        // 通常输出节点不需要输出端口
+        break;
+      case 'ENCODER':
+        inputs.text = { type: 'text', value: '', label: t('nodes.encoder.input') || '文本输入' };
+        inputs.model = { type: 'text', value: 'text-embedding-ada-002', label: t('nodes.encoder.model') || '编码模型' };
+        inputs.dimensions = { type: 'number', value: 1536, label: t('nodes.encoder.dimensions') || '维度' };
+        outputs.embedding = { type: 'object', value: null };
+        break;
+      case 'SAMPLER':
+        inputs.data = { type: 'any', value: null, label: t('nodes.sampler.input') || '数据输入' };
+        inputs.sampleSize = { type: 'number', value: 10, label: t('nodes.sampler.sampleSize') || '样本大小' };
+        inputs.randomSeed = { type: 'number', value: 42, label: t('nodes.sampler.randomSeed') || '随机种子' };
+        outputs.result = { type: 'any', value: null };
+        break;
+      case 'LOOP_CONTROL':
+        inputs.input = { type: 'any', value: null, label: t('nodes.loopControl.input') || '循环输入' };
+        inputs.iterations = { type: 'number', value: 5, label: t('nodes.loopControl.iterations') || '迭代次数' };
+        inputs.condition = { type: 'text', value: '', label: t('nodes.loopControl.condition') || '循环条件' };
+        outputs.result = { type: 'any', value: null };
+        outputs.iteration = { type: 'number', value: 0 };
+        outputs.completed = { type: 'boolean', value: false };
+        break;
+      case 'CUSTOM_NODE':
+        inputs.code = { type: 'textarea', value: '', label: t('nodes.custom.codeLabel') || '节点代码' };
+        inputs.config = { type: 'textarea', value: '{}', label: t('nodes.custom.config') || '配置' };
+        outputs.result = { type: 'any', value: null };
+        break;
       default:
-        inputs.input = { type: 'any', value: null };
+        inputs.input = { type: 'any', value: null, label: t('nodes.common.input') };
         outputs.output = { type: 'any', value: null };
     }
 
     // 创建新节点
     const newNode = {
       id: uuidv4(),
-      type: nodeType,
+      type: actualType,
       position,
       data: {
         label,
@@ -365,6 +460,67 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     console.log('节点创建成功，节点数据:', newNode);
     console.log(`------节点创建完成------`);
   }, [setNodes, setEdges, t, memoizedNodeTypes, nodeRegistry]);
+
+  // 开发环境中的节点测试函数 - 用于确保所有节点都能正确创建
+  const testNodeCreation = useCallback(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('===== 开始测试节点创建 =====');
+      
+      // 要测试的节点类型列表
+      const testNodeTypes = [
+        'TEXT_INPUT',
+        'IMAGE_INPUT',
+        'FILE_INPUT',
+        'MODEL_SELECTOR',
+        'LLM_QUERY',
+        'ENCODER',
+        'WEB_SEARCH',
+        'CUSTOM_NODE',
+        'SAMPLER',
+        'TEXT_OUTPUT',
+        'IMAGE_OUTPUT',
+        'FILE_OUTPUT',
+        'LOOP_CONTROL',
+        'DOCUMENT_QUERY'
+      ];
+      
+      // 测试位置
+      let startX = 50;
+      let startY = 100;
+      
+      // 尝试创建每种类型的节点
+      testNodeTypes.forEach((type, index) => {
+        console.log(`尝试创建节点: ${type}`);
+        
+        // 为每个节点创建错开的位置
+        const position = { 
+          x: startX + (index % 3) * 300, 
+          y: startY + Math.floor(index / 3) * 200 
+        };
+        
+        // 调用节点创建函数
+        addNode(type, position);
+      });
+      
+      console.log('===== 节点创建测试完成 =====');
+    }
+  }, [addNode]);
+
+  // 在开发环境中添加测试按钮
+  const renderTestButton = () => {
+    if (process.env.NODE_ENV === 'development') {
+      return (
+        <button
+          onClick={testNodeCreation}
+          className="comfy-button comfy-button-secondary"
+          style={{ position: 'absolute', bottom: '16px', left: '16px', zIndex: 1000 }}
+        >
+          测试所有节点创建
+        </button>
+      );
+    }
+    return null;
+  };
 
   // 显示MCP管理器
   const handleShowMcpManager = useCallback(() => {
@@ -555,6 +711,8 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
                   <McpManager onClose={() => setShowMcpManager(false)} />
                 </div>
               )}
+
+              {renderTestButton()}
             </div>
           </div>
 
