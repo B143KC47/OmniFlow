@@ -277,64 +277,30 @@ class NodeDiscoveryService {
     // 创建分类数组
     const categories: NodeCategory[] = [];
     
-    // 添加输入类别
-    if (categoryMap.has('input')) {
-      categories.push({
-        id: 'input',
-        name: t('categories.input'),
-        description: t('categories.inputDescription'),
-        nodes: categoryMap.get('input') || []
-      });
-    }
+    // 处理所有分类，包括新添加的分类
+    const allCategories = [
+      { id: 'input', name: t('categories.input'), description: t('categories.inputDescription') },
+      { id: 'AI_Task_Execution', name: t('categories.aiTaskExecution') || 'AI任务执行', description: t('categories.aiTaskExecutionDescription') || 'AI和机器学习相关的任务执行节点' },
+      { id: 'Data_Manipulation_Utilities', name: t('categories.dataManipulation') || '数据操作工具', description: t('categories.dataManipulationDescription') || '数据处理、转换和操作工具' },
+      { id: 'Flow_Control_Logic', name: t('categories.flowControl') || '流程控制逻辑', description: t('categories.flowControlDescription') || '控制工作流执行逻辑的节点' },
+      { id: 'Monitoring_Debugging', name: t('categories.monitoring') || '监控与调试', description: t('categories.monitoringDescription') || '工作流监控和调试工具' },
+      { id: 'output', name: t('categories.output'), description: t('categories.outputDescription') },
+      { id: 'User_Interaction_Control', name: t('categories.userInteraction') || '用户交互控制', description: t('categories.userInteractionDescription') || '处理用户交互的节点' },
+      { id: 'utility', name: t('categories.utility'), description: t('categories.utilityDescription') },
+      { id: 'flow', name: t('categories.flow'), description: t('categories.flowDescription') },
+      { id: 'advanced', name: t('categories.advanced'), description: t('categories.advancedDescription') }
+    ];
     
-    // 添加AI类别
-    if (categoryMap.has('ai')) {
-      categories.push({
-        id: 'ai',
-        name: t('categories.ai'),
-        description: t('categories.aiDescription'),
-        nodes: categoryMap.get('ai') || []
-      });
-    }
-    
-    // 添加实用工具类别
-    if (categoryMap.has('utility')) {
-      categories.push({
-        id: 'utility',
-        name: t('categories.utility'),
-        description: t('categories.utilityDescription'),
-        nodes: categoryMap.get('utility') || []
-      });
-    }
-    
-    // 添加流程控制类别
-    if (categoryMap.has('flow')) {
-      categories.push({
-        id: 'flow',
-        name: t('categories.flow'),
-        description: t('categories.flowDescription'),
-        nodes: categoryMap.get('flow') || []
-      });
-    }
-    
-    // 添加高级类别
-    if (categoryMap.has('advanced')) {
-      categories.push({
-        id: 'advanced',
-        name: t('categories.advanced'),
-        description: t('categories.advancedDescription'),
-        nodes: categoryMap.get('advanced') || []
-      });
-    }
-    
-    // 添加输出类别
-    if (categoryMap.has('output')) {
-      categories.push({
-        id: 'output',
-        name: t('categories.output'),
-        description: t('categories.outputDescription'),
-        nodes: categoryMap.get('output') || []
-      });
+    // 添加所有存在节点的分类
+    for (const categoryInfo of allCategories) {
+      if (categoryMap.has(categoryInfo.id)) {
+        categories.push({
+          id: categoryInfo.id,
+          name: categoryInfo.name,
+          description: categoryInfo.description,
+          nodes: categoryMap.get(categoryInfo.id) || []
+        });
+      }
     }
     
     this.nodeCategories = categories;

@@ -2,6 +2,7 @@ import { NodeType } from '../types';
 import { getNodeComponentMap, scanNodeComponents } from '../utils/nodeScanner';
 import { NodeDefinition } from './NodeDiscoveryService';
 import dynamic from 'next/dynamic';
+import React from 'react';
 
 /**
  * 节点注册表类 - 负责管理节点类型和组件之间的映射关系
@@ -79,36 +80,89 @@ class NodeRegistry {
    * 扫描所有节点组件并构建映射
    */
   private scanNodeComponents(): Record<string, any> {
-    // 获取所有节点组件
-    const componentMap = getNodeComponentMap();
-    
-    // 遍历节点定义，为每个节点类型创建动态导入
-    Object.entries(componentMap).forEach(([nodeType, componentPath]) => {
-      // 标准化节点类型
-      const normalizedType = this.normalizeNodeType(nodeType);
+    try {
+      // 获取所有节点组件
+      const componentMap = getNodeComponentMap();
+      console.log('获取节点组件映射完成');
       
-      // 将路径字符串转换为动态导入的组件
-      if (typeof componentPath === 'string') {
-        console.log(`为节点 ${normalizedType} 创建动态导入，路径: ${componentPath}`);
-        
-        // 创建动态导入组件
-        this.nodeComponents[normalizedType] = dynamic(
-          () => import('../components/ReactFlowNodeRenderer').then(mod => {
-            console.log(`成功加载节点渲染器: ${normalizedType}`);
-            return mod.default;
-          }),
-          { ssr: false }
-        );
-      } else {
-        // 如果已经是组件，直接使用
-        this.nodeComponents[normalizedType] = componentPath;
-      }
+      // 遍历节点定义，为每个节点类型创建动态导入
+      Object.entries(componentMap).forEach(([nodeType, componentPath]) => {
+        try {
+          // 标准化节点类型
+          const normalizedType = this.normalizeNodeType(nodeType);
+          
+          // 将路径字符串转换为动态导入的组件
+          if (typeof componentPath === 'string') {
+            console.log(`为节点 ${normalizedType} 创建动态导入，路径: ${componentPath}`);
+            
+            // 创建动态导入组件，使用通用渲染器
+            this.nodeComponents[normalizedType] = dynamic(
+              () => import('../components/ReactFlowNodeRenderer')
+                .then(mod => {
+                  console.log(`成功加载节点渲染器: ${normalizedType}`);
+                  return mod.default;
+                })
+                .catch(err => {
+                  console.error(`加载节点渲染器失败 ${normalizedType}:`, err);
+                  // 返回一个基本的占位组件，但不使用JSX语法
+                  return function PlaceholderComponent() {
+                    // 使用React.createElement代替JSX
+                    return React.createElement('div', {
+                      style: { 
+                        padding: '10px', 
+                        background: '#141414', 
+                        border: '1px solid #333',
+                        borderRadius: '5px',
+                        color: '#fff',
+                        width: '120px',
+                        height: '60px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }
+                    }, normalizedType);
+                  };
+                }),
+              { 
+                ssr: false,
+                loading: function LoadingComponent() {
+                  return React.createElement('div', {
+                    style: { 
+                      padding: '10px', 
+                      background: '#141414', 
+                      border: '1px dashed #333',
+                      borderRadius: '5px',
+                      color: '#555',
+                      width: '120px',
+                      height: '60px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px'
+                    }
+                  }, '加载中...');
+                }
+              }
+            );
+          } else {
+            // 如果已经是组件，直接使用
+            this.nodeComponents[normalizedType] = componentPath;
+          }
+          
+          // 添加类型映射（小写 -> 标准类型）
+          this.nodeTypeMap[normalizedType.toLowerCase()] = normalizedType;
+        } catch (itemError) {
+          console.error(`处理节点 ${nodeType} 时出错:`, itemError);
+          this.errors.push(`处理节点 ${nodeType} 时出错: ${itemError instanceof Error ? itemError.message : String(itemError)}`);
+        }
+      });
       
-      // 添加类型映射（小写 -> 标准类型）
-      this.nodeTypeMap[normalizedType.toLowerCase()] = normalizedType;
-    });
-    
-    return componentMap;
+      return componentMap;
+    } catch (error) {
+      console.error('扫描节点组件失败:', error);
+      this.errors.push(`扫描节点组件失败: ${error instanceof Error ? error.message : String(error)}`);
+      return {};
+    }
   }
 
   /**
@@ -266,6 +320,44 @@ class NodeRegistry {
    */
   public getErrors(): string[] {
     return this.errors;
+  }
+
+  /**
+   * 确保基本组件可用，即使在初始化失败的情况下
+   */
+  private ensureBasicComponents(): void {
+    // 确保至少有一个默认组件可用
+    if (Object.keys(this.nodeComponents).length === 0) {
+      console.log('添加默认组件作为应急措施');
+      
+      // 添加一个默认组件
+      try {
+        // 直接使用一个简单的占位组件，避免动态导入可能引起的问题
+        this.nodeComponents['DEFAULT_NODE'] = function DefaultNode() {
+          return React.createElement('div', {
+            style: { 
+              padding: '10px', 
+              background: '#141414', 
+              border: '1px solid #333',
+              borderRadius: '5px',
+              color: '#fff',
+              width: '120px',
+              height: '60px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px'
+            }
+          }, '默认节点');
+        };
+        
+        // 添加类型映射
+        this.nodeTypeMap['default_node'] = 'DEFAULT_NODE';
+        console.log('成功添加默认占位节点组件');
+      } catch (error) {
+        console.error('添加默认组件失败:', error);
+      }
+    }
   }
 }
 

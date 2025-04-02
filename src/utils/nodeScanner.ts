@@ -40,6 +40,7 @@ const DefaultNamingConvention: NamingConvention = {
 
 // 预定义的节点映射，避免使用 require.context
 const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
+  // 基本输入节点
   input: [
     {
       id: 'TEXT_INPUT',
@@ -51,15 +52,28 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       outputs: 1,
       icon: 'text',
       component: 'input/TextInputNode'
+    },
+    {
+      id: 'FILE_INPUT',
+      type: 'FILE_INPUT',
+      name: '文件输入',
+      description: '文件上传和处理节点',
+      category: 'input',
+      inputs: 0,
+      outputs: 1,
+      icon: 'file',
+      component: 'input/FileInputNode'
     }
   ],
-  ai: [
+  
+  // AI任务执行节点
+  AI_Task_Execution: [
     {
       id: 'MODEL_SELECTOR',
       type: 'MODEL_SELECTOR',
       name: '模型选择器',
       description: '选择AI模型和参数的节点',
-      category: 'ai',
+      category: 'AI_Task_Execution',
       inputs: 0,
       outputs: 1,
       icon: 'model',
@@ -70,75 +84,176 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       type: 'LLM_QUERY',
       name: 'LLM查询',
       description: '执行大型语言模型查询的节点',
-      category: 'ai',
+      category: 'AI_Task_Execution',
       inputs: 2,
       outputs: 1,
       icon: 'brain',
       component: 'ai/LlmQueryNode'
+    },
+    {
+      id: 'IMAGE_GENERATION',
+      type: 'IMAGE_GENERATION',
+      name: '图像生成',
+      description: '使用AI生成图像的节点',
+      category: 'AI_Task_Execution',
+      inputs: 1,
+      outputs: 1,
+      icon: 'image',
+      component: 'ai/ImageGenerationNode'
     }
   ],
-  utility: [
+  
+  // 数据操作工具节点
+  Data_Manipulation_Utilities: [
     {
       id: 'WEB_SEARCH',
       type: 'WEB_SEARCH',
       name: 'Web搜索',
       description: '执行网络搜索的节点',
-      category: 'utility',
+      category: 'Data_Manipulation_Utilities',
       inputs: 1,
       outputs: 1,
       icon: 'search',
-      component: 'WebSearchNode'
+      component: 'data/WebSearchNode'
     },
     {
       id: 'DOCUMENT_QUERY',
       type: 'DOCUMENT_QUERY',
       name: '文档查询',
       description: '在文档中执行查询的节点',
-      category: 'utility',
+      category: 'Data_Manipulation_Utilities',
       inputs: 2,
       outputs: 1,
       icon: 'document',
-      component: 'DocumentQueryNode'
+      component: 'data/DocumentQueryNode'
     },
     {
-      id: 'CUSTOM',
-      type: 'CUSTOM',
-      name: '自定义节点',
-      description: '执行自定义JavaScript代码的节点',
-      category: 'utility',
+      id: 'DATA_TRANSFORM',
+      type: 'DATA_TRANSFORM',
+      name: '数据转换',
+      description: '转换数据格式和结构的节点',
+      category: 'Data_Manipulation_Utilities',
       inputs: 1,
       outputs: 1,
-      icon: 'code',
-      component: 'CustomNode'
+      icon: 'transform',
+      component: 'data/DataTransformNode'
     }
   ],
-  flow: [
+  
+  // 流程控制逻辑节点
+  Flow_Control_Logic: [
+    {
+      id: 'CONDITION',
+      type: 'CONDITION',
+      name: '条件判断',
+      description: '基于条件选择执行路径的节点',
+      category: 'Flow_Control_Logic',
+      inputs: 1,
+      outputs: 2,
+      icon: 'condition',
+      component: 'flow/ConditionNode'
+    },
+    {
+      id: 'LOOP',
+      type: 'LOOP',
+      name: '循环控制',
+      description: '实现循环执行逻辑的节点',
+      category: 'Flow_Control_Logic',
+      inputs: 2,
+      outputs: 1,
+      icon: 'loop',
+      component: 'flow/LoopNode'
+    },
     {
       id: 'SAMPLER',
       type: 'SAMPLER',
       name: '采样器',
       description: '从多个选项中采样输出',
-      category: 'flow',
+      category: 'Flow_Control_Logic',
       inputs: 1,
       outputs: 1,
       icon: 'sampler',
-      component: 'SamplerNode'
+      component: 'flow/SamplerNode'
     }
   ],
-  advanced: [
+  
+  // 监控与调试节点
+  Monitoring_Debugging: [
     {
-      id: 'ENCODER',
-      type: 'ENCODER',
-      name: '编码器',
-      description: '将文本转换为嵌入向量的节点',
-      category: 'advanced',
+      id: 'LOGGER',
+      type: 'LOGGER',
+      name: '日志记录',
+      description: '记录节点执行过程和结果的节点',
+      category: 'Monitoring_Debugging',
       inputs: 1,
       outputs: 1,
-      icon: 'encoder',
-      component: 'EncoderNode'
+      icon: 'log',
+      component: 'debug/LoggerNode'
+    },
+    {
+      id: 'VISUALIZER',
+      type: 'VISUALIZER',
+      name: '数据可视化',
+      description: '将数据以可视化方式展示的节点',
+      category: 'Monitoring_Debugging',
+      inputs: 1,
+      outputs: 0,
+      icon: 'chart',
+      component: 'debug/VisualizerNode'
     }
   ],
-  output: []
+  
+  // 输出节点
+  output: [
+    {
+      id: 'TEXT_OUTPUT',
+      type: 'TEXT_OUTPUT',
+      name: '文本输出',
+      description: '输出文本结果的节点',
+      category: 'output',
+      inputs: 1,
+      outputs: 0,
+      icon: 'text-out',
+      component: 'output/TextOutputNode'
+    },
+    {
+      id: 'FILE_OUTPUT',
+      type: 'FILE_OUTPUT',
+      name: '文件输出',
+      description: '将结果保存为文件的节点',
+      category: 'output',
+      inputs: 1,
+      outputs: 0,
+      icon: 'file-out',
+      component: 'output/FileOutputNode'
+    }
+  ],
+  
+  // 用户交互控制节点
+  User_Interaction_Control: [
+    {
+      id: 'USER_INPUT',
+      type: 'USER_INPUT',
+      name: '用户输入',
+      description: '请求用户输入的节点',
+      category: 'User_Interaction_Control',
+      inputs: 1,
+      outputs: 1,
+      icon: 'user',
+      component: 'interaction/UserInputNode'
+    },
+    {
+      id: 'CONFIRMATION',
+      type: 'CONFIRMATION',
+      name: '确认对话框',
+      description: '显示确认对话框的节点',
+      category: 'User_Interaction_Control',
+      inputs: 1,
+      outputs: 2,
+      icon: 'confirm',
+      component: 'interaction/ConfirmationNode'
+    }
+  ]
 };
 
 // 扫描目录中的所有节点组件
@@ -163,14 +278,40 @@ export function getNodeComponentMap(): Record<string, any> {
   
   // 预定义节点组件映射
   const nodeComponentMapping: Record<string, string> = {
+    // 输入节点
     'TEXT_INPUT': '../components/nodes/input/TextInputNode',
+    'FILE_INPUT': '../components/nodes/input/FileInputNode',
+    
+    // AI任务执行节点
     'MODEL_SELECTOR': '../components/nodes/ai/ModelSelectorNode',
     'LLM_QUERY': '../components/nodes/ai/LlmQueryNode',
-    'WEB_SEARCH': '../components/nodes/WebSearchNode',
-    'DOCUMENT_QUERY': '../components/nodes/DocumentQueryNode',
+    'IMAGE_GENERATION': '../components/nodes/ai/ImageGenerationNode',
+    
+    // 数据操作工具节点
+    'WEB_SEARCH': '../components/nodes/data/WebSearchNode',
+    'DOCUMENT_QUERY': '../components/nodes/data/DocumentQueryNode',
+    'DATA_TRANSFORM': '../components/nodes/data/DataTransformNode',
+    
+    // 流程控制逻辑节点
+    'CONDITION': '../components/nodes/flow/ConditionNode',
+    'LOOP': '../components/nodes/flow/LoopNode',
+    'SAMPLER': '../components/nodes/flow/SamplerNode',
+    
+    // 监控与调试节点
+    'LOGGER': '../components/nodes/debug/LoggerNode',
+    'VISUALIZER': '../components/nodes/debug/VisualizerNode',
+    
+    // 输出节点
+    'TEXT_OUTPUT': '../components/nodes/output/TextOutputNode',
+    'FILE_OUTPUT': '../components/nodes/output/FileOutputNode',
+    
+    // 用户交互控制节点
+    'USER_INPUT': '../components/nodes/interaction/UserInputNode',
+    'CONFIRMATION': '../components/nodes/interaction/ConfirmationNode',
+    
+    // 其他旧有节点兼容
     'CUSTOM': '../components/nodes/CustomNode',
-    'ENCODER': '../components/nodes/EncoderNode',
-    'SAMPLER': '../components/nodes/SamplerNode',
+    'ENCODER': '../components/nodes/EncoderNode'
   };
   
   // 使用预定义映射而不是动态扫描

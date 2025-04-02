@@ -250,6 +250,11 @@
       "utility": "Utility",
       "flow": "Flow Control",
       "advanced": "Advanced",
+      "aiTaskExecution": "AI Task Execution",
+      "dataManipulation": "Data Manipulation",
+      "flowControl": "Flow Control Logic",
+      "monitoring": "Monitoring & Debugging",
+      "userInteraction": "User Interaction Control",
       "inputDescription": "Nodes for input handling",
       "aiDescription": "AI model nodes",
       "utilDescription": "Utility tools and helpers",
@@ -257,7 +262,12 @@
       "advancedDescription": "Advanced functionality nodes",
       "popularDescription": "Most commonly used nodes",
       "newDescription": "Recently added nodes",
-      "allDescription": "All available nodes"
+      "allDescription": "All available nodes",
+      "aiTaskExecutionDescription": "AI and machine learning task execution nodes",
+      "dataManipulationDescription": "Data processing, transformation and operation tools",
+      "flowControlDescription": "Nodes that control workflow execution logic",
+      "monitoringDescription": "Workflow monitoring and debugging tools",
+      "userInteractionDescription": "Nodes that handle user interaction"
     },
     "textInput": {
       "name": "Text Input",

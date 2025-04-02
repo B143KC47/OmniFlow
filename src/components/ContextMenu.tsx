@@ -251,7 +251,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
         <Submenu label={t('contextMenu.addNode')} className={styles.submenu}>
           {/* 输入节点 */}
           {nodeCategories.find(cat => cat.id === 'input') && (
-            <Submenu label={t('nodes.categories.input')} className={styles.submenu}>
+            <Submenu label={nodeCategories.find(cat => cat.id === 'input')?.name || t('nodes.categories.input')} className={styles.submenu}>
               {nodeCategories
                 .find(cat => cat.id === 'input')
                 ?.nodes.map((node, index) => (
@@ -266,14 +266,14 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
             </Submenu>
           )}
           
-          {/* AI节点 */}
-          {nodeCategories.find(cat => cat.id === 'ai') && (
-            <Submenu label={t('nodes.categories.ai')} className={styles.submenu}>
+          {/* AI任务执行节点 */}
+          {nodeCategories.find(cat => cat.id === 'AI_Task_Execution') && (
+            <Submenu label={nodeCategories.find(cat => cat.id === 'AI_Task_Execution')?.name || t('nodes.categories.aiTaskExecution')} className={styles.submenu}>
               {nodeCategories
-                .find(cat => cat.id === 'ai')
+                .find(cat => cat.id === 'AI_Task_Execution')
                 ?.nodes.map((node, index) => (
                   <Item 
-                    key={`ai-${node.id}-${index}`}
+                    key={`ai-task-${node.id}-${index}`}
                     onClick={e => handleAddNode(node.type, e)}
                     className={styles['comfy-menu-item']}
                   >
@@ -283,14 +283,65 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
             </Submenu>
           )}
           
-          {/* 实用工具节点 */}
-          {nodeCategories.find(cat => cat.id === 'utility') && (
-            <Submenu label={t('nodes.categories.utility')} className={styles.submenu}>
+          {/* 数据操作工具节点 */}
+          {nodeCategories.find(cat => cat.id === 'Data_Manipulation_Utilities') && (
+            <Submenu label={nodeCategories.find(cat => cat.id === 'Data_Manipulation_Utilities')?.name || t('nodes.categories.dataManipulation')} className={styles.submenu}>
               {nodeCategories
-                .find(cat => cat.id === 'utility')
+                .find(cat => cat.id === 'Data_Manipulation_Utilities')
                 ?.nodes.map((node, index) => (
                   <Item 
-                    key={`utility-${node.id}-${index}`}
+                    key={`data-util-${node.id}-${index}`}
+                    onClick={e => handleAddNode(node.type, e)}
+                    className={styles['comfy-menu-item']}
+                  >
+                    {node.name}
+                  </Item>
+                ))}
+            </Submenu>
+          )}
+          
+          {/* 流程控制逻辑节点 */}
+          {nodeCategories.find(cat => cat.id === 'Flow_Control_Logic') && (
+            <Submenu label={nodeCategories.find(cat => cat.id === 'Flow_Control_Logic')?.name || t('nodes.categories.flowControl')} className={styles.submenu}>
+              {nodeCategories
+                .find(cat => cat.id === 'Flow_Control_Logic')
+                ?.nodes.map((node, index) => (
+                  <Item 
+                    key={`flow-logic-${node.id}-${index}`}
+                    onClick={e => handleAddNode(node.type, e)}
+                    className={styles['comfy-menu-item']}
+                  >
+                    {node.name}
+                  </Item>
+                ))}
+            </Submenu>
+          )}
+          
+          {/* 监控与调试节点 */}
+          {nodeCategories.find(cat => cat.id === 'Monitoring_Debugging') && (
+            <Submenu label={nodeCategories.find(cat => cat.id === 'Monitoring_Debugging')?.name || t('nodes.categories.monitoring')} className={styles.submenu}>
+              {nodeCategories
+                .find(cat => cat.id === 'Monitoring_Debugging')
+                ?.nodes.map((node, index) => (
+                  <Item 
+                    key={`monitoring-${node.id}-${index}`}
+                    onClick={e => handleAddNode(node.type, e)}
+                    className={styles['comfy-menu-item']}
+                  >
+                    {node.name}
+                  </Item>
+                ))}
+            </Submenu>
+          )}
+          
+          {/* 用户交互控制节点 */}
+          {nodeCategories.find(cat => cat.id === 'User_Interaction_Control') && (
+            <Submenu label={nodeCategories.find(cat => cat.id === 'User_Interaction_Control')?.name || t('nodes.categories.userInteraction')} className={styles.submenu}>
+              {nodeCategories
+                .find(cat => cat.id === 'User_Interaction_Control')
+                ?.nodes.map((node, index) => (
+                  <Item 
+                    key={`user-interaction-${node.id}-${index}`}
                     onClick={e => handleAddNode(node.type, e)}
                     className={styles['comfy-menu-item']}
                   >
@@ -302,7 +353,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
           
           {/* 输出节点 */}
           {nodeCategories.find(cat => cat.id === 'output') && (
-            <Submenu label={t('nodes.categories.output')} className={styles.submenu}>
+            <Submenu label={nodeCategories.find(cat => cat.id === 'output')?.name || t('nodes.categories.output')} className={styles.submenu}>
               {nodeCategories
                 .find(cat => cat.id === 'output')
                 ?.nodes.map((node, index) => (
@@ -317,14 +368,14 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
             </Submenu>
           )}
           
-          {/* 流程控制节点 */}
-          {nodeCategories.find(cat => cat.id === 'flow') && (
-            <Submenu label={t('nodes.categories.flow')} className={styles.submenu}>
+          {/* 高级节点 */}
+          {nodeCategories.find(cat => cat.id === 'advanced') && (
+            <Submenu label={nodeCategories.find(cat => cat.id === 'advanced')?.name || t('nodes.categories.advanced')} className={styles.submenu}>
               {nodeCategories
-                .find(cat => cat.id === 'flow')
+                .find(cat => cat.id === 'advanced')
                 ?.nodes.map((node, index) => (
                   <Item 
-                    key={`flow-${node.id}-${index}`}
+                    key={`advanced-${node.id}-${index}`}
                     onClick={e => handleAddNode(node.type, e)}
                     className={styles['comfy-menu-item']}
                   >

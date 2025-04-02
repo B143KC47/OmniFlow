@@ -253,6 +253,11 @@
       "flow": "流程控制",
       "advanced": "高级",
       "ai": "AI 节点",
+      "aiTaskExecution": "AI 任务执行",
+      "dataManipulation": "数据操作工具",
+      "flowControl": "流程控制逻辑",
+      "monitoring": "监控与调试",
+      "userInteraction": "用户交互控制",
       "inputDescription": "用于获取输入的节点",
       "outputDescription": "用于显示输出的节点",
       "aiDescription": "AI模型相关节点",
@@ -261,7 +266,12 @@
       "advancedDescription": "高级功能节点",
       "popularDescription": "常用节点",
       "newDescription": "新增节点",
-      "allDescription": "所有可用节点"
+      "allDescription": "所有可用节点",
+      "aiTaskExecutionDescription": "AI和机器学习相关的任务执行节点",
+      "dataManipulationDescription": "数据处理、转换和操作工具",
+      "flowControlDescription": "控制工作流执行逻辑的节点",
+      "monitoringDescription": "工作流监控和调试工具",
+      "userInteractionDescription": "处理用户交互的节点"
     },
     "textInput": {
       "name": "文本输入",
