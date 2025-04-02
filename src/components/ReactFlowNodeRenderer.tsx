@@ -4,6 +4,7 @@ import { NodeData } from '../types';
 import NodeFactory from '../core/nodes';
 import { Z_INDEX, NODE_SIZE, PORT_TYPE_COLORS } from '../styles/nodeConstants';
 import styles from './ReactFlowRenderer.module.css';
+import nodeStyles from './Node.module.css'; // 导入统一的节点样式
 
 /**
  * ReactFlow节点渲染器 - 作为与ReactFlow连接的桥梁
@@ -51,37 +52,46 @@ const ReactFlowNodeRenderer = ({
     const inputsCount = Object.keys(inputs).length;
     const outputsCount = Object.keys(outputs).length;
     
-    // 返回默认节点渲染
+    // 返回默认节点渲染，使用统一的comfy-node样式
     return (
       <div 
-        className={`${styles.defaultNode} ${selected ? styles.selected : ''}`}
+        className={`${nodeStyles['comfy-node']} ${selected ? nodeStyles['selected'] : ''}`}
         style={{
           width: NODE_SIZE.DEFAULT_WIDTH,
           minHeight: NODE_SIZE.MIN_HEIGHT,
-          backgroundColor: 'var(--node-color, #2d2d2d)',
-          borderColor: 'var(--node-border-color, #444)',
           zIndex: selected ? Z_INDEX.NODE_SELECTED : Z_INDEX.NODE
         }}
       >
-        <div className={styles.defaultNodeHeader}>
-          {data.label || type || id}
+        <div className={nodeStyles['comfy-node-header']}>
+          <div className={nodeStyles['comfy-node-title']}>
+            {data.label || type || id}
+          </div>
+          <div className={nodeStyles['comfy-node-controls']}>
+            <span
+              role="button"
+              className={nodeStyles['comfy-node-collapse-btn']}
+              onClick={() => data.onChange && data.onChange(id, { deleted: true })}
+            >
+              ×
+            </span>
+          </div>
         </div>
         
-        <div className={styles.defaultNodeContent}>
+        <div className={nodeStyles['comfy-node-content']}>
           {/* 输入部分 */}
           {Object.keys(inputs).length > 0 && (
-            <div className={styles.section}>
-              <div className={styles.sectionTitle}>输入</div>
-              <div className={styles.portList}>
+            <div className={nodeStyles['comfy-section']}>
+              <div className={nodeStyles['comfy-section-title']}>输入</div>
+              <div>
                 {Object.entries(inputs).map(([key, input]: [string, any], index) => (
-                  <div key={`input-${key}`} className={styles.portItem}>
-                    {input.label || key}
+                  <div key={`input-${key}`} className={nodeStyles['comfy-node-row']}>
+                    <div className={nodeStyles['comfy-node-label']}>{input.label || key}</div>
                     <Handle
                       type="target"
                       position={Position.Left}
                       id={`input-${key}`}
+                      className={nodeStyles['comfy-node-handle']}
                       style={{ 
-                        top: `${getHandlePosition(index, inputsCount) * 100}%`,
                         backgroundColor: PORT_TYPE_COLORS[input.type as keyof typeof PORT_TYPE_COLORS] || PORT_TYPE_COLORS.default,
                         zIndex: Z_INDEX.HANDLE
                       }}
@@ -95,18 +105,18 @@ const ReactFlowNodeRenderer = ({
           
           {/* 输出部分 */}
           {Object.keys(outputs).length > 0 && (
-            <div className={styles.section}>
-              <div className={styles.sectionTitle}>输出</div>
-              <div className={styles.portList}>
+            <div className={nodeStyles['comfy-section']}>
+              <div className={nodeStyles['comfy-section-title']}>输出</div>
+              <div>
                 {Object.entries(outputs).map(([key, output]: [string, any], index) => (
-                  <div key={`output-${key}`} className={styles.portItem}>
-                    {output.label || key}
+                  <div key={`output-${key}`} className={nodeStyles['comfy-node-row']}>
+                    <div className={nodeStyles['comfy-node-label']}>{output.label || key}</div>
                     <Handle
                       type="source"
                       position={Position.Right}
                       id={`output-${key}`}
+                      className={nodeStyles['comfy-node-handle']}
                       style={{ 
-                        top: `${getHandlePosition(index, outputsCount) * 100}%`,
                         backgroundColor: PORT_TYPE_COLORS[output.type as keyof typeof PORT_TYPE_COLORS] || PORT_TYPE_COLORS.default,
                         zIndex: Z_INDEX.HANDLE
                       }}

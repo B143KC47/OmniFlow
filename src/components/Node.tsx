@@ -24,9 +24,6 @@ function CustomNodeComponent(props: NodeProps<NodeData>) {
     }
   }, [data, id, nodeType]);
 
-  // 添加日志输出，帮助调试
-  console.log(`Node.tsx渲染节点: ${id}, 类型: ${nodeType}`, data);
-
   // 尝试使用工厂创建节点组件
   const NodeComponent = nodeFactory.createNodeComponent(nodeType);
   if (NodeComponent) {
@@ -43,60 +40,66 @@ function CustomNodeComponent(props: NodeProps<NodeData>) {
     return <NodeComponent {...nodeProps} />;
   }
 
-  // 如果找不到组件，返回一个增强的默认节点，确保可见性
+  // 如果找不到组件，返回增强的默认节点，使用统一的comfy-node样式
   console.warn(`未找到节点类型 ${nodeType} 的组件`);
   return (
     <div 
-      className={styles['default-node']} 
+      className={`${styles['comfy-node']} ${selected ? styles['selected'] : ''}`}
       style={{
-        backgroundColor: 'var(--node-color, #2d2d2d)',
-        border: '1px solid var(--node-border-color, #444)',
-        borderRadius: '6px',
         minWidth: '200px',
         minHeight: '100px',
-        boxShadow: selected ? '0 0 0 2px var(--primary-color, #10a37f)' : 'var(--shadow-md, 0 2px 4px rgba(0,0,0,0.2))',
-        overflow: 'visible',
-        position: 'relative',
         zIndex: selected ? 100 : 10
       }}
     >
-      <div 
-        className={styles['default-node-header']}
-        style={{
-          backgroundColor: 'var(--node-header-color, #383838)',
-          color: 'var(--node-title-color, #eee)',
-          padding: '8px 12px',
-          borderBottom: '1px solid var(--node-border-color, #444)',
-          fontWeight: 'bold',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}
-      >
-        {data?.label || nodeType}
-        <span 
-          role="button"
-          onClick={() => data?.onChange && data.onChange(id, { deleted: true })}
-          style={{ cursor: 'pointer', opacity: 0.7 }}
-        >
-          ×
-        </span>
+      <div className={styles['comfy-node-header']}>
+        <div className={styles['comfy-node-title']}>
+          {data?.label || nodeType}
+        </div>
+        <div className={styles['comfy-node-controls']}>
+          <span 
+            role="button"
+            className={styles['comfy-node-collapse-btn']}
+            onClick={() => data?.onChange && data.onChange(id, { deleted: true })}
+          >
+            ×
+          </span>
+        </div>
       </div>
-      <div 
-        className={styles['default-node-content']}
-        style={{
-          padding: '12px',
-          color: 'var(--node-text-color, #ddd)'
-        }}
-      >
+      
+      <div className={styles['comfy-node-content']}>
         {data?.inputs && Object.keys(data.inputs).length > 0 && (
-          <div style={{ marginBottom: '8px' }}>
-            <strong>输入:</strong> {Object.keys(data.inputs).join(', ')}
+          <div className={styles['comfy-section']}>
+            <div className={styles['comfy-section-title']}>输入</div>
+            {Object.entries(data.inputs).map(([key, input]: [string, any]) => (
+              <div key={`input-${key}`} className={styles['comfy-node-row']}>
+                <div className={styles['comfy-node-label']}>{input.label || key}</div>
+                <Handle
+                  type="target"
+                  position={Position.Left}
+                  id={`input-${key}`}
+                  className={`${styles['comfy-node-handle']} ${styles['comfy-node-handle-input']}`}
+                  isConnectable={isConnectable}
+                />
+              </div>
+            ))}
           </div>
         )}
+        
         {data?.outputs && Object.keys(data.outputs).length > 0 && (
-          <div>
-            <strong>输出:</strong> {Object.keys(data.outputs).join(', ')}
+          <div className={styles['comfy-section']}>
+            <div className={styles['comfy-section-title']}>输出</div>
+            {Object.entries(data.outputs).map(([key, output]: [string, any]) => (
+              <div key={`output-${key}`} className={styles['comfy-node-row']}>
+                <div className={styles['comfy-node-label']}>{output.label || key}</div>
+                <Handle
+                  type="source"
+                  position={Position.Right}
+                  id={`output-${key}`}
+                  className={`${styles['comfy-node-handle']} ${styles['comfy-node-handle-output']}`}
+                  isConnectable={isConnectable}
+                />
+              </div>
+            ))}
           </div>
         )}
       </div>

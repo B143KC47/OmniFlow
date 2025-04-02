@@ -129,6 +129,16 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
               icon: 'search'
             },
             { 
+              id: 'document_query', 
+              type: 'DOCUMENT_QUERY', 
+              name: t('nodes.documentQuery.name') || '文档查询', 
+              description: t('nodes.documentQuery.description') || '文档查询节点', 
+              category: 'utility',
+              inputs: 2,
+              outputs: 1,
+              icon: 'document'
+            },
+            { 
               id: 'custom_node', 
               type: 'CUSTOM_NODE', 
               name: t('nodes.custom.name'), 
