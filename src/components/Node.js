@@ -162,14 +162,16 @@ const Node = ({ node, onStartConnecting, onFinishConnecting, onRemove }) => {
       ref={nodeRef} 
       className={nodeClasses}
       style={{ 
-        left: position.x, 
-        top: position.y,
-        zIndex: isDragging ? 1000 : 1
+        width: '100%', 
+        height: '100%',
+        position: 'relative',
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column'
       }}
-      onMouseDown={handleMouseDown}
     >
       <div className={styles['node-header']}>
-        <span>{node.id}</span>
+        <span>{node.data?.label || node.id}</span>
         <button className={styles['node-delete-btn']} onClick={() => onRemove(node.id)}>×</button>
       </div>
       <div className={styles['node-content']}>

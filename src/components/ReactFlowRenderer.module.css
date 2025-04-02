@@ -1,0 +1,76 @@
+/* ReactFlow渲染器样式 */
+
+.defaultNode {
+  position: relative;
+  border-radius: 6px;
+  border: 1px solid;
+  overflow: visible;
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.defaultNode:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.defaultNode.selected {
+  border-color: var(--primary-color, #10a37f) !important;
+  box-shadow: 0 0 0 2px var(--primary-color, #10a37f) !important;
+}
+
+.defaultNodeHeader {
+  padding: 8px 12px;
+  background-color: var(--node-header-color, #383838);
+  color: var(--node-title-color, #eee);
+  font-weight: bold;
+  border-bottom: 1px solid var(--node-border-color, #444);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.defaultNodeContent {
+  padding: 12px;
+  color: var(--node-text-color, #ddd);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section {
+  margin-bottom: 8px;
+}
+
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--node-text-muted, #aaa);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.portList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.portItem {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  position: relative;
+  padding: 4px 0;
+}
+
+.errorNode {
+  background-color: #ffdddd;
+  border: 1px solid #ff6666;
+  color: #dd2222;
+  padding: 10px;
+  border-radius: 6px;
+  min-width: 160px;
+  text-align: center;
+}

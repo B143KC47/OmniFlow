@@ -20,6 +20,9 @@ import McpService from '../services/McpService';
 import { useTranslation } from '../utils/i18n';
 import NodeDiscoveryService from '../services/NodeDiscoveryService';
 import NodeRegistry from '../services/NodeRegistry';
+import NodeFactory from '../core/nodes'; // 修正导入路径，从索引文件导入
+import { NodeRegistrator } from '../core/nodes'; // 修正导入路径，从索引文件导入
+import ReactFlowNodeRenderer from '../components/ReactFlowNodeRenderer'; // 修正导入路径
 
 // 使用动态导入避免 SSR 问题
 const ReactFlow = dynamic(
@@ -66,6 +69,39 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
   // 使用 useMemo 对 nodeTypes 进行记忆化，避免每次渲染创建新对象
   const memoizedNodeTypes = useMemo(() => nodeTypes, [nodeTypes]);
 
+  // 在组件挂载时初始化节点工厂和注册节点
+  useEffect(() => {
+    if (isClient) {
+      console.log('初始化节点工厂...');
+      const factory = NodeFactory.getInstance();
+      factory.initialize();
+      
+      console.log('注册所有节点...');
+      NodeRegistrator.registerAllNodes();
+      console.log('节点注册完成');
+      
+      // 获取节点类型并设置节点组件映射
+      const allNodeDefinitions = factory.getAllNodeDefinitions();
+      console.log(`已注册 ${allNodeDefinitions.length} 个节点类型`);
+      
+      // 设置节点注册表
+      setNodeRegistry(new NodeRegistry(factory));
+      
+      // 构建节点类型映射
+      const typeMap: Record<string, string> = {};
+      const nodeTypes: Record<string, React.ComponentType<any>> = {};
+      
+      allNodeDefinitions.forEach(def => {
+        // 使用自定义渲染器作为节点组件的包装器
+        nodeTypes[def.type] = ReactFlowNodeRenderer;
+        typeMap[def.type] = def.type;
+      });
+      
+      setNodeTypes(nodeTypes);
+      setNodeTypeMap(typeMap);
+    }
+  }, [isClient]);
+
   // 在客户端挂载后更新状态
   useEffect(() => {
     setIsClient(true);
@@ -78,10 +114,17 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     
     window.addEventListener('error', errorHandler);
     
-    // 初始化节点注册表和发现服务
-    const initServices = async () => {
+    // 初始化节点系统
+    const initNodeSystem = async () => {
       try {
-        // 初始化节点注册表
+        // 初始化节点工厂 - 修正访问方式，使用静态方法
+        const factory = NodeFactory.getInstance();
+        factory.initialize();
+        
+        // 注册所有节点
+        NodeRegistrator.registerAllNodes();
+        
+        // 初始化节点注册表（为了兼容性保留）
         const registry = NodeRegistry.getInstance();
         await registry.initialize();
         
@@ -89,26 +132,33 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
         const discoveryService = NodeDiscoveryService.getInstance();
         await discoveryService.initialize(t);
         
-        // 获取组件映射
-        const components = registry.getNodeComponents();
-        const typeMap = registry.getNodeTypeMap();
+        // 设置所有节点类型为ReactFlowNodeRenderer
+        // 这是因为我们的ReactFlowNodeRenderer会根据节点类型动态选择正确的组件
+        const allNodeTypes = factory.getAllNodeDefinitions().reduce((acc, def) => {
+          acc[def.type] = ReactFlowNodeRenderer;
+          return acc;
+        }, {} as Record<string, React.ComponentType<any>>);
+        
+        // 如果节点工厂中没有注册节点，使用旧版注册表的组件映射
+        const nodeTypes = Object.keys(allNodeTypes).length > 0 
+          ? allNodeTypes 
+          : registry.getNodeComponents();
         
         // 设置状态
         setNodeRegistry(registry);
-        setNodeTypes(components);
-        setNodeTypeMap(typeMap);
+        setNodeTypes(nodeTypes);
+        setNodeTypeMap(registry.getNodeTypeMap());
         setIsInitialized(true);
         
         console.log('工作流编辑器初始化完成', {
-          components: Object.keys(components),
-          typeMap: Object.keys(typeMap)
+          components: Object.keys(nodeTypes)
         });
       } catch (error) {
         console.error('初始化节点系统时出错:', error);
       }
     };
     
-    initServices();
+    initNodeSystem();
     
     return () => {
       window.removeEventListener('error', errorHandler);
@@ -239,7 +289,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
 
     // 使用节点注册表解析标准节点类型
     const nodeType = nodeRegistry.resolveNodeType(type);
-    const actualType = nodeType || type; // 如果解析失败，直接使用原始类型
+    let actualType = nodeType || type; // 修改为let，允许后续修改
     
     console.log(`节点类型处理结果: ${actualType} (原始类型: ${type})`);
     
@@ -291,7 +341,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
       // 否则根据节点类型生成标签
       switch (actualType) {
         case 'TEXT_INPUT':
-          label = t('nodes.textInput.name');
+          label = t('nodes.textInput.name') || '文本输入';
           break;
         case 'WEB_SEARCH':
           label = t('nodes.webSearch.name');
@@ -344,7 +394,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     // 根据节点类型设置不同的默认输入输出
     switch (actualType) {
       case 'TEXT_INPUT':
-        inputs.text = { type: 'text', value: '', label: t('nodes.textInput.placeholder') };
+        inputs.text = { type: 'text', value: '', label: t('nodes.textInput.placeholder') || '输入文本' };
         outputs.text = { type: 'text', value: '' };
         break;
       case 'WEB_SEARCH':
@@ -414,11 +464,11 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
         outputs.result = { type: 'any', value: null };
         break;
       default:
-        inputs.input = { type: 'any', value: null, label: t('nodes.common.input') };
+        inputs.input = { type: 'any', value: null, label: t('nodes.common.input') || '输入' };
         outputs.output = { type: 'any', value: null };
     }
 
-    // 创建新节点
+    // 创建新节点，确保具有基本样式属性
     const newNode = {
       id: uuidv4(),
       type: actualType,
@@ -451,15 +501,39 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
       },
       selected: false,
       dragging: false,
+      // 添加默认的宽高，确保节点可见
+      style: {
+        width: 240,
+        minHeight: 120, 
+        zIndex: 10,
+        backgroundColor: 'var(--node-color, #2d2d2d)',
+        border: '1px solid var(--node-border-color, #444)',
+        borderRadius: '6px'
+      }
     };
 
-    // 添加节点
-    setNodes(nds => [...nds, newNode]);
+    // 添加节点 - 使用回调函数确保节点添加后立即可见
+    setNodes(nds => {
+      const updatedNodes = [...nds, newNode];
+      console.log(`节点已添加到状态，当前节点数量: ${updatedNodes.length}`);
+      
+      // 确保ReactFlow实例存在并在下一个渲染周期进行fitView
+      setTimeout(() => {
+        if (reactFlowInstance) {
+          reactFlowInstance.fitView({ padding: 0.2, includeHiddenNodes: true });
+          console.log('已执行fitView以确保节点可见');
+        }
+      }, 10);
+      
+      return updatedNodes;
+    });
     
     // 添加调试信息
     console.log('节点创建成功，节点数据:', newNode);
     console.log(`------节点创建完成------`);
-  }, [setNodes, setEdges, t, memoizedNodeTypes, nodeRegistry]);
+    
+    return newNode.id; // 返回节点ID以供可能的后续操作
+  }, [setNodes, setEdges, t, memoizedNodeTypes, nodeRegistry, reactFlowInstance]);
 
   // 开发环境中的节点测试函数 - 用于确保所有节点都能正确创建
   const testNodeCreation = useCallback(() => {

@@ -1,24 +1,49 @@
-// filepath: c:\Users\ko202\Desktop\project\OmniFlow\src\core\nodes\NodeFactory.ts
-import { Node, NodeType } from '../../types';
-import { BaseNode } from './BaseNode';
-import NodeRegistry from './NodeRegistry';
+// 节点工厂 - 负责创建和管理节点组件
+import React from 'react';
+import { NodeData } from '../../types';
 
 /**
- * 节点工厂类
- * 负责创建和管理所有类型的节点实例
+ * 节点组件的属性接口
  */
-export class NodeFactory {
+export interface NodeComponentProps {
+  id: string;
+  data: NodeData;
+  selected?: boolean;
+  isConnectable?: boolean;
+  onDataChange?: (nodeId: string, newData: any) => void;
+}
+
+/**
+ * 节点定义接口 - 用于向节点工厂注册节点类型
+ */
+export interface NodeDefinition {
+  type: string;             // 节点类型标识符
+  category: string;         // 节点分类
+  name: string;             // 节点显示名称
+  description: string;      // 节点描述
+  icon: string;             // 节点图标（可以是Unicode字符或图标名称）
+  component: React.ComponentType<NodeComponentProps>; // 节点React组件
+  defaultConfig?: any;      // 节点的默认配置
+}
+
+/**
+ * 节点工厂类 - 单例模式
+ * 负责管理所有注册的节点类型和创建节点实例
+ */
+class NodeFactory {
   private static instance: NodeFactory;
-  private nodeRegistry: NodeRegistry;
-  private nodeInstances: Map<NodeType, BaseNode>;
-  
-  private constructor() {
-    this.nodeRegistry = NodeRegistry.getInstance();
-    this.nodeInstances = new Map();
-  }
-  
+  private nodeDefinitions: Map<string, NodeDefinition>;
+  private initialized: boolean = false;
+
   /**
-   * 获取单例实例
+   * 私有构造函数，防止外部直接实例化
+   */
+  private constructor() {
+    this.nodeDefinitions = new Map();
+  }
+
+  /**
+   * 获取NodeFactory单例
    */
   public static getInstance(): NodeFactory {
     if (!NodeFactory.instance) {
@@ -26,95 +51,107 @@ export class NodeFactory {
     }
     return NodeFactory.instance;
   }
-  
+
   /**
-   * 注册节点类
-   * @param nodeType 节点类型
-   * @param nodeInstance 节点实例
+   * 初始化节点工厂
    */
-  public registerNode(nodeType: NodeType, nodeInstance: BaseNode): void {
-    if (this.nodeInstances.has(nodeType)) {
-      console.warn(`节点类型 ${nodeType} 已存在，将被覆盖`);
-    }
-    this.nodeInstances.set(nodeType, nodeInstance);
-  }
-  
-  /**
-   * 创建节点实例
-   * @param nodeType 节点类型
-   * @param id 节点ID
-   * @param position 节点位置
-   * @param data 附加数据
-   */
-  public createNode(
-    nodeType: NodeType, 
-    id: string, 
-    position: { x: number; y: number }, 
-    data?: Record<string, any>
-  ): Node {
-    // 从注册表中获取节点实例
-    const nodeInstance = this.nodeInstances.get(nodeType);
-    
-    if (!nodeInstance) {
-      // 如果找不到实例，则尝试从注册表创建
-      const nodeDefinition = this.nodeRegistry.getNodeDefinition(nodeType);
-      if (nodeDefinition) {
-        return {
-          id,
-          type: nodeType,
-          position,
-          data: {
-            label: nodeDefinition.label || nodeDefinition.name,
-            type: nodeType,
-            ...(nodeDefinition.initialData || {}),
-            ...data
-          }
-        };
-      }
-      throw new Error(`未找到节点类型 ${nodeType} 的实例或定义`);
+  public initialize(): void {
+    if (this.initialized) {
+      console.warn('NodeFactory已经初始化');
+      return;
     }
     
-    // 使用节点实例创建数据
-    return nodeInstance.createNodeData(id, position, data);
-  }
-  
-  /**
-   * 获取节点实例
-   * @param nodeType 节点类型
-   */
-  public getNodeInstance(nodeType: NodeType): BaseNode | undefined {
-    return this.nodeInstances.get(nodeType);
-  }
-  
-  /**
-   * 验证节点输入
-   * @param nodeType 节点类型
-   * @param inputs 节点输入
-   */
-  public validateNodeInputs(
-    nodeType: NodeType, 
-    inputs: Record<string, any>
-  ): { isValid: boolean; errors: string[] } {
-    const nodeInstance = this.getNodeInstance(nodeType);
-    
-    if (!nodeInstance) {
-      return {
-        isValid: false,
-        errors: [`未找到节点类型 ${nodeType} 的实例`]
-      };
-    }
-    
-    return nodeInstance.validateInputs(inputs);
-  }
-  
-  /**
-   * 初始化系统内置节点
-   * 应用启动时调用
-   */
-  public initializeBuiltinNodes(): void {
-    // 这个方法将在应用启动时被调用，用于初始化所有内置节点
-    // 后续可以在这里添加所有内置节点的注册逻辑
     console.log('初始化节点工厂');
+    this.initialized = true;
+  }
+
+  /**
+   * 注册节点类型
+   * @param definition 节点定义
+   */
+  public registerNodeType(definition: NodeDefinition): void {
+    if (this.nodeDefinitions.has(definition.type)) {
+      console.warn(`节点类型 ${definition.type} 已存在，将被覆盖`);
+    }
+    
+    this.nodeDefinitions.set(definition.type, definition);
+    console.log(`已注册节点类型: ${definition.type}`);
+  }
+
+  /**
+   * 批量注册节点类型
+   * @param definitions 节点定义数组
+   */
+  public registerNodeTypes(definitions: NodeDefinition[]): void {
+    definitions.forEach(definition => this.registerNodeType(definition));
+  }
+
+  /**
+   * 根据类型创建节点组件
+   * @param type 节点类型
+   * @returns 对应的React组件
+   */
+  public createNodeComponent(type: string): React.ComponentType<NodeComponentProps> | null {
+    const definition = this.nodeDefinitions.get(type);
+    
+    if (!definition) {
+      console.warn(`未找到节点类型 ${type} 的定义`);
+      return null;
+    }
+    
+    return definition.component;
+  }
+
+  /**
+   * 获取节点定义
+   * @param type 节点类型
+   * @returns 节点定义
+   */
+  public getNodeDefinition(type: string): NodeDefinition | undefined {
+    return this.nodeDefinitions.get(type);
+  }
+
+  /**
+   * 获取所有节点定义
+   * @returns 所有节点定义的数组
+   */
+  public getAllNodeDefinitions(): NodeDefinition[] {
+    return Array.from(this.nodeDefinitions.values());
+  }
+
+  /**
+   * 获取特定分类的节点定义
+   * @param category 节点分类
+   * @returns 符合该分类的节点定义数组
+   */
+  public getNodeDefinitionsByCategory(category: string): NodeDefinition[] {
+    return this.getAllNodeDefinitions().filter(def => def.category === category);
+  }
+
+  /**
+   * 检查节点类型是否已注册
+   * @param type 节点类型
+   * @returns 是否已注册
+   */
+  public hasNodeType(type: string): boolean {
+    return this.nodeDefinitions.has(type);
+  }
+
+  /**
+   * 根据节点类型获取默认配置
+   * @param type 节点类型
+   * @returns 默认配置对象
+   */
+  public getDefaultConfig(type: string): any {
+    const definition = this.nodeDefinitions.get(type);
+    return definition?.defaultConfig || {};
+  }
+
+  /**
+   * 清除所有注册的节点类型（主要用于测试）
+   */
+  public clearNodeTypes(): void {
+    this.nodeDefinitions.clear();
   }
 }
 

@@ -58,6 +58,7 @@ export enum NodeCategoryType {
 // 工作流节点数据 - 作为节点的 data 字段
 export interface NodeData {
   label?: string;
+  type?: string;  // 添加节点类型属性
   inputs?: {
     [key: string]: {
       type: string;

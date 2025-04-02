@@ -1,132 +1,145 @@
 import React from 'react';
 import { NodeProps, Handle, Position } from 'reactflow';
-import styles from './Node.module.css';
 import { NodeData } from '../types';
-import DefaultNode from './Node.js';
+import NodeFactory from '../core/nodes';
+import { Z_INDEX, NODE_SIZE, PORT_TYPE_COLORS } from '../styles/nodeConstants';
+import styles from './ReactFlowRenderer.module.css';
 
 /**
- * 通用节点渲染器 - 作为与 ReactFlow 连接的桥梁
- * 该组件将会根据节点类型渲染对应的节点组件
+ * ReactFlow节点渲染器 - 作为与ReactFlow连接的桥梁
+ * 这个组件负责将我们的节点系统与ReactFlow集成
  */
-const ReactFlowNodeRenderer = ({ id, data, type, selected, position, isConnectable }: NodeProps<NodeData>) => {
-  console.log(`渲染节点: ${id}, 类型: ${type}`, data);
-
+const ReactFlowNodeRenderer = ({ 
+  id, 
+  data, 
+  type, 
+  selected, 
+  isConnectable
+}: NodeProps<NodeData>) => {
+  // 获取节点工厂实例
+  const nodeFactory = NodeFactory.getInstance();
+  
+  // 检查节点数据
   if (!data) {
     console.error(`节点 ${id} 的数据为空`);
-    return <div className={styles['error-node']}>节点数据缺失</div>;
-  }
-
-  // 确保输入输出对象存在
-  const inputs = data.inputs || {};
-  const outputs = data.outputs || {};
-  
-  // 创建默认的输入和输出，确保每种节点类型都有基本的连接点
-  if (Object.keys(inputs).length === 0) {
-    // 为不同类型的节点添加默认输入
-    switch(type) {
-      case 'TEXT_INPUT':
-        inputs.text = { type: 'text', value: '' };
-        break;
-      case 'WEB_SEARCH':
-        inputs.query = { type: 'text', value: '' };
-        break;
-      case 'MODEL_SELECTOR':
-        inputs.model = { type: 'text', value: 'gpt-4' };
-        break;
-      default:
-        inputs.input = { type: 'any', value: null };
-    }
+    return (
+      <div className={styles.errorNode}>
+        节点数据缺失
+      </div>
+    );
   }
   
-  if (Object.keys(outputs).length === 0) {
-    // 为不同类型的节点添加默认输出
-    switch(type) {
-      case 'TEXT_INPUT':
-        outputs.text = { type: 'text', value: '' };
-        break;
-      case 'WEB_SEARCH':
-        outputs.results = { type: 'text', value: '' };
-        break;
-      case 'MODEL_SELECTOR':
-        outputs.model = { type: 'text', value: '' };
-        break;
-      default:
-        outputs.output = { type: 'any', value: null };
-    }
+  // 获取节点类型对应的组件
+  const NodeComponent = nodeFactory.createNodeComponent(type || '');
+  
+  // 如果没有找到对应组件，使用默认渲染方式
+  if (!NodeComponent) {
+    console.warn(`未找到节点类型 ${type} 对应的组件`);
+    
+    // 确保输入输出对象存在
+    const inputs = data.inputs || {};
+    const outputs = data.outputs || {};
+    
+    // 计算连接点位置
+    const getHandlePosition = (index: number, total: number) => {
+      if (total === 1) return 0.5; // 只有一个连接点时居中
+      const step = 1.0 / (total + 1);
+      return step * (index + 1);
+    };
+    
+    // 获取输入输出的条目数量
+    const inputsCount = Object.keys(inputs).length;
+    const outputsCount = Object.keys(outputs).length;
+    
+    // 返回默认节点渲染
+    return (
+      <div 
+        className={`${styles.defaultNode} ${selected ? styles.selected : ''}`}
+        style={{
+          width: NODE_SIZE.DEFAULT_WIDTH,
+          minHeight: NODE_SIZE.MIN_HEIGHT,
+          backgroundColor: 'var(--node-color, #2d2d2d)',
+          borderColor: 'var(--node-border-color, #444)',
+          zIndex: selected ? Z_INDEX.NODE_SELECTED : Z_INDEX.NODE
+        }}
+      >
+        <div className={styles.defaultNodeHeader}>
+          {data.label || type || id}
+        </div>
+        
+        <div className={styles.defaultNodeContent}>
+          {/* 输入部分 */}
+          {Object.keys(inputs).length > 0 && (
+            <div className={styles.section}>
+              <div className={styles.sectionTitle}>输入</div>
+              <div className={styles.portList}>
+                {Object.entries(inputs).map(([key, input]: [string, any], index) => (
+                  <div key={`input-${key}`} className={styles.portItem}>
+                    {input.label || key}
+                    <Handle
+                      type="target"
+                      position={Position.Left}
+                      id={`input-${key}`}
+                      style={{ 
+                        top: `${getHandlePosition(index, inputsCount) * 100}%`,
+                        backgroundColor: PORT_TYPE_COLORS[input.type as keyof typeof PORT_TYPE_COLORS] || PORT_TYPE_COLORS.default,
+                        zIndex: Z_INDEX.HANDLE
+                      }}
+                      isConnectable={isConnectable}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* 输出部分 */}
+          {Object.keys(outputs).length > 0 && (
+            <div className={styles.section}>
+              <div className={styles.sectionTitle}>输出</div>
+              <div className={styles.portList}>
+                {Object.entries(outputs).map(([key, output]: [string, any], index) => (
+                  <div key={`output-${key}`} className={styles.portItem}>
+                    {output.label || key}
+                    <Handle
+                      type="source"
+                      position={Position.Right}
+                      id={`output-${key}`}
+                      style={{ 
+                        top: `${getHandlePosition(index, outputsCount) * 100}%`,
+                        backgroundColor: PORT_TYPE_COLORS[output.type as keyof typeof PORT_TYPE_COLORS] || PORT_TYPE_COLORS.default,
+                        zIndex: Z_INDEX.HANDLE
+                      }}
+                      isConnectable={isConnectable}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
-
-  // 构建传递给基础节点的属性
-  const nodeProps = {
-    node: {
-      id,
-      type,
-      position,
-      data: {
-        ...data,
-        inputs,
-        outputs
-      },
-      inputs,
-      outputs,
-    },
-    // 使用data.onChange回调通知上层组件
-    onStartConnecting: (nodeId: string, portId: string, isOutput: boolean) => {
-      console.log('开始连接:', nodeId, portId, isOutput ? '输出' : '输入');
-    },
-    onFinishConnecting: (nodeId: string, portId: string, isOutput: boolean) => {
-      console.log('完成连接:', nodeId, portId, isOutput ? '输出' : '输入');
-    },
-    onRemove: () => {
-      if (data.onChange) {
-        // 通知上层组件删除该节点
-        console.log(`触发删除节点: ${id}`);
-        // 使用onChange回调删除节点
-        data.onChange(id, { deleted: true });
-      }
+  
+  // 定义数据更改回调
+  const handleDataChange = (nodeId: string, newData: any) => {
+    if (data.onChange) {
+      data.onChange(nodeId, newData);
+    } else {
+      console.warn(`节点 ${nodeId} 没有onChange处理器`);
     }
   };
-
-  // 计算Handle连接点的位置
-  const getHandlePosition = (index: number, total: number) => {
-    if (total === 1) return 0.5; // 只有一个连接点时居中
-    const step = 1.0 / (total + 1);
-    return step * (index + 1);
-  };
-
-  // 获取输入输出的条目数量
-  const inputsCount = Object.keys(inputs).length;
-  const outputsCount = Object.keys(outputs).length;
-
-  // 在节点周围添加连接点
+  
+  // 使用对应的节点组件渲染
   return (
-    <div className={`${styles['react-flow-node']} ${selected ? styles['selected'] : ''}`}>
-      {/* 渲染基础节点 */}
-      <DefaultNode {...nodeProps} />
-      
-      {/* 渲染输入连接点 */}
-      {Object.entries(inputs).map(([key, input]: [string, any], index) => (
-        <Handle
-          key={`input-${key}`}
-          type="target"
-          position={Position.Left}
-          id={`input-${key}`}
-          style={{ top: `${getHandlePosition(index, inputsCount) * 100}%` }}
-          isConnectable={isConnectable}
-        />
-      ))}
-      
-      {/* 渲染输出连接点 */}
-      {Object.entries(outputs).map(([key, output]: [string, any], index) => (
-        <Handle
-          key={`output-${key}`}
-          type="source"
-          position={Position.Right}
-          id={`output-${key}`}
-          style={{ top: `${getHandlePosition(index, outputsCount) * 100}%` }}
-          isConnectable={isConnectable}
-        />
-      ))}
-    </div>
+    <NodeComponent
+      id={id}
+      data={data}
+      selected={selected}
+      isConnectable={isConnectable}
+      onDataChange={handleDataChange}
+    />
   );
 };
 

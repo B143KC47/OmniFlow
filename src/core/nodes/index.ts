@@ -1,24 +1,15 @@
-// filepath: c:\Users\ko202\Desktop\project\OmniFlow\src\core\nodes\index.ts
-import { NodeFactory } from './NodeFactory';
-import NodeRegistry from './NodeRegistry';
-import { BaseNode } from './BaseNode';
-import { NodeCategoryType, PortType, PortDataType, NodeStatus, NodeDefinition, PortDefinition, NodeCategoryInfo } from './types';
+// 节点系统入口文件
+import NodeFactory from './NodeFactory';
+import NodeRegistrator from './NodeRegistrator';
 
-export {
-  NodeFactory,
-  NodeRegistry,
-  BaseNode,
-  NodeCategoryType,
-  PortType,
-  PortDataType,
-  NodeStatus
+// 导出组件和类型
+export { 
+  NodeFactory as default,  // 修改：导出NodeFactory类作为默认导出，而不是实例
+  NodeRegistrator
 };
 
-export type {
-  NodeDefinition,
-  PortDefinition,
-  NodeCategoryInfo
-};
-
-// 默认导出工厂实例，方便直接使用
-export default NodeFactory.getInstance();
+// 导出类型定义
+export type { 
+  NodeComponentProps, 
+  NodeDefinition 
+} from './NodeFactory';

@@ -1,145 +1,59 @@
-/* 
- * CSS 模块版本 - 确保动态导入可以正常工作
- * 主要样式已移至 src/styles/globals.css
- */
- 
+/* 默认节点样式 */
 .default-node {
-  background-color: var(--node-color);
-  border: 1px solid var(--node-border-color);
   border-radius: 6px;
-  box-shadow: var(--shadow-md);
-  min-width: 180px;
   overflow: hidden;
+  user-select: none;
+  position: relative;
+  background-color: var(--node-color, #2d2d2d);
+  box-shadow: var(--shadow-md, 0 2px 4px rgba(0, 0, 0, 0.2));
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  min-width: 200px;
+}
+
+.default-node:hover {
+  box-shadow: var(--shadow-lg, 0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .default-node-header {
+  background-color: var(--node-header-color, #383838);
   padding: 8px 12px;
-  background-color: var(--node-header-color);
-  color: var(--node-title-color);
   font-weight: bold;
-  border-bottom: 1px solid var(--node-border-color);
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .default-node-content {
   padding: 12px;
-  color: var(--node-text-color);
 }
 
-/* 为ReactFlow节点渲染器添加样式 */
-
-.react-flow-node {
-  position: relative;
-  width: auto;
-  height: auto;
-}
-
-.selected {
-  outline: 2px solid var(--primary-color);
-  border-radius: 8px;
-}
-
-.error-node {
-  background-color: #ffdddd;
-  border: 1px solid #ff6666;
-  color: #dd2222;
-  padding: 10px;
-  border-radius: 6px;
-  min-width: 160px;
-  text-align: center;
-}
-
-/* 节点基础样式 */
-.node {
-  position: absolute;
-  background-color: var(--node-color);
-  border: 1px solid var(--node-border-color);
-  border-radius: 6px;
-  padding: 0;
-  min-width: 200px;
-  transition: box-shadow 0.3s, border-color 0.3s;
-  box-shadow: var(--shadow-sm);
-  cursor: move;
-  user-select: none;
-}
-
-.node:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--node-hover-border-color);
-}
-
-.dragging {
-  opacity: 0.8;
-  box-shadow: var(--shadow-lg);
-  z-index: 1000;
-}
-
-/* 节点头部 */
-.node-header {
-  background-color: var(--node-header-color);
-  color: var(--node-title-color);
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--node-border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-}
-
-.node-delete-btn {
-  background: none;
-  border: none;
-  color: var(--node-text-muted);
-  font-size: 16px;
-  cursor: pointer;
-  padding: 0 4px;
-  opacity: 0.6;
-  transition: opacity 0.2s, color 0.2s;
-}
-
-.node-delete-btn:hover {
-  opacity: 1;
-  color: var(--error-color);
-}
-
-/* 节点内容 */
-.node-content {
-  padding: 12px;
-}
-
-/* 节点端口 */
-.node-inputs, .node-outputs {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.node-port {
-  display: flex;
-  align-items: center;
-  height: 24px;
-  font-size: 12px;
-  color: var(--node-text-color);
-}
-
-.node-input {
-  justify-content: flex-start;
-}
-
-.node-output {
-  justify-content: flex-end;
-}
-
-.port-connector {
+/* 连接点样式 */
+.node-handle {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: var(--primary-color);
-  margin: 0 8px;
-  cursor: crosshair;
+  background-color: var(--handle-color, #555);
+  border: 2px solid var(--handle-border-color, #444);
 }
 
-.port-connector:hover {
-  transform: scale(1.2);
-  transition: transform 0.2s;
+.input-handle {
+  left: -5px;
+}
+
+.output-handle {
+  right: -5px;
+}
+
+.node-handle.connected {
+  background-color: var(--connected-handle-color, #10a37f);
+  border-color: var(--connected-handle-border-color, #0d8c6e);
+}
+
+/* 节点拖拽时的样式 */
+.node-dragging {
+  opacity: 0.8;
+  transform: scale(1.02);
+  z-index: 1000;
 }
