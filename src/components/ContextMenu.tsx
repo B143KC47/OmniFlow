@@ -57,8 +57,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
             { 
               id: 'image_input', 
               type: 'IMAGE_INPUT', 
-              name: t('nodes.imageInput.name') || '图像输入', 
-              description: t('nodes.imageInput.description') || '图像输入节点', 
+              name: t('nodes.imageInput.name') || t('defaultNames.imageInput'), 
+              description: t('nodes.imageInput.description') || t('defaultDescriptions.imageInput'), 
               category: 'input',
               inputs: 0,
               outputs: 1,
@@ -67,8 +67,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
             { 
               id: 'file_input', 
               type: 'FILE_INPUT', 
-              name: t('nodes.fileInput.name') || '文件输入', 
-              description: t('nodes.fileInput.description') || '文件输入节点', 
+              name: t('nodes.fileInput.name') || t('defaultNames.fileInput'), 
+              description: t('nodes.fileInput.description') || t('defaultDescriptions.fileInput'), 
               category: 'input',
               inputs: 0,
               outputs: 1,
@@ -104,8 +104,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
             { 
               id: 'encoder', 
               type: 'ENCODER', 
-              name: t('nodes.encoder.name') || '文本编码器', 
-              description: t('nodes.encoder.description') || '文本编码转换', 
+              name: t('nodes.encoder.name') || t('defaultNames.encoder'), 
+              description: t('nodes.encoder.description') || t('defaultDescriptions.encoder'), 
               category: 'ai',
               inputs: 1,
               outputs: 1,
@@ -131,8 +131,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
             { 
               id: 'document_query', 
               type: 'DOCUMENT_QUERY', 
-              name: t('nodes.documentQuery.name') || '文档查询', 
-              description: t('nodes.documentQuery.description') || '文档查询节点', 
+              name: t('nodes.documentQuery.name') || t('defaultNames.documentQuery'), 
+              description: t('nodes.documentQuery.description') || t('defaultDescriptions.documentQuery'), 
               category: 'utility',
               inputs: 2,
               outputs: 1,
@@ -151,8 +151,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
             { 
               id: 'sampler', 
               type: 'SAMPLER', 
-              name: t('nodes.sampler.name') || '数据采样器', 
-              description: t('nodes.sampler.description') || '数据采样处理', 
+              name: t('nodes.sampler.name') || t('defaultNames.sampler'), 
+              description: t('nodes.sampler.description') || t('defaultDescriptions.sampler'), 
               category: 'utility',
               inputs: 1,
               outputs: 1,
@@ -163,13 +163,13 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
         {
           id: 'output',
           name: t('nodes.categories.output'),
-          description: t('nodes.categories.outputDescription') || '输出节点',
+          description: t('nodes.categories.outputDescription') || t('defaultDescriptions.outputCategory'),
           nodes: [
             { 
               id: 'text_output', 
               type: 'TEXT_OUTPUT', 
-              name: t('nodes.textOutput.name') || '文本输出', 
-              description: t('nodes.textOutput.description') || '文本输出节点', 
+              name: t('nodes.textOutput.name') || t('defaultNames.textOutput'), 
+              description: t('nodes.textOutput.description') || t('defaultDescriptions.textOutput'), 
               category: 'output',
               inputs: 1,
               outputs: 0,
@@ -178,8 +178,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
             { 
               id: 'image_output', 
               type: 'IMAGE_OUTPUT', 
-              name: t('nodes.imageOutput.name') || '图像输出', 
-              description: t('nodes.imageOutput.description') || '图像输出节点', 
+              name: t('nodes.imageOutput.name') || t('defaultNames.imageOutput'), 
+              description: t('nodes.imageOutput.description') || t('defaultDescriptions.imageOutput'), 
               category: 'output',
               inputs: 1,
               outputs: 0,
@@ -188,8 +188,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
             { 
               id: 'file_output', 
               type: 'FILE_OUTPUT', 
-              name: t('nodes.fileOutput.name') || '文件输出', 
-              description: t('nodes.fileOutput.description') || '文件输出节点', 
+              name: t('nodes.fileOutput.name') || t('defaultNames.fileOutput'), 
+              description: t('nodes.fileOutput.description') || t('defaultDescriptions.fileOutput'), 
               category: 'output',
               inputs: 1,
               outputs: 0,
@@ -232,11 +232,24 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
     return (
       <div className={styles['contexify-wrapper']}>
         <Menu id={id} className={styles['comfy-context-menu']}>
-          <Item disabled className={styles['comfy-menu-item']}>{t('contextMenu.loading') || '加载中...'}</Item>
+          <Item disabled className={styles['comfy-menu-item']}>{t('contextMenu.loading')}</Item>
         </Menu>
       </div>
     );
   }
+  
+  // 获取分类信息的辅助函数
+  const getCategoryTranslation = (categoryId: string): string => {
+    const category = nodeCategories.find(cat => cat.id === categoryId);
+    if (category) {
+      return category.name;
+    }
+    
+    // 默认翻译键
+    return t(`nodes.categories.${categoryId.toLowerCase()}`) || 
+           t(`defaultCategories.${categoryId.toLowerCase()}`) || 
+           categoryId;
+  };
 
   return (
     <div className={styles['contexify-wrapper']}>
@@ -249,141 +262,24 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode }) => {
         
         {/* 添加节点子菜单 */}
         <Submenu label={t('contextMenu.addNode')} className={styles.submenu}>
-          {/* 输入节点 */}
-          {nodeCategories.find(cat => cat.id === 'input') && (
-            <Submenu label={nodeCategories.find(cat => cat.id === 'input')?.name || t('nodes.categories.input')} className={styles.submenu}>
-              {nodeCategories
-                .find(cat => cat.id === 'input')
-                ?.nodes.map((node, index) => (
-                  <Item 
-                    key={`input-${node.id}-${index}`}
-                    onClick={e => handleAddNode(node.type, e)}
-                    className={styles['comfy-menu-item']}
-                  >
-                    {node.name}
-                  </Item>
-                ))}
+          {/* 动态生成所有节点类别 */}
+          {nodeCategories.map((category) => (
+            <Submenu 
+              key={`category-${category.id}`}
+              label={category.name} 
+              className={styles.submenu}
+            >
+              {category.nodes.map((node, index) => (
+                <Item 
+                  key={`${category.id}-${node.id}-${index}`}
+                  onClick={e => handleAddNode(node.type, e)}
+                  className={styles['comfy-menu-item']}
+                >
+                  {node.name}
+                </Item>
+              ))}
             </Submenu>
-          )}
-          
-          {/* AI任务执行节点 */}
-          {nodeCategories.find(cat => cat.id === 'AI_Task_Execution') && (
-            <Submenu label={nodeCategories.find(cat => cat.id === 'AI_Task_Execution')?.name || t('nodes.categories.aiTaskExecution')} className={styles.submenu}>
-              {nodeCategories
-                .find(cat => cat.id === 'AI_Task_Execution')
-                ?.nodes.map((node, index) => (
-                  <Item 
-                    key={`ai-task-${node.id}-${index}`}
-                    onClick={e => handleAddNode(node.type, e)}
-                    className={styles['comfy-menu-item']}
-                  >
-                    {node.name}
-                  </Item>
-                ))}
-            </Submenu>
-          )}
-          
-          {/* 数据操作工具节点 */}
-          {nodeCategories.find(cat => cat.id === 'Data_Manipulation_Utilities') && (
-            <Submenu label={nodeCategories.find(cat => cat.id === 'Data_Manipulation_Utilities')?.name || t('nodes.categories.dataManipulation')} className={styles.submenu}>
-              {nodeCategories
-                .find(cat => cat.id === 'Data_Manipulation_Utilities')
-                ?.nodes.map((node, index) => (
-                  <Item 
-                    key={`data-util-${node.id}-${index}`}
-                    onClick={e => handleAddNode(node.type, e)}
-                    className={styles['comfy-menu-item']}
-                  >
-                    {node.name}
-                  </Item>
-                ))}
-            </Submenu>
-          )}
-          
-          {/* 流程控制逻辑节点 */}
-          {nodeCategories.find(cat => cat.id === 'Flow_Control_Logic') && (
-            <Submenu label={nodeCategories.find(cat => cat.id === 'Flow_Control_Logic')?.name || t('nodes.categories.flowControl')} className={styles.submenu}>
-              {nodeCategories
-                .find(cat => cat.id === 'Flow_Control_Logic')
-                ?.nodes.map((node, index) => (
-                  <Item 
-                    key={`flow-logic-${node.id}-${index}`}
-                    onClick={e => handleAddNode(node.type, e)}
-                    className={styles['comfy-menu-item']}
-                  >
-                    {node.name}
-                  </Item>
-                ))}
-            </Submenu>
-          )}
-          
-          {/* 监控与调试节点 */}
-          {nodeCategories.find(cat => cat.id === 'Monitoring_Debugging') && (
-            <Submenu label={nodeCategories.find(cat => cat.id === 'Monitoring_Debugging')?.name || t('nodes.categories.monitoring')} className={styles.submenu}>
-              {nodeCategories
-                .find(cat => cat.id === 'Monitoring_Debugging')
-                ?.nodes.map((node, index) => (
-                  <Item 
-                    key={`monitoring-${node.id}-${index}`}
-                    onClick={e => handleAddNode(node.type, e)}
-                    className={styles['comfy-menu-item']}
-                  >
-                    {node.name}
-                  </Item>
-                ))}
-            </Submenu>
-          )}
-          
-          {/* 用户交互控制节点 */}
-          {nodeCategories.find(cat => cat.id === 'User_Interaction_Control') && (
-            <Submenu label={nodeCategories.find(cat => cat.id === 'User_Interaction_Control')?.name || t('nodes.categories.userInteraction')} className={styles.submenu}>
-              {nodeCategories
-                .find(cat => cat.id === 'User_Interaction_Control')
-                ?.nodes.map((node, index) => (
-                  <Item 
-                    key={`user-interaction-${node.id}-${index}`}
-                    onClick={e => handleAddNode(node.type, e)}
-                    className={styles['comfy-menu-item']}
-                  >
-                    {node.name}
-                  </Item>
-                ))}
-            </Submenu>
-          )}
-          
-          {/* 输出节点 */}
-          {nodeCategories.find(cat => cat.id === 'output') && (
-            <Submenu label={nodeCategories.find(cat => cat.id === 'output')?.name || t('nodes.categories.output')} className={styles.submenu}>
-              {nodeCategories
-                .find(cat => cat.id === 'output')
-                ?.nodes.map((node, index) => (
-                  <Item 
-                    key={`output-${node.id}-${index}`}
-                    onClick={e => handleAddNode(node.type, e)}
-                    className={styles['comfy-menu-item']}
-                  >
-                    {node.name}
-                  </Item>
-                ))}
-            </Submenu>
-          )}
-          
-          {/* 高级节点 */}
-          {nodeCategories.find(cat => cat.id === 'advanced') && (
-            <Submenu label={nodeCategories.find(cat => cat.id === 'advanced')?.name || t('nodes.categories.advanced')} className={styles.submenu}>
-              {nodeCategories
-                .find(cat => cat.id === 'advanced')
-                ?.nodes.map((node, index) => (
-                  <Item 
-                    key={`advanced-${node.id}-${index}`}
-                    onClick={e => handleAddNode(node.type, e)}
-                    className={styles['comfy-menu-item']}
-                  >
-                    {node.name}
-                  </Item>
-                ))}
-            </Submenu>
-          )}
+          ))}
         </Submenu>
         
         <Separator />

@@ -63,17 +63,28 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       outputs: 1,
       icon: 'file',
       component: 'input/FileInputNode'
+    },
+    {
+      id: 'IMAGE_INPUT',
+      type: 'IMAGE_INPUT',
+      name: '图像输入',
+      description: '图像输入节点',
+      category: 'input',
+      inputs: 0,
+      outputs: 1,
+      icon: 'image',
+      component: 'input/ImageInputNode'
     }
   ],
   
   // AI任务执行节点
-  AI_Task_Execution: [
+  ai: [
     {
       id: 'MODEL_SELECTOR',
       type: 'MODEL_SELECTOR',
       name: '模型选择器',
       description: '选择AI模型和参数的节点',
-      category: 'AI_Task_Execution',
+      category: 'ai',
       inputs: 0,
       outputs: 1,
       icon: 'model',
@@ -84,7 +95,7 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       type: 'LLM_QUERY',
       name: 'LLM查询',
       description: '执行大型语言模型查询的节点',
-      category: 'AI_Task_Execution',
+      category: 'ai',
       inputs: 2,
       outputs: 1,
       icon: 'brain',
@@ -95,7 +106,7 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       type: 'IMAGE_GENERATION',
       name: '图像生成',
       description: '使用AI生成图像的节点',
-      category: 'AI_Task_Execution',
+      category: 'ai',
       inputs: 1,
       outputs: 1,
       icon: 'image',
@@ -104,13 +115,13 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
   ],
   
   // 数据操作工具节点
-  Data_Manipulation_Utilities: [
+  data: [
     {
       id: 'WEB_SEARCH',
       type: 'WEB_SEARCH',
       name: 'Web搜索',
       description: '执行网络搜索的节点',
-      category: 'Data_Manipulation_Utilities',
+      category: 'data',
       inputs: 1,
       outputs: 1,
       icon: 'search',
@@ -121,7 +132,7 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       type: 'DOCUMENT_QUERY',
       name: '文档查询',
       description: '在文档中执行查询的节点',
-      category: 'Data_Manipulation_Utilities',
+      category: 'data',
       inputs: 2,
       outputs: 1,
       icon: 'document',
@@ -132,22 +143,33 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       type: 'DATA_TRANSFORM',
       name: '数据转换',
       description: '转换数据格式和结构的节点',
-      category: 'Data_Manipulation_Utilities',
+      category: 'data',
       inputs: 1,
       outputs: 1,
       icon: 'transform',
       component: 'data/DataTransformNode'
+    },
+    {
+      id: 'ENCODER',
+      type: 'ENCODER',
+      name: '文本编码器',
+      description: '文本编码转换',
+      category: 'data',
+      inputs: 1,
+      outputs: 1,
+      icon: 'embed',
+      component: 'data/EncoderNode'
     }
   ],
   
   // 流程控制逻辑节点
-  Flow_Control_Logic: [
+  flow: [
     {
       id: 'CONDITION',
       type: 'CONDITION',
       name: '条件判断',
       description: '基于条件选择执行路径的节点',
-      category: 'Flow_Control_Logic',
+      category: 'flow',
       inputs: 1,
       outputs: 2,
       icon: 'condition',
@@ -158,7 +180,7 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       type: 'LOOP',
       name: '循环控制',
       description: '实现循环执行逻辑的节点',
-      category: 'Flow_Control_Logic',
+      category: 'flow',
       inputs: 2,
       outputs: 1,
       icon: 'loop',
@@ -169,7 +191,7 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       type: 'SAMPLER',
       name: '采样器',
       description: '从多个选项中采样输出',
-      category: 'Flow_Control_Logic',
+      category: 'flow',
       inputs: 1,
       outputs: 1,
       icon: 'sampler',
@@ -178,13 +200,13 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
   ],
   
   // 监控与调试节点
-  Monitoring_Debugging: [
+  debug: [
     {
       id: 'LOGGER',
       type: 'LOGGER',
       name: '日志记录',
       description: '记录节点执行过程和结果的节点',
-      category: 'Monitoring_Debugging',
+      category: 'debug',
       inputs: 1,
       outputs: 1,
       icon: 'log',
@@ -195,7 +217,7 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       type: 'VISUALIZER',
       name: '数据可视化',
       description: '将数据以可视化方式展示的节点',
-      category: 'Monitoring_Debugging',
+      category: 'debug',
       inputs: 1,
       outputs: 0,
       icon: 'chart',
@@ -226,17 +248,28 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       outputs: 0,
       icon: 'file-out',
       component: 'output/FileOutputNode'
+    },
+    {
+      id: 'IMAGE_OUTPUT',
+      type: 'IMAGE_OUTPUT',
+      name: '图像输出',
+      description: '输出图像结果的节点',
+      category: 'output',
+      inputs: 1,
+      outputs: 0,
+      icon: 'image-out',
+      component: 'output/ImageOutputNode'
     }
   ],
   
   // 用户交互控制节点
-  User_Interaction_Control: [
+  interaction: [
     {
       id: 'USER_INPUT',
       type: 'USER_INPUT',
       name: '用户输入',
       description: '请求用户输入的节点',
-      category: 'User_Interaction_Control',
+      category: 'interaction',
       inputs: 1,
       outputs: 1,
       icon: 'user',
@@ -247,13 +280,50 @@ const PREDEFINED_NODES: Record<string, NodeDefinition[]> = {
       type: 'CONFIRMATION',
       name: '确认对话框',
       description: '显示确认对话框的节点',
-      category: 'User_Interaction_Control',
+      category: 'interaction',
       inputs: 1,
       outputs: 2,
       icon: 'confirm',
       component: 'interaction/ConfirmationNode'
     }
+  ],
+  
+  // 高级和自定义节点
+  advanced: [
+    {
+      id: 'CUSTOM_NODE',
+      type: 'CUSTOM_NODE',
+      name: '自定义节点',
+      description: '用户可定制的自定义节点',
+      category: 'advanced',
+      inputs: 1,
+      outputs: 1,
+      icon: 'code',
+      component: 'advanced/CustomNode'
+    }
   ]
+};
+
+// 尝试通过API扫描文件系统获取节点文件
+const scanNodeFilesFromFileSystem = async (rootPath: string): Promise<Record<string, string[]>> => {
+  // 注意：此函数仅在浏览器环境运行，且需要服务器支持
+  // 如果不支持文件系统API，会静默失败并返回空对象
+  if (typeof window === 'undefined' || typeof fetch !== 'function') {
+    return {};
+  }
+  
+  try {
+    // 尝试通过API获取节点文件信息
+    const response = await fetch('/api/node-discovery/scan');
+    if (!response.ok) {
+      throw new Error(`节点扫描API响应错误: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.warn('通过API扫描节点文件失败:', error);
+    return {};
+  }
 };
 
 // 扫描目录中的所有节点组件
@@ -263,8 +333,51 @@ export function scanNodeComponents(): Record<string, NodeDefinition[]> {
     return PREDEFINED_NODES;
   }
   
-  // 在客户端可以尝试动态扫描，但为了避免错误，仍然返回预定义的节点
+  // 在客户端尝试动态扫描节点文件
+  // 这里可以通过API请求或其他方式动态获取节点信息
+  // 目前为简化处理，直接返回预定义节点
+  try {
+    // 检查是否有缓存的节点定义
+    const cachedNodes = sessionStorage.getItem('omniflow-node-definitions');
+    if (cachedNodes) {
+      const parsed = JSON.parse(cachedNodes);
+      if (parsed && typeof parsed === 'object') {
+        console.log('使用缓存的节点定义');
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.warn('读取缓存的节点定义失败:', e);
+  }
+  
+  // 返回预定义节点
   return PREDEFINED_NODES;
+}
+
+// 异步初始化节点定义，用于启动时扫描
+export async function initializeNodeDefinitions(): Promise<Record<string, NodeDefinition[]>> {
+  const result = scanNodeComponents();
+  
+  // 尝试通过API扫描文件系统
+  try {
+    const fsNodes = await scanNodeFilesFromFileSystem('/src/components/nodes');
+    if (fsNodes && Object.keys(fsNodes).length > 0) {
+      // 将文件系统扫描结果转换为节点定义
+      // 这需要服务器端API支持，因此这里只是预留接口
+      console.log('从文件系统获取到节点文件:', fsNodes);
+    }
+  } catch (error) {
+    console.warn('扫描文件系统节点失败:', error);
+  }
+  
+  // 尝试缓存结果，简化后续加载
+  try {
+    sessionStorage.setItem('omniflow-node-definitions', JSON.stringify(result));
+  } catch (e) {
+    console.warn('缓存节点定义失败:', e);
+  }
+  
+  return result;
 }
 
 // 获取节点组件名称映射
@@ -281,6 +394,7 @@ export function getNodeComponentMap(): Record<string, any> {
     // 输入节点
     'TEXT_INPUT': '../components/nodes/input/TextInputNode',
     'FILE_INPUT': '../components/nodes/input/FileInputNode',
+    'IMAGE_INPUT': '../components/nodes/input/ImageInputNode',
     
     // AI任务执行节点
     'MODEL_SELECTOR': '../components/nodes/ai/ModelSelectorNode',
@@ -291,6 +405,7 @@ export function getNodeComponentMap(): Record<string, any> {
     'WEB_SEARCH': '../components/nodes/data/WebSearchNode',
     'DOCUMENT_QUERY': '../components/nodes/data/DocumentQueryNode',
     'DATA_TRANSFORM': '../components/nodes/data/DataTransformNode',
+    'ENCODER': '../components/nodes/data/EncoderNode',
     
     // 流程控制逻辑节点
     'CONDITION': '../components/nodes/flow/ConditionNode',
@@ -304,14 +419,14 @@ export function getNodeComponentMap(): Record<string, any> {
     // 输出节点
     'TEXT_OUTPUT': '../components/nodes/output/TextOutputNode',
     'FILE_OUTPUT': '../components/nodes/output/FileOutputNode',
+    'IMAGE_OUTPUT': '../components/nodes/output/ImageOutputNode',
     
     // 用户交互控制节点
     'USER_INPUT': '../components/nodes/interaction/UserInputNode',
     'CONFIRMATION': '../components/nodes/interaction/ConfirmationNode',
     
-    // 其他旧有节点兼容
-    'CUSTOM': '../components/nodes/CustomNode',
-    'ENCODER': '../components/nodes/EncoderNode'
+    // 高级节点
+    'CUSTOM_NODE': '../components/nodes/advanced/CustomNode'
   };
   
   // 使用预定义映射而不是动态扫描

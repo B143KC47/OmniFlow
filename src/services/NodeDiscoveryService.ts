@@ -29,6 +29,8 @@ export interface NodeCategory {
 // 预设节点类型与图标的映射关系
 const NODE_ICON_MAP: Record<string, string> = {
   'TEXT_INPUT': 'text',
+  'IMAGE_INPUT': 'image',
+  'FILE_INPUT': 'file',
   'LLM_QUERY': 'brain',
   'WEB_SEARCH': 'search',
   'DOCUMENT_QUERY': 'document',
@@ -36,17 +38,45 @@ const NODE_ICON_MAP: Record<string, string> = {
   'CUSTOM_NODE': 'code',
   'ENCODER': 'embed',
   'SAMPLER': 'random',
+  'LOOP_CONTROL': 'loop',
+  'TEXT_OUTPUT': 'text-out',
+  'IMAGE_OUTPUT': 'image-out',
+  'FILE_OUTPUT': 'file-out',
+  'DATA_TRANSFORM': 'transform',
+  'CONDITION': 'condition',
+  'LOGGER': 'log',
+  'VISUALIZER': 'chart',
+  'USER_INPUT': 'user',
+  'CONFIRMATION': 'confirm',
+  'IMAGE_GENERATION': 'image'
 };
 
 // 预设文件夹与分类的映射关系
 const FOLDER_CATEGORY_MAP: Record<string, string> = {
   'input': 'input',
-  'ai': 'ai',
-  'flow': 'flow',
+  'ai': 'AI_Task_Execution',
+  'flow': 'Flow_Control_Logic',
   'advanced': 'advanced',
   'search': 'utility',
   'output': 'output',
-  'utility': 'utility',
+  'utility': 'Data_Manipulation_Utilities',
+  'data': 'Data_Manipulation_Utilities',
+  'debug': 'Monitoring_Debugging',
+  'interaction': 'User_Interaction_Control'
+};
+
+// 分类的国际化映射
+const CATEGORY_I18N_MAP: Record<string, string> = {
+  'input': 'nodes.categories.input',
+  'AI_Task_Execution': 'nodes.categories.aiTaskExecution',
+  'Data_Manipulation_Utilities': 'nodes.categories.dataManipulation',
+  'Flow_Control_Logic': 'nodes.categories.flowControl',
+  'Monitoring_Debugging': 'nodes.categories.monitoring',
+  'output': 'nodes.categories.output',
+  'User_Interaction_Control': 'nodes.categories.userInteraction',
+  'utility': 'nodes.categories.utility',
+  'flow': 'nodes.categories.flow',
+  'advanced': 'nodes.categories.advanced'
 };
 
 class NodeDiscoveryService {
@@ -55,6 +85,7 @@ class NodeDiscoveryService {
   private nodeCategories: NodeCategory[] = [];
   private isInitialized = false;
   private nodeRegistry: NodeRegistry;
+  private translateFunc: ((key: string) => string) | null = null;
 
   private constructor() {
     // 初始化节点注册表
@@ -71,6 +102,9 @@ class NodeDiscoveryService {
   // 初始化节点定义，从预设和自动扫描中收集
   public async initialize(t: (key: string) => string): Promise<void> {
     if (this.isInitialized) return;
+
+    // 保存翻译函数用于后续操作
+    this.translateFunc = t;
 
     // 确保节点注册表已初始化
     await this.nodeRegistry.initialize();
@@ -149,7 +183,7 @@ class NodeDiscoveryService {
         type: 'LLM_QUERY',
         name: t('nodes.llmQuery.name'),
         description: t('nodes.llmQuery.description'),
-        category: 'ai',
+        category: 'AI_Task_Execution',
         inputs: 1,
         outputs: 1,
         icon: 'brain',
@@ -160,7 +194,7 @@ class NodeDiscoveryService {
         type: 'WEB_SEARCH',
         name: t('nodes.webSearch.name'), 
         description: t('nodes.webSearch.description'),
-        category: 'utility',
+        category: 'Data_Manipulation_Utilities',
         inputs: 1,
         outputs: 1,
         icon: 'search',
@@ -171,7 +205,7 @@ class NodeDiscoveryService {
         type: 'DOCUMENT_QUERY',
         name: t('nodes.documentQuery.name'),
         description: t('nodes.documentQuery.description'),
-        category: 'utility',
+        category: 'Data_Manipulation_Utilities',
         inputs: 1,
         outputs: 1,
         icon: 'document'
@@ -181,7 +215,7 @@ class NodeDiscoveryService {
         type: 'MODEL_SELECTOR',
         name: t('nodes.modelSelector.name'),
         description: t('nodes.modelSelector.description'),
-        category: 'ai',
+        category: 'AI_Task_Execution',
         inputs: 0,
         outputs: 1,
         icon: 'model'
@@ -201,7 +235,7 @@ class NodeDiscoveryService {
         type: 'ENCODER',
         name: t('nodes.encoder.name'),
         description: t('nodes.encoder.description'),
-        category: 'utility',
+        category: 'Data_Manipulation_Utilities',
         inputs: 1,
         outputs: 1,
         icon: 'embed'
@@ -211,7 +245,7 @@ class NodeDiscoveryService {
         type: 'SAMPLER',
         name: t('nodes.sampler.name'),
         description: t('nodes.sampler.description'),
-        category: 'utility',
+        category: 'Flow_Control_Logic',
         inputs: 1,
         outputs: 1,
         icon: 'random'
@@ -232,6 +266,9 @@ class NodeDiscoveryService {
       
       // 处理每个类别中的节点
       Object.entries(categoryNodeMap).forEach(([category, nodes]) => {
+        // 确定正确的分类ID
+        const mappedCategory = FOLDER_CATEGORY_MAP[category] || category;
+        
         // 对于每个发现的节点，添加到列表中
         nodes.forEach(node => {
           // 确保节点有一个合适的图标
@@ -241,7 +278,13 @@ class NodeDiscoveryService {
             node.icon = category; // 使用类别作为默认图标
           }
           
-          discoveredNodes.push(node);
+          // 确保节点分类正确
+          const nodeWithCategory = {
+            ...node,
+            category: mappedCategory
+          };
+          
+          discoveredNodes.push(nodeWithCategory);
         });
       });
       
@@ -279,16 +322,16 @@ class NodeDiscoveryService {
     
     // 处理所有分类，包括新添加的分类
     const allCategories = [
-      { id: 'input', name: t('categories.input'), description: t('categories.inputDescription') },
-      { id: 'AI_Task_Execution', name: t('categories.aiTaskExecution') || 'AI任务执行', description: t('categories.aiTaskExecutionDescription') || 'AI和机器学习相关的任务执行节点' },
-      { id: 'Data_Manipulation_Utilities', name: t('categories.dataManipulation') || '数据操作工具', description: t('categories.dataManipulationDescription') || '数据处理、转换和操作工具' },
-      { id: 'Flow_Control_Logic', name: t('categories.flowControl') || '流程控制逻辑', description: t('categories.flowControlDescription') || '控制工作流执行逻辑的节点' },
-      { id: 'Monitoring_Debugging', name: t('categories.monitoring') || '监控与调试', description: t('categories.monitoringDescription') || '工作流监控和调试工具' },
-      { id: 'output', name: t('categories.output'), description: t('categories.outputDescription') },
-      { id: 'User_Interaction_Control', name: t('categories.userInteraction') || '用户交互控制', description: t('categories.userInteractionDescription') || '处理用户交互的节点' },
-      { id: 'utility', name: t('categories.utility'), description: t('categories.utilityDescription') },
-      { id: 'flow', name: t('categories.flow'), description: t('categories.flowDescription') },
-      { id: 'advanced', name: t('categories.advanced'), description: t('categories.advancedDescription') }
+      { id: 'input', name: t('nodes.categories.input'), description: t('nodes.categories.inputDescription') },
+      { id: 'AI_Task_Execution', name: t('nodes.categories.aiTaskExecution') || t('defaultCategories.aiTaskExecution'), description: t('nodes.categories.aiTaskExecutionDescription') || t('defaultDescriptions.aiTaskExecution') },
+      { id: 'Data_Manipulation_Utilities', name: t('nodes.categories.dataManipulation') || t('defaultCategories.dataManipulation'), description: t('nodes.categories.dataManipulationDescription') || t('defaultDescriptions.dataManipulation') },
+      { id: 'Flow_Control_Logic', name: t('nodes.categories.flowControl') || t('defaultCategories.flowControl'), description: t('nodes.categories.flowControlDescription') || t('defaultDescriptions.flowControl') },
+      { id: 'Monitoring_Debugging', name: t('nodes.categories.monitoring') || t('defaultCategories.monitoring'), description: t('nodes.categories.monitoringDescription') || t('defaultDescriptions.monitoring') },
+      { id: 'output', name: t('nodes.categories.output'), description: t('nodes.categories.outputDescription') || t('defaultDescriptions.output')},
+      { id: 'User_Interaction_Control', name: t('nodes.categories.userInteraction') || t('defaultCategories.userInteraction'), description: t('nodes.categories.userInteractionDescription') || t('defaultDescriptions.userInteraction') },
+      { id: 'utility', name: t('nodes.categories.utility'), description: t('nodes.categories.utilityDescription') },
+      { id: 'flow', name: t('nodes.categories.flow'), description: t('nodes.categories.flowDescription') },
+      { id: 'advanced', name: t('nodes.categories.advanced'), description: t('nodes.categories.advancedDescription') }
     ];
     
     // 添加所有存在节点的分类
@@ -303,7 +346,71 @@ class NodeDiscoveryService {
       }
     }
     
+    // 检查是否有未包含在预定义分类中的节点类别
+    for (const [categoryId, nodes] of categoryMap.entries()) {
+      if (!categories.some(cat => cat.id === categoryId)) {
+        // 尝试获取此类别的国际化名称
+        const categoryName = this.translateCategory(categoryId, t);
+        const categoryDescription = this.translateCategoryDescription(categoryId, t);
+        
+        categories.push({
+          id: categoryId,
+          name: categoryName,
+          description: categoryDescription,
+          nodes: nodes
+        });
+      }
+    }
+    
     this.nodeCategories = categories;
+  }
+
+  // 翻译分类名称
+  private translateCategory(categoryId: string, t: (key: string) => string): string {
+    // 检查是否有预设的国际化映射
+    if (CATEGORY_I18N_MAP[categoryId]) {
+      const translated = t(CATEGORY_I18N_MAP[categoryId]);
+      if (translated !== CATEGORY_I18N_MAP[categoryId]) {
+        return translated;
+      }
+    }
+    
+    // 尝试使用默认的分类国际化路径
+    const defaultKey = `nodes.categories.${categoryId.toLowerCase()}`;
+    const translated = t(defaultKey);
+    if (translated !== defaultKey) {
+      return translated;
+    }
+    
+    // 尝试使用备用分类国际化路径
+    const fallbackKey = `defaultCategories.${categoryId.toLowerCase()}`;
+    const fallbackTranslated = t(fallbackKey);
+    if (fallbackTranslated !== fallbackKey) {
+      return fallbackTranslated;
+    }
+    
+    // 格式化分类ID作为后备
+    return categoryId.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').trim();
+  }
+  
+  // 翻译分类描述
+  private translateCategoryDescription(categoryId: string, t: (key: string) => string): string {
+    // 尝试使用描述国际化路径
+    const descriptionKey = `nodes.categories.${categoryId.toLowerCase()}Description`;
+    const translated = t(descriptionKey);
+    if (translated !== descriptionKey) {
+      return translated;
+    }
+    
+    // 尝试使用备用描述国际化路径
+    const fallbackKey = `defaultDescriptions.${categoryId.toLowerCase()}`;
+    const fallbackTranslated = t(fallbackKey);
+    if (fallbackTranslated !== fallbackKey) {
+      return fallbackTranslated;
+    }
+    
+    // 格式化分类ID作为后备
+    return `${this.translateCategory(categoryId, t)} 类型的节点`;
   }
 
   // 注册自定义节点
@@ -318,8 +425,29 @@ class NodeDiscoveryService {
       this.nodeDefinitions.push(node);
     }
     
+    // 如果有翻译函数，使用它更新节点名称和描述
+    if (this.translateFunc) {
+      const nodeType = node.type.toLowerCase().replace(/_/g, '');
+      const nameKey = `nodes.${nodeType}.name`;
+      const descKey = `nodes.${nodeType}.description`;
+      
+      const translatedName = this.translateFunc(nameKey);
+      if (translatedName !== nameKey) {
+        node.name = translatedName;
+      }
+      
+      const translatedDesc = this.translateFunc(descKey);
+      if (translatedDesc !== descKey) {
+        node.description = translatedDesc;
+      }
+    }
+    
     // 重新组织节点分类
-    this.organizeNodesByCategory((key: string) => key);
+    if (this.translateFunc) {
+      this.organizeNodesByCategory(this.translateFunc);
+    } else {
+      this.organizeNodesByCategory((key: string) => key);
+    }
   }
 
   // 获取节点注册表实例
