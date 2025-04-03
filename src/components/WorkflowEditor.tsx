@@ -56,29 +56,67 @@ interface NodeTypes {
   [key: string]: React.ComponentType<any>;
 }
 
+// 创建一个默认的nodeTypes对象，使用ReactFlowNodeRenderer作为所有节点类型的渲染器
+// 通过将这个对象放在组件外部，避免在每次渲染时重新创建
+const defaultNodeTypes: NodeTypes = {
+  default: ReactFlowNodeRenderer
+};
+
+// 创建一个稳定的节点类型映射对象
+// 所有可能的节点类型都使用同一个渲染器组件
+const staticNodeTypes: NodeTypes = {
+  default: ReactFlowNodeRenderer,
+  TEXT_INPUT: ReactFlowNodeRenderer,
+  WEB_SEARCH: ReactFlowNodeRenderer,
+  DOCUMENT_QUERY: ReactFlowNodeRenderer,
+  MODEL_SELECTOR: ReactFlowNodeRenderer,
+  CUSTOM_NODE: ReactFlowNodeRenderer,
+  ENCODER: ReactFlowNodeRenderer,
+  SAMPLER: ReactFlowNodeRenderer,
+  LLM_QUERY: ReactFlowNodeRenderer,
+  IMAGE_INPUT: ReactFlowNodeRenderer,
+  FILE_INPUT: ReactFlowNodeRenderer,
+  TEXT_OUTPUT: ReactFlowNodeRenderer,
+  IMAGE_OUTPUT: ReactFlowNodeRenderer,
+  FILE_OUTPUT: ReactFlowNodeRenderer,
+  LOOP_CONTROL: ReactFlowNodeRenderer
+};
+
+// 节点类型映射器 - 将ReactFlowNodeRenderer用作所有节点类型的渲染器的工厂函数
+// 这个函数在组件外部定义，避免在每次渲染时重新创建
+const createNodeTypesMap = (nodeTypes: string[]): Record<string, React.ComponentType<any>> => {
+  return nodeTypes.reduce((acc, type) => {
+    acc[type] = ReactFlowNodeRenderer;
+    return acc;
+  }, { ...defaultNodeTypes } as Record<string, React.ComponentType<any>>);
+};
+
 // 内部工作流编辑器组件
 const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
   const { t } = useTranslation();
   // 使用 useState 来跟踪客户端渲染状态
   const [isClient, setIsClient] = useState(false);
   const [nodeRegistry, setNodeRegistry] = useState<NodeRegistry | null>(null);
-  const [nodeTypes, setNodeTypes] = useState<Record<string, React.ComponentType<any>>>({});
+  const [nodeTypes, setNodeTypes] = useState<Record<string, React.ComponentType<any>>>(defaultNodeTypes);
   const [nodeTypeMap, setNodeTypeMap] = useState<Record<string, string>>({});
   const [isInitialized, setIsInitialized] = useState(false);
-
-  // 使用 useMemo 对 nodeTypes 进行记忆化，避免每次渲染创建新对象
-  const memoizedNodeTypes = useMemo(() => nodeTypes, [nodeTypes]);
 
   // 在组件挂载时初始化节点工厂和注册节点
   useEffect(() => {
     if (isClient) {
       console.log('初始化节点工厂...');
       const factory = NodeFactory.getInstance();
-      factory.initialize();
       
-      console.log('注册所有节点...');
-      NodeRegistrator.registerAllNodes();
-      console.log('节点注册完成');
+      // 避免重复初始化
+      if (!factory.isInitialized()) {
+        factory.initialize();
+        
+        console.log('注册所有节点...');
+        NodeRegistrator.registerAllNodes();
+        console.log('节点注册完成');
+      } else {
+        console.log('节点工厂已初始化，跳过重复初始化');
+      }
       
       // 获取节点类型并设置节点组件映射
       const allNodeDefinitions = factory.getAllNodeDefinitions();
@@ -89,15 +127,15 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
       
       // 构建节点类型映射
       const typeMap: Record<string, string> = {};
-      const nodeTypes: Record<string, React.ComponentType<any>> = {};
+      const nodeTypesObj: Record<string, React.ComponentType<any>> = {};
       
       allNodeDefinitions.forEach(def => {
         // 使用自定义渲染器作为节点组件的包装器
-        nodeTypes[def.type] = ReactFlowNodeRenderer;
+        nodeTypesObj[def.type] = ReactFlowNodeRenderer;
         typeMap[def.type] = def.type;
       });
       
-      setNodeTypes(nodeTypes);
+      setNodeTypes(nodeTypesObj);
       setNodeTypeMap(typeMap);
     }
   }, [isClient]);
@@ -117,12 +155,18 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     // 初始化节点系统
     const initNodeSystem = async () => {
       try {
-        // 初始化节点工厂 - 修正访问方式，使用静态方法
+        // 获取节点工厂实例
         const factory = NodeFactory.getInstance();
-        factory.initialize();
         
-        // 注册所有节点
-        NodeRegistrator.registerAllNodes();
+        // 检查节点工厂是否已初始化，避免重复初始化
+        if (!factory.isInitialized()) {
+          factory.initialize();
+          
+          // 注册所有节点
+          NodeRegistrator.registerAllNodes();
+        } else {
+          console.log('节点工厂已初始化，跳过重复初始化');
+        }
         
         // 初始化节点注册表（为了兼容性保留）
         const registry = NodeRegistry.getInstance();
@@ -140,18 +184,18 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
         }, {} as Record<string, React.ComponentType<any>>);
         
         // 如果节点工厂中没有注册节点，使用旧版注册表的组件映射
-        const nodeTypes = Object.keys(allNodeTypes).length > 0 
+        const nodeTypesObj = Object.keys(allNodeTypes).length > 0 
           ? allNodeTypes 
           : registry.getNodeComponents();
         
         // 设置状态
         setNodeRegistry(registry);
-        setNodeTypes(nodeTypes);
+        setNodeTypes(nodeTypesObj);
         setNodeTypeMap(registry.getNodeTypeMap());
         setIsInitialized(true);
         
         console.log('工作流编辑器初始化完成', {
-          components: Object.keys(nodeTypes)
+          components: Object.keys(nodeTypesObj)
         });
       } catch (error) {
         console.error('初始化节点系统时出错:', error);
@@ -164,6 +208,16 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
       window.removeEventListener('error', errorHandler);
     };
   }, [t]);
+
+  // 优化的节点类型记忆化 - 使用前面定义的工厂函数生成节点类型映射
+  // 这种方式会避免在组件重新渲染时创建新的nodeTypes对象
+  const nodeTypeKeys = useMemo(() => Object.keys(nodeTypes), [nodeTypes]);
+  
+  // 使用静态工厂函数创建节点类型映射，而不是在组件内部创建新对象
+  const memoizedNodeTypes = useMemo(() => {
+    if (nodeTypeKeys.length === 0) return defaultNodeTypes;
+    return createNodeTypesMap(nodeTypeKeys);
+  }, [nodeTypeKeys]);
 
   // ReactFlow元素状态
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
@@ -294,32 +348,33 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     console.log(`节点类型处理结果: ${actualType} (原始类型: ${type})`);
     
     // 检查这个节点类型是否有对应的组件
-    if (!memoizedNodeTypes[actualType]) {
+    // 使用静态节点类型映射替代memoizedNodeTypes
+    if (!staticNodeTypes[actualType]) {
       console.error(`未找到节点类型 "${actualType}" 对应的组件，尝试使用通用节点`);
-      console.log(`已注册的节点类型映射: ${Object.keys(memoizedNodeTypes).join(', ')}`);
+      console.log(`已注册的节点类型映射: ${Object.keys(staticNodeTypes).join(', ')}`);
       
       // 如果是已知类型但未找到对应组件，可能是因为命名不一致，尝试处理常见的大小写差异
       let resolvedType = actualType;
       
       // 尝试处理可能的大小写差异
-      if (memoizedNodeTypes[actualType.toLowerCase()]) {
+      if (staticNodeTypes[actualType.toLowerCase()]) {
         resolvedType = actualType.toLowerCase();
         console.log(`找到了小写匹配: ${resolvedType}`);
-      } else if (memoizedNodeTypes[actualType.toUpperCase()]) {
+      } else if (staticNodeTypes[actualType.toUpperCase()]) {
         resolvedType = actualType.toUpperCase();
         console.log(`找到了大写匹配: ${resolvedType}`);
       } 
       // 尝试处理可能的下划线和驼峰命名差异
       else if (actualType.includes('_')) {
         const camelCase = actualType.toLowerCase().replace(/_([a-z])/g, (_, c) => c.toUpperCase());
-        if (memoizedNodeTypes[camelCase]) {
+        if (staticNodeTypes[camelCase]) {
           resolvedType = camelCase;
           console.log(`找到了驼峰命名匹配: ${resolvedType}`);
         }
       } else {
         // 转换成下划线形式尝试
         const underscored = actualType.replace(/([A-Z])/g, '_$1').toUpperCase();
-        if (memoizedNodeTypes[underscored]) {
+        if (staticNodeTypes[underscored]) {
           resolvedType = underscored;
           console.log(`找到了下划线命名匹配: ${resolvedType}`);
         }
@@ -705,6 +760,7 @@ const FlowEditor = ({ initialWorkflow, onSave }: WorkflowEditorProps) => {
     return <div className="min-h-screen bg-[#141414]">正在加载节点库...</div>;
   }
 
+  // 在 ReactFlow 组件中使用静态的 nodeTypes 对象，而不是动态创建的对象
   return (
     <>
       {workflowController && (

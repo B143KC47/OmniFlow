@@ -27,11 +27,21 @@ class NodeExecutorFactory {
    * 注册节点执行器
    * @param type 节点类型
    * @param executor 执行器实例
+   * @param force 是否强制覆盖现有的执行器，默认为false
    */
-  public registerExecutor(type: string, executor: NodeExecutor): void {
+  public registerExecutor(type: string, executor: NodeExecutor, force: boolean = false): void {
+    // 检查执行器是否已存在
     if (this.executors.has(type)) {
+      // 如果不强制覆盖，则输出警告并返回
+      if (!force) {
+        console.warn(`节点执行器 ${type} 已存在，跳过注册`);
+        return;
+      }
+      // 强制覆盖时输出信息
       console.warn(`节点执行器 ${type} 已存在，将被覆盖`);
     }
+    
+    // 注册执行器
     this.executors.set(type, executor);
   }
 

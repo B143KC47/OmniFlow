@@ -66,6 +66,14 @@ class NodeFactory {
   }
 
   /**
+   * 检查节点工厂是否已初始化
+   * @returns 是否已初始化
+   */
+  public isInitialized(): boolean {
+    return this.initialized;
+  }
+
+  /**
    * 注册节点类型
    * @param definition 节点定义
    */

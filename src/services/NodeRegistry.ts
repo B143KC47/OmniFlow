@@ -179,6 +179,18 @@ class NodeRegistry {
       ['CUSTOM_NODE', '../components/nodes/CustomNode'],
       ['ENCODER', '../components/nodes/EncoderNode'],
       ['SAMPLER', '../components/nodes/SamplerNode'],
+      // 添加缺失的节点类型
+      ['VIDEO_INPUT', '../components/ReactFlowNodeRenderer'],
+      ['AUDIO_INPUT', '../components/ReactFlowNodeRenderer'],
+      ['IMAGE_INPUT', '../components/ReactFlowNodeRenderer'],
+      ['VIDEO_OUTPUT', '../components/ReactFlowNodeRenderer'],
+      ['AUDIO_OUTPUT', '../components/ReactFlowNodeRenderer'],
+      ['FILE_INPUT', '../components/ReactFlowNodeRenderer'],
+      ['FILE_OUTPUT', '../components/ReactFlowNodeRenderer'],
+      ['TEXT_OUTPUT', '../components/ReactFlowNodeRenderer'],
+      ['IMAGE_OUTPUT', '../components/ReactFlowNodeRenderer'],
+      ['NOTE', '../components/ReactFlowNodeRenderer'],
+      ['LOOP_CONTROL', '../components/ReactFlowNodeRenderer']
     ];
     
     // 注册核心节点
@@ -214,6 +226,18 @@ class NodeRegistry {
     // 获取所有枚举的节点类型
     const nodeTypeValues = Object.values(NodeType);
     
+    // 创建节点类型映射，包括转换后的格式（无下划线、小写）
+    const nodeTypeMap = new Set<string>();
+    nodeTypeValues.forEach(type => {
+      nodeTypeMap.add(type);
+      // 添加无下划线版本
+      nodeTypeMap.add(type.replace(/_/g, ''));
+      // 添加小写版本
+      nodeTypeMap.add(type.toLowerCase());
+      // 添加小写无下划线版本
+      nodeTypeMap.add(type.toLowerCase().replace(/_/g, ''));
+    });
+    
     // 检查每个节点类型是否都有对应的组件
     nodeTypeValues.forEach(nodeType => {
       const normalizedType = this.normalizeNodeType(nodeType);
@@ -225,7 +249,14 @@ class NodeRegistry {
     
     // 检查是否有组件没有对应的类型
     Object.keys(this.nodeComponents).forEach(nodeType => {
-      if (!nodeTypeValues.includes(nodeType as NodeType) && !Object.values(NodeType).includes(nodeType as any)) {
+      // 使用更宽松的匹配规则，检查不同格式的类型
+      const isValidNodeType = 
+        nodeTypeMap.has(nodeType) ||
+        nodeTypeMap.has(nodeType.replace(/_/g, '')) ||
+        nodeTypeMap.has(nodeType.toLowerCase()) ||
+        nodeTypeMap.has(nodeType.toLowerCase().replace(/_/g, ''));
+      
+      if (!isValidNodeType) {
         console.warn(`组件类型 "${nodeType}" 不在 NodeType 枚举中，可能需要添加到枚举定义`);
       }
     });

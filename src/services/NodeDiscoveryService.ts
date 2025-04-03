@@ -31,6 +31,8 @@ const NODE_ICON_MAP: Record<string, string> = {
   'TEXT_INPUT': 'text',
   'IMAGE_INPUT': 'image',
   'FILE_INPUT': 'file',
+  'VIDEO_INPUT': 'video',
+  'AUDIO_INPUT': 'audio',
   'LLM_QUERY': 'brain',
   'WEB_SEARCH': 'search',
   'DOCUMENT_QUERY': 'document',
@@ -41,6 +43,8 @@ const NODE_ICON_MAP: Record<string, string> = {
   'LOOP_CONTROL': 'loop',
   'TEXT_OUTPUT': 'text-out',
   'IMAGE_OUTPUT': 'image-out',
+  'VIDEO_OUTPUT': 'video-out',
+  'AUDIO_OUTPUT': 'audio-out',
   'FILE_OUTPUT': 'file-out',
   'DATA_TRANSFORM': 'transform',
   'CONDITION': 'condition',
@@ -48,7 +52,8 @@ const NODE_ICON_MAP: Record<string, string> = {
   'VISUALIZER': 'chart',
   'USER_INPUT': 'user',
   'CONFIRMATION': 'confirm',
-  'IMAGE_GENERATION': 'image'
+  'IMAGE_GENERATION': 'image',
+  'NOTE': 'note'
 };
 
 // 预设文件夹与分类的映射关系

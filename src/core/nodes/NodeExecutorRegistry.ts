@@ -13,10 +13,18 @@ import { CustomNodeExecutor } from './executors/CustomNodeExecutor';
  * 负责将所有节点执行器注册到工厂
  */
 export class NodeExecutorRegistry {
+  // 添加静态标志，表示内置执行器是否已注册
+  private static isBuiltinExecutorsRegistered: boolean = false;
+
   /**
    * 注册所有内置节点执行器
    */
   public static registerBuiltinExecutors(): void {
+    // 如果已经注册过内置执行器，则直接返回
+    if (NodeExecutorRegistry.isBuiltinExecutorsRegistered) {
+      return;
+    }
+    
     const factory = NodeExecutorFactory.getInstance();
     
     // 注册文本输入节点执行器
@@ -44,6 +52,9 @@ export class NodeExecutorRegistry {
     factory.registerExecutor('CUSTOM', new CustomNodeExecutor());
     
     console.log('已注册所有内置节点执行器');
+    
+    // 设置标志，表示内置执行器已注册
+    NodeExecutorRegistry.isBuiltinExecutorsRegistered = true;
   }
   
   /**
