@@ -1,4 +1,4 @@
-/* React Flow 节点样式覆盖 */
+/* React Flow 节点样式覆盖 - 增强版 */
 
 /* 覆盖默认节点样式 */
 .react-flow__node {
@@ -8,17 +8,22 @@
   overflow: visible !important;
   padding: 0 !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  min-width: auto !important;
+  min-height: auto !important;
 }
 
 /* 折叠状态下的节点样式 */
-.react-flow__node:has(.BaseNodeComponent_collapsed__PbT1J) {
+.react-flow__node:has(.BaseNodeComponent_collapsed__PbT1J),
+.react-flow__node:has(.collapsed) {
   width: auto !important;
   min-width: auto !important;
   min-height: auto !important;
-  height: auto !important;
+  height: var(--node-header-height, 42px) !important;
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* 选中状态下的节点样式 */
@@ -26,6 +31,7 @@
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  z-index: 100 !important;
 }
 
 /* 确保节点内容可见 */
@@ -42,7 +48,26 @@
 .react-flow__node-DOCUMENT_QUERY,
 .react-flow__node-WEB_SEARCH,
 .react-flow__node-ENCODER,
-.react-flow__node-CUSTOM {
+.react-flow__node-CUSTOM,
+.react-flow__node-MODEL_SELECTOR,
+.react-flow__node-IMAGE_GENERATION,
+.react-flow__node-DATA_TRANSFORM,
+.react-flow__node-CONDITION,
+.react-flow__node-LOOP,
+.react-flow__node-LOGGER,
+.react-flow__node-VISUALIZER,
+.react-flow__node-TEXT_OUTPUT,
+.react-flow__node-FILE_OUTPUT,
+.react-flow__node-IMAGE_OUTPUT,
+.react-flow__node-USER_INPUT,
+.react-flow__node-CONFIRMATION,
+.react-flow__node-FILE_INPUT,
+.react-flow__node-VIDEO_INPUT,
+.react-flow__node-AUDIO_INPUT {
   width: auto !important;
   height: auto !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
 }

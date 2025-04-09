@@ -322,7 +322,7 @@ const BaseNodeComponent = memo(({
   return (
     <div
       ref={nodeRef}
-      className={`${styles.baseNode} ${selected ? 'selected' : ''} ${status || ''} ${collapsed ? styles.collapsed : ''}`}
+      className={`${styles.baseNode} node-unified ${selected ? 'selected' : ''} ${status || ''} ${collapsed ? styles.collapsed : ''} ${collapsed ? 'collapsed' : ''}`}
       data-category={getNodeCategory()}
       data-type={type}
       style={{
@@ -334,18 +334,18 @@ const BaseNodeComponent = memo(({
     >
       {/* 节点头部 */}
       <div
-        className={styles.nodeHeader}
+        className={`${styles.nodeHeader} node-header`}
         style={{
           background: theme.headerColor || NODE_THEME.DEFAULT.headerColor,
           color: theme.titleColor || NODE_THEME.DEFAULT.titleColor
         }}
       >
-        <div className={styles.nodeTitle}>
+        <div className={`${styles.nodeTitle} node-title`}>
           {/* 添加节点图标 */}
-          <span className={styles.nodeIcon}>
+          <span className={`${styles.nodeIcon} node-icon`}>
             {getNodeTypeIcon(type)}
           </span>
-          <span className={styles.nodeTitleText}>{label || id}</span>
+          <span className={`${styles.nodeTitleText} node-title-text`}>{label || id}</span>
           {status && (
             <span className={`${styles.nodeStatus} ${status}`} title={getStatusText(status)}>
               {status === 'running' && '⏳'} {/* 沙漏计时器 */}
@@ -354,14 +354,14 @@ const BaseNodeComponent = memo(({
             </span>
           )}
         </div>
-        <div className={styles.nodeControls}>
+        <div className={`${styles.nodeControls} node-controls`}>
           {!collapsed && (
             <button
               onClick={() => {
                 setAutoSized(false);
                 autoAdjustNodeSize();
               }}
-              className={styles.nodeActionButton}
+              className={`${styles.nodeActionButton} node-action-button`}
               title={t('nodes.common.autoSize', { defaultValue: '自动调整大小' })}
             >
               <span style={{
@@ -375,7 +375,7 @@ const BaseNodeComponent = memo(({
           )}
           <button
             onClick={toggleCollapsed}
-            className={styles.nodeActionButton}
+            className={`${styles.nodeActionButton} node-action-button`}
             title={collapsed ? t('nodes.common.expand') : t('nodes.common.collapse')}
           >
             <span style={{
@@ -393,7 +393,7 @@ const BaseNodeComponent = memo(({
       </div>
 
       {/* 节点内容 */}
-      <div ref={contentRef} className={`${styles.nodeContent} ${collapsed ? styles.collapsed : ''}`}>
+      <div ref={contentRef} className={`${styles.nodeContent} node-content ${collapsed ? styles.collapsed : ''}`}>
         {/* 自定义内容渲染 */}
         {customContent && (
           <div className={styles.customContent}>
@@ -403,10 +403,10 @@ const BaseNodeComponent = memo(({
 
         {/* 输入部分 - 增强可读性 */}
         {Object.keys(inputs).length > 0 && (
-          <div className={styles.section}>
-            <div className={styles.sectionTitle}>
+          <div className={`${styles.section} section`}>
+            <div className={`${styles.sectionTitle} section-title`}>
               {t('nodes.common.inputs')}
-              <span className={styles.sectionCount}>{Object.keys(inputs).filter(k => !inputs[k].hidden).length}</span>
+              <span className={`${styles.sectionCount} section-count`}>{Object.keys(inputs).filter(k => !inputs[k].hidden).length}</span>
             </div>
             {Object.entries(inputs).map(([key, input]: [string, any], index) => {
               if (input.hidden) return null;
@@ -418,7 +418,7 @@ const BaseNodeComponent = memo(({
               return (
                 <div
                   key={`input-${id}-${key}`}
-                  className={`${styles.nodeRow} ${isConnected ? styles.connected : ''}`}
+                  className={`${styles.nodeRow} node-row ${isConnected ? styles.connected : ''}`}
                   data-input-type={input.type}
                 >
                   <Handle
@@ -426,7 +426,7 @@ const BaseNodeComponent = memo(({
                     position={Position.Left}
                     id={`input-${key}`}
                     isConnectable={isConnectable}
-                    className={`${styles.handle} ${styles.inputHandle} ${isConnected ? styles.connected : ''}`}
+                    className={`${styles.handle} handle ${styles.inputHandle} ${isConnected ? styles.connected : ''} ${isConnected ? 'connected' : ''}`}
                     style={{
                       backgroundColor: getPortColor(input.type),
                       border: '2px solid var(--node-bg, #1a1a1a)',
@@ -437,19 +437,19 @@ const BaseNodeComponent = memo(({
                     data-tooltip={tooltipText}
                   />
 
-                  <div className={styles.nodeLabel} title={tooltipText}>
+                  <div className={`${styles.nodeLabel} node-label`} title={tooltipText}>
                     {input.label || key}
-                    {input.required && <span className={styles.requiredBadge}>*</span>}
+                    {input.required && <span className={`${styles.requiredBadge} required-badge`}>*</span>}
                   </div>
 
-                  <div className={styles.nodeInputWrapper}>
+                  <div className={`${styles.nodeInputWrapper} node-input-wrapper`}>
                     {/* 不同类型的输入渲染 */}
                     {input.type === 'text' && (
                       <input
                         type="text"
                         value={input.value || ''}
                         onChange={(e) => handleInputChange(key, e.target.value)}
-                        className={styles.nodeInput}
+                        className={`${styles.nodeInput} node-input`}
                         placeholder={input.placeholder || ''}
                         disabled={input.isConnected}
                         autoComplete="off"
@@ -464,7 +464,7 @@ const BaseNodeComponent = memo(({
                         max={input.max}
                         step={input.step || 1}
                         onChange={(e) => handleInputChange(key, parseFloat(e.target.value))}
-                        className={styles.nodeInput}
+                        className={`${styles.nodeInput} node-input`}
                         disabled={input.isConnected}
                       />
                     )}
@@ -473,7 +473,7 @@ const BaseNodeComponent = memo(({
                       <select
                         value={input.value || ''}
                         onChange={(e) => handleInputChange(key, e.target.value)}
-                        className={styles.nodeSelect}
+                        className={`${styles.nodeSelect} node-select`}
                         disabled={input.isConnected}
                       >
                         {input.options?.map((option: string) => (
@@ -489,7 +489,7 @@ const BaseNodeComponent = memo(({
                         type="checkbox"
                         checked={!!input.value}
                         onChange={(e) => handleInputChange(key, e.target.checked)}
-                        className={styles.nodeCheckbox}
+                        className={`${styles.nodeCheckbox} node-checkbox`}
                         disabled={input.isConnected}
                       />
                     )}
@@ -498,7 +498,7 @@ const BaseNodeComponent = memo(({
                       <textarea
                         value={input.value || ''}
                         onChange={(e) => handleInputChange(key, e.target.value)}
-                        className={styles.nodeTextarea}
+                        className={`${styles.nodeTextarea} node-textarea`}
                         rows={input.rows || 3}
                         placeholder={input.placeholder || ''}
                         disabled={input.isConnected}
@@ -572,10 +572,10 @@ const BaseNodeComponent = memo(({
 
         {/* 输出部分 - 增强可读性 */}
         {Object.keys(outputs).length > 0 && (
-          <div className={styles.section}>
-            <div className={styles.sectionTitle}>
+          <div className={`${styles.section} section`}>
+            <div className={`${styles.sectionTitle} section-title`}>
               {t('nodes.common.outputs')}
-              <span className={styles.sectionCount}>{Object.keys(outputs).filter(k => !outputs[k].hidden).length}</span>
+              <span className={`${styles.sectionCount} section-count`}>{Object.keys(outputs).filter(k => !outputs[k].hidden).length}</span>
             </div>
             {Object.entries(outputs).map(([key, output]: [string, any], index) => {
               if (output.hidden) return null;
@@ -589,15 +589,15 @@ const BaseNodeComponent = memo(({
               return (
                 <div
                   key={`output-${id}-${key}`}
-                  className={`${styles.nodeRow} ${isConnected ? styles.connected : ''}`}
+                  className={`${styles.nodeRow} node-row ${isConnected ? styles.connected : ''}`}
                   data-output-type={output.type}
                 >
-                  <div className={styles.nodeLabel} title={tooltipText}>
+                  <div className={`${styles.nodeLabel} node-label`} title={tooltipText}>
                     {output.label || key}
-                    {output.type && <span className={styles.typeBadge}>{output.type}</span>}
+                    {output.type && <span className={`${styles.typeBadge} type-badge`}>{output.type}</span>}
                   </div>
 
-                  <div className={`${styles.nodeOutput} ${needsExpand ? styles.expandable : ''}`}>
+                  <div className={`${styles.nodeOutput} node-output ${needsExpand ? styles.expandable : ''} ${needsExpand ? 'expandable' : ''}`}>
                     {outputValue ? (
                       <div
                         className={`${styles.nodeOutputContent} ${isExpanded ? styles.expanded : ''}`}
@@ -621,7 +621,7 @@ const BaseNodeComponent = memo(({
                         )}
                       </div>
                     ) : (
-                      <span className={styles.nodeOutputEmpty}>{t('nodes.common.noData')}</span>
+                      <span className={`${styles.nodeOutputEmpty} node-output-empty`}>{t('nodes.common.noData')}</span>
                     )}
                   </div>
 
@@ -630,7 +630,7 @@ const BaseNodeComponent = memo(({
                     position={Position.Right}
                     id={`output-${key}`}
                     isConnectable={isConnectable}
-                    className={`${styles.handle} ${styles.outputHandle} ${isConnected ? styles.connected : ''}`}
+                    className={`${styles.handle} handle ${styles.outputHandle} ${isConnected ? styles.connected : ''} ${isConnected ? 'connected' : ''}`}
                     style={{
                       backgroundColor: getPortColor(output.type),
                       border: '2px solid var(--node-bg, #1a1a1a)',
@@ -648,7 +648,7 @@ const BaseNodeComponent = memo(({
 
         {/* 大小调整手柄 */}
         <div
-          className={styles.resizeHandle}
+          className={`${styles.resizeHandle} resize-handle`}
           onMouseDown={startResize}
         />
       </div>

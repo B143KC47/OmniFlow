@@ -8,6 +8,12 @@
 /* 导入React Flow覆盖样式 */
 @import './react-flow-overrides.css';
 
+/* 导入统一节点样式系统 */
+@import './node-unified-style.css';
+
+/* 导入节点类型颜色映射 */
+@import './node-type-colors.css';
+
 :root {
   /* OpenAI风格极客黑色主题 */
   --background-color: #050505;
