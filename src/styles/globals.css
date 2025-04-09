@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 导入节点主题样式 */
+@import './node-themes.css';
+
+/* 导入React Flow覆盖样式 */
+@import './react-flow-overrides.css';
+
 :root {
   /* OpenAI风格极客黑色主题 */
   --background-color: #050505;
@@ -15,7 +21,7 @@
   --node-input-bg: #1a1a1a;
   --node-input-border: #333333;
   --node-input-text: #ffffff;
-  
+
   /* 连接线颜色 */
   --connection-color: #10a37f;
   --connection-hover-color: #0fd292;
@@ -23,7 +29,7 @@
   --handle-bg: #141414;
   --handle-border: #10a37f;
   --handle-glow: rgba(16, 163, 127, 0.4);
-  
+
   /* 类别颜色变量 */
   --category-input: #1e88e5;
   --category-llm: #10a37f;
@@ -31,7 +37,7 @@
   --category-search: #ff9800;
   --category-output: #f44336;
   --category-utility: #607d8b;
-  
+
   /* 主题颜色 */
   --primary-color: #10a37f;
   --secondary-color: #0fd292;
@@ -39,14 +45,14 @@
   --success-color: #2ecc71;
   --error-color: #f44336;
   --warning-color: #ff9800;
-  
+
   /* 阴影和发光效果 */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.7);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.7);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.7);
   --glow-primary: 0 0 10px rgba(16, 163, 127, 0.4);
   --glow-accent: 0 0 10px rgba(107, 87, 255, 0.4);
-  
+
   /* Node 组件全局变量 (从Node.css迁移) */
   --node-bg-color: #2d3748;
   --node-text-color: #e2e8f0;
@@ -57,13 +63,13 @@
   --node-connector-hover: #4caf50;
   --node-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   --node-selected-color: #3b82f6;
-  
+
   /* NodeLibrary 组件变量 (从NodeLibrary.css迁移) */
   --node-library-bg: #1e1e1e;
   --node-library-text: #e0e0e0;
   --node-library-border: #333;
   --node-library-item-hover: #2d2d2d;
-  
+
   /* NodePalette 组件变量 (从NodePalette.css迁移) */
   --palette-bg: #1e1e1e;
   --palette-text: #e0e0e0;

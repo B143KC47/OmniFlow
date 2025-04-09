@@ -1,0 +1,241 @@
+/**
+ * 节点主题系统
+ * 为不同类型的节点提供独特的视觉风格
+ */
+
+:root {
+  /* 基础颜色 - 现代暗色绿色主题 */
+  --primary-color: #10b981; /* 主要绿色 */
+  --primary-dark: #059669; /* 深绿色 */
+  --primary-light: #34d399; /* 浅绿色 */
+  --primary-lighter: #6ee7b7; /* 更浅的绿色 */
+  --primary-darker: #047857; /* 更深的绿色 */
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #3b82f6;
+
+  /* 节点基础样式 */
+  --node-bg: #1a1a1a; /* 非常暗的背景 */
+  --node-border: #2a2a2a; /* 深色边框 */
+  --node-header-bg: #10b981; /* 绿色标题栏 */
+  --node-header-bg-gradient: linear-gradient(90deg, #10b981, #059669); /* 标题栏渐变 */
+  --node-header-height: 42px; /* 节点标题栏高度 */
+  --node-title-color: #ffffff; /* 白色标题文字 */
+  --node-text-color: #e0e0e0; /* 浅色文字 */
+  --node-text-muted: #a0a0a0; /* 灰色文字 */
+  --node-input-bg: #2a2a2a; /* 输入框背景 */
+  --node-input-border: #3a3a3a; /* 输入框边框 */
+  --node-input-focus-border: #10b981; /* 输入框聚焦边框 */
+  --node-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 节点阴影 */
+  --node-shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.4); /* 节点悬停阴影 */
+  --node-shadow-selected: 0 0 0 2px var(--primary-color), 0 8px 16px rgba(0, 0, 0, 0.4); /* 选中阴影 */
+  --node-border-radius: 8px; /* 节点圆角 */
+
+  /* 节点类型颜色 - 全部使用绿色调 */
+  --input-node-color: #10b981; /* 输入节点 */
+  --output-node-color: #059669; /* 输出节点 */
+  --model-node-color: #10b981; /* 模型节点 */
+  --processing-node-color: #059669; /* 处理节点 */
+  --logic-node-color: #34d399; /* 逻辑节点 */
+  --utility-node-color: #10b981; /* 工具节点 */
+  --ui-node-color: #059669; /* UI节点 */
+
+  /* 连接点颜色 */
+  --port-color: #10b981; /* 端口颜色 */
+  --port-hover-color: #34d399; /* 端口悬停颜色 */
+  --port-connected-color: #059669; /* 端口连接颜色 */
+  --port-glow: 0 0 8px var(--primary-color); /* 端口发光效果 */
+}
+
+/* 输入节点主题 */
+.node[data-category="INPUT"] {
+  border: 1px solid var(--node-border, #2a2a2a);
+}
+
+.node[data-category="INPUT"] .nodeHeader {
+  background: var(--node-header-bg-gradient, linear-gradient(90deg, #10b981, #059669));
+}
+
+/* 输出节点主题 */
+.node[data-category="OUTPUT"] {
+  border: 1px solid var(--node-border, #2a2a2a);
+}
+
+.node[data-category="OUTPUT"] .nodeHeader {
+  background: var(--node-header-bg-gradient, linear-gradient(90deg, #10b981, #059669));
+}
+
+/* AI模型节点主题 */
+.node[data-category="AI_TASK_EXECUTION"] {
+  border: 1px solid var(--node-border, #2a2a2a);
+}
+
+.node[data-category="AI_TASK_EXECUTION"] .nodeHeader {
+  background: var(--node-header-bg-gradient, linear-gradient(90deg, #10b981, #059669));
+}
+
+/* 数据处理节点主题 */
+.node[data-category="DATA_MANIPULATION"] {
+  border: 1px solid var(--node-border, #2a2a2a);
+}
+
+.node[data-category="DATA_MANIPULATION"] .nodeHeader {
+  background: var(--node-header-bg-gradient, linear-gradient(90deg, #10b981, #059669));
+}
+
+/* 流程控制节点主题 */
+.node[data-category="FLOW_CONTROL"] {
+  border: 1px solid var(--node-border, #2a2a2a);
+}
+
+.node[data-category="FLOW_CONTROL"] .nodeHeader {
+  background: var(--node-header-bg-gradient, linear-gradient(90deg, #10b981, #059669));
+}
+
+/* 工具节点主题 */
+.node[data-category="UTILITY"] {
+  border: 1px solid var(--node-border, #2a2a2a);
+}
+
+.node[data-category="UTILITY"] .nodeHeader {
+  background: var(--node-header-bg-gradient, linear-gradient(90deg, #10b981, #059669));
+}
+
+/* 交互节点主题 */
+.node[data-category="INTERACTION"] {
+  border: 1px solid var(--node-border, #2a2a2a);
+}
+
+.node[data-category="INTERACTION"] .nodeHeader {
+  background: var(--node-header-bg-gradient, linear-gradient(90deg, #10b981, #059669));
+}
+
+/* 调试节点主题 */
+.node[data-category="DEBUG"] {
+  border: 1px solid var(--node-border, #2a2a2a);
+}
+
+.node[data-category="DEBUG"] .nodeHeader {
+  background: var(--node-header-bg-gradient, linear-gradient(90deg, #10b981, #059669));
+}
+
+/* 高级节点主题 */
+.node[data-category="ADVANCED"] {
+  border: 1px solid var(--node-border, #2a2a2a);
+}
+
+.node[data-category="ADVANCED"] .nodeHeader {
+  background: var(--node-header-bg-gradient, linear-gradient(90deg, #10b981, #059669));
+}
+
+/* 节点状态样式增强 */
+.node.running {
+  animation: node-pulse 2s infinite;
+  border-color: var(--primary-color, #10b981);
+}
+
+.node.completed {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+  border-color: var(--success-color, #10b981);
+}
+
+.node.error {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+  border-color: var(--error-color, #ef4444);
+}
+
+/* 添加网格背景效果 */
+.node::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background-image: radial-gradient(circle, rgba(42, 42, 42, 0.5) 1px, transparent 1px);
+  background-size: 4px 4px;
+  border-radius: 0 0 8px 0;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* 节点连接点样式增强 */
+.handle {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.handle:hover {
+  transform: scale(1.5);
+}
+
+.handle.connected {
+  animation: handle-glow 1.5s infinite alternate;
+}
+
+/* 动画效果 */
+@keyframes node-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 163, 127, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(16, 163, 127, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 163, 127, 0);
+  }
+}
+
+@keyframes handle-glow {
+  from {
+    box-shadow: 0 0 2px var(--primary-color);
+  }
+  to {
+    box-shadow: 0 0 8px var(--primary-color);
+  }
+}
+
+/* 节点出现动画 */
+@keyframes nodeAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 节点折叠动画 */
+@keyframes nodeCollapse {
+  from {
+    max-height: 1000px;
+    opacity: 1;
+  }
+  to {
+    max-height: var(--node-header-height);
+    opacity: 0.9;
+  }
+}
+
+/* 节点展开动画 */
+@keyframes nodeExpand {
+  from {
+    max-height: var(--node-header-height);
+    opacity: 0.9;
+  }
+  to {
+    max-height: 1000px;
+    opacity: 1;
+  }
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --node-bg: #252530;
+    --node-border: #35354a;
+    --node-header-bg: #2c2c38;
+  }
+}

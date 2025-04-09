@@ -1,0 +1,48 @@
+/* React Flow 节点样式覆盖 */
+
+/* 覆盖默认节点样式 */
+.react-flow__node {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* 折叠状态下的节点样式 */
+.react-flow__node:has(.BaseNodeComponent_collapsed__PbT1J) {
+  width: auto !important;
+  min-width: auto !important;
+  min-height: auto !important;
+  height: auto !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* 选中状态下的节点样式 */
+.react-flow__node.selected {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* 确保节点内容可见 */
+.react-flow__node > div {
+  visibility: visible !important;
+  pointer-events: all !important;
+}
+
+/* 确保节点大小自适应内容 */
+.react-flow__node-TEXT_INPUT,
+.react-flow__node-IMAGE_INPUT,
+.react-flow__node-SAMPLER,
+.react-flow__node-LLM_QUERY,
+.react-flow__node-DOCUMENT_QUERY,
+.react-flow__node-WEB_SEARCH,
+.react-flow__node-ENCODER,
+.react-flow__node-CUSTOM {
+  width: auto !important;
+  height: auto !important;
+}

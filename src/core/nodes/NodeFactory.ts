@@ -60,7 +60,7 @@ class NodeFactory {
       console.warn('NodeFactory已经初始化');
       return;
     }
-    
+
     console.log('初始化节点工厂');
     this.initialized = true;
   }
@@ -81,7 +81,7 @@ class NodeFactory {
     if (this.nodeDefinitions.has(definition.type)) {
       console.warn(`节点类型 ${definition.type} 已存在，将被覆盖`);
     }
-    
+
     this.nodeDefinitions.set(definition.type, definition);
     console.log(`已注册节点类型: ${definition.type}`);
   }
@@ -101,12 +101,12 @@ class NodeFactory {
    */
   public createNodeComponent(type: string): React.ComponentType<NodeComponentProps> | null {
     const definition = this.nodeDefinitions.get(type);
-    
+
     if (!definition) {
       console.warn(`未找到节点类型 ${type} 的定义`);
       return null;
     }
-    
+
     return definition.component;
   }
 
@@ -125,6 +125,24 @@ class NodeFactory {
    */
   public getAllNodeDefinitions(): NodeDefinition[] {
     return Array.from(this.nodeDefinitions.values());
+  }
+
+  /**
+   * 获取通用节点组件
+   * 当特定节点类型没有实现时，使用这个通用组件
+   */
+  public getGenericNodeComponent(): React.ComponentType<NodeComponentProps> {
+    // 返回一个简单的通用节点组件
+    // 这个组件会使用BaseNodeComponent来渲染节点
+    // 导入BaseNodeComponent
+    const BaseNodeComponent = require('../../components/nodes/BaseNodeComponent').default;
+
+    // 创建一个包装组件
+    const GenericNodeComponent = (props: NodeComponentProps) => {
+      return React.createElement(BaseNodeComponent, props);
+    };
+
+    return GenericNodeComponent;
   }
 
   /**
