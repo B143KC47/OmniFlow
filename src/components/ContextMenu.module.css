@@ -1,38 +1,77 @@
 .comfy-context-menu {
-  background-color: #1a1a1a;
-  border: 1px solid #282828;
-  border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-  padding: 6px 0;
-  min-width: 180px;
+  background-color: rgba(26, 26, 26, 0.95);
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  border: 1px solid rgba(40, 40, 40, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.1);
+  padding: 8px 0;
+  min-width: 220px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
   position: fixed;
   z-index: 1000;
+  animation: menuAppear 0.2s ease-out forwards;
+  backdrop-filter: blur(12px);
 }
 
 .comfy-menu-item {
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  padding: 10px 14px;
   color: #e0e0e0;
   font-size: 13px;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   cursor: pointer;
-  border-radius: 4px;
-  margin: 0 4px;
+  border-radius: 6px;
+  margin: 2px 6px;
+  position: relative;
+  overflow: hidden;
+  height: 20px; /* 固定高度确保一致性 */
+  min-width: 180px; /* 最小宽度确保一致性 */
 }
 
 .comfy-menu-item:hover {
-  background-color: rgba(16, 163, 127, 0.15);
+  background-color: rgba(16, 185, 129, 0.15);
   color: #fff;
 }
 
+.comfy-menu-item:hover::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: #10b981;
+  animation: slideIn 0.2s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes menuAppear {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes submenuAppear {
+  from { opacity: 0; transform: translateX(-5px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 .comfy-menu-icon {
-  width: 16px;
-  height: 16px;
-  margin-right: 10px;
-  color: #10a37f;
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+  color: #10b981;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 包装器类，用于包含全局选择器 */
@@ -41,17 +80,84 @@
   display: contents; /* 这会让元素在视觉上"消失"，但子元素仍然会正常渲染 */
 }
 
+/* 强制使用深色主题 - 使用包装器类作为前缀 */
+.contexify-wrapper :global(.contexify),
+.contexify-wrapper :global(.contexify_submenu),
+.contexify-wrapper :global(.contexify_submenu-bottom),
+.contexify-wrapper :global(.contexify_submenu-right) {
+  background-color: rgba(26, 26, 26, 0.95) !important;
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px) !important;
+  background-size: 20px 20px !important;
+  border: 1px solid rgba(40, 40, 40, 0.8) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.1) !important;
+  backdrop-filter: blur(12px) !important;
+  --contexify-menu-bgColor: rgba(26, 26, 26, 0.95) !important;
+  --contexify-item-color: #e0e0e0 !important;
+  --contexify-activeItem-color: #fff !important;
+  --contexify-activeItem-bgColor: rgba(16, 185, 129, 0.15) !important;
+  --contexify-separator-color: #282828 !important;
+  --contexify-arrow-color: #10b981 !important;
+  --contexify-activeArrow-color: #10b981 !important;
+}
+
+/* 子菜单项样式 */
+.contexify-wrapper :global(.contexify_itemContent) {
+  color: #e0e0e0 !important;
+}
+
+.contexify-wrapper :global(.contexify_item:not(.contexify_item-disabled):hover > .contexify_itemContent),
+.contexify-wrapper :global(.contexify_item:not(.contexify_item-disabled):focus > .contexify_itemContent) {
+  color: #fff !important;
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+/* 确保子菜单箭头颜色正确 */
+.contexify-wrapper :global(.contexify_submenu-arrow) {
+  color: #10b981 !important;
+}
+
+.contexify-wrapper :global(.contexify_item:not(.contexify_item-disabled):hover > .contexify_itemContent .contexify_submenu-arrow),
+.contexify-wrapper :global(.contexify_item:not(.contexify_item-disabled):focus > .contexify_itemContent .contexify_submenu-arrow) {
+  color: #10b981 !important;
+  opacity: 1 !important;
+}
+
 /* React Contexify 样式覆盖 - 与本地类结合使用 */
-.contexify-wrapper :global(.react-contexify) {
-  background-color: #1a1a1a;
-  border: 1px solid #282828;
-  border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+.contexify-wrapper :global(.react-contexify),
+.contexify-wrapper :global(.contexify) {
+  background-color: rgba(26, 26, 26, 0.95);
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  border: 1px solid rgba(40, 40, 40, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.1);
+  backdrop-filter: blur(12px);
+  --contexify-menu-bgColor: rgba(26, 26, 26, 0.95);
+  --contexify-item-color: #e0e0e0;
+  --contexify-activeItem-color: #fff;
+  --contexify-activeItem-bgColor: rgba(16, 185, 129, 0.15);
 }
 
 .contexify-wrapper :global(.react-contexify__item:hover > .react-contexify__item__content) {
-  background-color: rgba(16, 163, 127, 0.15);
+  background-color: rgba(16, 185, 129, 0.15);
   color: #fff;
+  position: relative;
+}
+
+.contexify-wrapper :global(.react-contexify__item:hover > .react-contexify__item__content::after) {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: #10b981;
+  animation: slideIn 0.2s ease-out forwards;
 }
 
 .react-contexify__item:not(:first-child) {
@@ -59,55 +165,376 @@
 }
 
 .react-contexify__item:hover .comfy-menu-icon {
-  color: #10a37f;
+  color: #10b981;
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
 }
 
 .react-contexify__separator {
   background-color: #282828;
   height: 1px;
-  margin: 6px 8px;
+  margin: 8px 10px;
+  opacity: 0.6;
 }
 
-.contexify-wrapper :global(.react-contexify__submenu) {
+.contexify-wrapper :global(.react-contexify__submenu),
+.contexify-wrapper :global(.contexify .contexify_submenu) {
   margin-top: 0;
   margin-bottom: 0;
-  background-color: #1a1a1a;
-  border: 1px solid #282828;
-  border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  background-color: rgba(26, 26, 26, 0.95);
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  border: 1px solid rgba(40, 40, 40, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.1);
+  animation: submenuAppear 0.2s ease-out forwards;
+  backdrop-filter: blur(12px);
+  --contexify-menu-bgColor: rgba(26, 26, 26, 0.95) !important;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .contexify-wrapper :global(.react-contexify__submenu-arrow) {
   margin-left: 8px;
-  color: #666;
+  color: #10b981;
+  opacity: 0.7;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Submenu hover effects */
+.submenu:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+  border-radius: 6px;
+}
+
+/* Submenu transition effects */
+.contexify-wrapper :global(.react-contexify__submenu-item:hover) > :global(.react-contexify__submenu-arrow) {
+  transform: translateX(3px);
+}
+
+/* Improve submenu appearance/disappearance */
+.contexify-wrapper :global(.react-contexify__submenu-container) {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.contexify-wrapper :global(.react-contexify__submenu--is-open) {
+  animation: submenuFadeIn 0.15s ease forwards;
+}
+
+@keyframes submenuFadeIn {
+  from { opacity: 0; transform: translateX(-5px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .contexify-wrapper :global(.react-contexify__item:hover > .react-contexify__item__content .react-contexify__submenu-arrow) {
-  color: #fff;
+  color: #10b981;
+  opacity: 1;
+  transform: translateX(2px);
 }
 
 .submenu {
   position: relative;
   color: #e0e0e0;
+  font-weight: 500;
 }
 
-.contexify-wrapper :global(.react-contexify__item__content) {
-  cursor: pointer;
-  padding: 8px 12px;
+/* Category color indicators */
+.category-input {
+  color: var(--category-input, #1e88e5);
+}
+
+.category-ai {
+  color: var(--category-llm, #10a37f);
+}
+
+.category-utility {
+  color: var(--category-utility, #607d8b);
+}
+
+.category-output {
+  color: var(--category-output, #f44336);
+}
+
+.category-flow {
+  color: var(--primary-color, #10b981);
+}
+
+/* Add Node container and submenu styling */
+.add-node-container {
+  position: relative;
+}
+
+.add-node-item {
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+}
+
+.add-node-item:hover {
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+/* Node submenu content */
+.node-submenu-content {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background-color: rgba(26, 26, 26, 0.95);
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  border: 1px solid rgba(40, 40, 40, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.1);
+  padding: 8px;
+  min-width: 220px;
+  z-index: 1001;
+  animation: submenuFadeIn 0.15s ease-out forwards;
+  backdrop-filter: blur(12px);
+}
+
+/* Category wrapper for proper positioning */
+.category-wrapper {
+  position: relative;
+}
+
+/* Category submenu content - for child nodes */
+.category-submenu-content {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background-color: rgba(26, 26, 26, 0.95);
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  border: 1px solid rgba(40, 40, 40, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.1);
+  padding: 8px;
+  min-width: 200px;
+  z-index: 1002;
+  animation: submenuFadeIn 0.15s ease-out forwards;
+  backdrop-filter: blur(12px);
+}
+
+/* Node item styling */
+.node-item {
+  font-size: 12px;
+  padding: 6px 10px;
+  margin: 1px 0;
+  height: auto;
+}
+
+/* Submenu styling for consistent size */
+.submenu {
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+  padding: 10px 14px;
+  height: 20px; /* 固定高度确保一致性 */
+  min-width: 180px; /* 最小宽度确保一致性 */
+  display: flex;
+  align-items: center;
+}
+
+.submenu:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+/* Category submenu styling */
+.category-submenu {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+  height: 20px; /* 固定高度确保一致性 */
+  min-width: 180px; /* 最小宽度确保一致性 */
+}
+
+/* Category container for hover effects */
+.category-container {
+  position: relative;
+  margin: 2px 0;
+  transition: all 0.15s ease;
+  height: 20px; /* 固定高度确保一致性 */
+}
+
+.category-container:hover {
+  background-color: rgba(16, 185, 129, 0.05);
+  border-radius: 4px;
+}
+
+/* Active category styling */
+.active-category {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  border-radius: 6px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: translateX(2px);
+}
+
+/* Active submenu container */
+.active-submenu-container {
+  animation: fadeIn 0.15s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Category count badge */
+.category-count {
+  font-size: 10px;
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: 8px;
+}
+
+/* Category item styling */
+.category-item {
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.category-item:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.category-item .submenu-arrow {
+  font-size: 10px;
+  margin-left: 8px;
+  color: #10b981;
+  opacity: 0.7;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.category-item:hover .submenu-arrow {
+  transform: translateX(2px);
+  opacity: 1;
+}
+
+/* Active category styling - more prominent */
+.active-category {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.active-category::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 50%;
+  background-color: #10b981;
+  border-radius: 3px;
+}
+
+/* 添加分类标记和动画效果 */
+.category-container {
+  position: relative;
+}
+
+.category-badge {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  font-size: 9px;
+  padding: 2px 5px;
+  border-radius: 10px;
+  opacity: 0.8;
+}
+
+/* 平滑显示子菜单 */
+.category-submenu-content {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-5px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* 节点数量标记 */
+.category-count {
+  font-size: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* 搜索框样式 */
+.search-container {
+  padding: 6px 10px;
+  margin: 0px 6px 8px 6px;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 6px 10px 6px 30px;
+  font-size: 12px;
   color: #e0e0e0;
-  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
 }
 
-.contexify-wrapper :global(.react-contexify__item:hover .react-contexify__item__content) {
-  color: #fff;
+.search-input:focus {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
 }
 
-.contexify-wrapper :global(.react-contexify__item--disabled) {
-  opacity: 0.5;
-  cursor: not-allowed;
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
 }
 
-.contexify-wrapper :global(.react-contexify__item--disabled:hover > .react-contexify__item__content) {
-  background-color: transparent;
-  color: #e0e0e0;
+.search-results {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 8px;
+  padding: 0 6px;
+}
+
+.search-results-title {
+  padding: 4px 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 6px;
+}
+
+.node-result {
+  display: flex;
+  flex-direction: column;
+}
+
+.node-result-category {
+  font-size: 10px;
+  color: #10b981;
+  opacity: 0.7;
+  margin-top: 2px;
 }
