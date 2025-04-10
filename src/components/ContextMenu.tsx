@@ -487,7 +487,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode, autoHideTim
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         {getCategoryIcon(category.id)}
-                        <span>{category.name}</span>
+                        <span>{t(`nodes.categories.${category.id.toLowerCase()}`) || category.name}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span className={styles['category-count']}>{category.nodes.length}</span>
@@ -506,7 +506,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ id, onSelectNode, autoHideTim
                           className={`${styles['comfy-menu-item']} ${styles['node-item']}`}
                         >
                           {getNodeIcon(node.type, node.icon, category.id)}
-                          {node.name}
+                          {t(`nodes.${node.id.toLowerCase()}.name`) || node.name}
                         </Item>
                       ))}
                     </div>

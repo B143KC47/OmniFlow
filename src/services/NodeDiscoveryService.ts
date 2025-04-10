@@ -1,4 +1,4 @@
-import { NodeType } from '../types';
+// import { NodeType } from '../types';
 import { scanNodeComponents } from '../utils/nodeScanner';
 import NodeRegistry from './NodeRegistry';
 
@@ -150,17 +150,17 @@ class NodeDiscoveryService {
   private validateNodeConsistency(): void {
     // 获取节点注册表中的错误
     const registryErrors = this.nodeRegistry.getErrors();
-    
+
     if (registryErrors.length > 0) {
       console.warn('节点注册表验证发现问题:');
       registryErrors.forEach(error => console.warn(`- ${error}`));
     }
-    
+
     // 检查所有节点定义是否有对应的组件
-    const missingComponents = this.nodeDefinitions.filter(def => 
+    const missingComponents = this.nodeDefinitions.filter(def =>
       !this.nodeRegistry.getNodeComponent(def.type)
     );
-    
+
     if (missingComponents.length > 0) {
       console.warn('发现没有对应组件实现的节点定义:');
       missingComponents.forEach(def => {
@@ -197,7 +197,7 @@ class NodeDiscoveryService {
       {
         id: 'WEB_SEARCH',
         type: 'WEB_SEARCH',
-        name: t('nodes.webSearch.name'), 
+        name: t('nodes.webSearch.name'),
         description: t('nodes.webSearch.description'),
         category: 'Data_Manipulation_Utilities',
         inputs: 1,
@@ -265,15 +265,15 @@ class NodeDiscoveryService {
     try {
       // 使用节点扫描器获取所有节点
       const categoryNodeMap = scanNodeComponents();
-      
+
       // 收集所有发现的节点
       const discoveredNodes: NodeDefinition[] = [];
-      
+
       // 处理每个类别中的节点
       Object.entries(categoryNodeMap).forEach(([category, nodes]) => {
         // 确定正确的分类ID
         const mappedCategory = FOLDER_CATEGORY_MAP[category] || category;
-        
+
         // 对于每个发现的节点，添加到列表中
         nodes.forEach(node => {
           // 确保节点有一个合适的图标
@@ -282,24 +282,24 @@ class NodeDiscoveryService {
           } else if (!node.icon) {
             node.icon = category; // 使用类别作为默认图标
           }
-          
+
           // 确保节点分类正确
           const nodeWithCategory = {
             ...node,
             category: mappedCategory
           };
-          
+
           discoveredNodes.push(nodeWithCategory);
         });
       });
-      
+
       // 过滤掉已存在的节点（避免与核心节点重复）
-      const uniqueNodes = discoveredNodes.filter(node => 
+      const uniqueNodes = discoveredNodes.filter(node =>
         !this.nodeDefinitions.some(existing => existing.id === node.id)
       );
-      
+
       this.nodeDefinitions.push(...uniqueNodes);
-      
+
       console.log(`发现 ${uniqueNodes.length} 个新节点`);
     } catch (error) {
       console.error('扫描节点文件夹时出错:', error);
@@ -309,7 +309,7 @@ class NodeDiscoveryService {
   // 按照分类组织节点
   private organizeNodesByCategory(t: (key: string) => string): void {
     const categoryMap: Map<string, NodeDefinition[]> = new Map();
-    
+
     // 按照类别分组节点
     for (const node of this.nodeDefinitions) {
       const category = node.category;
@@ -321,24 +321,24 @@ class NodeDiscoveryService {
         nodesInCategory.push(node);
       }
     }
-    
+
     // 创建分类数组
     const categories: NodeCategory[] = [];
-    
+
     // 处理所有分类，包括新添加的分类
     const allCategories = [
-      { id: 'input', name: t('nodes.categories.input'), description: t('nodes.categories.inputDescription') },
-      { id: 'AI_Task_Execution', name: t('nodes.categories.aiTaskExecution') || t('defaultCategories.aiTaskExecution'), description: t('nodes.categories.aiTaskExecutionDescription') || t('defaultDescriptions.aiTaskExecution') },
-      { id: 'Data_Manipulation_Utilities', name: t('nodes.categories.dataManipulation') || t('defaultCategories.dataManipulation'), description: t('nodes.categories.dataManipulationDescription') || t('defaultDescriptions.dataManipulation') },
-      { id: 'Flow_Control_Logic', name: t('nodes.categories.flowControl') || t('defaultCategories.flowControl'), description: t('nodes.categories.flowControlDescription') || t('defaultDescriptions.flowControl') },
-      { id: 'Monitoring_Debugging', name: t('nodes.categories.monitoring') || t('defaultCategories.monitoring'), description: t('nodes.categories.monitoringDescription') || t('defaultDescriptions.monitoring') },
-      { id: 'output', name: t('nodes.categories.output'), description: t('nodes.categories.outputDescription') || t('defaultDescriptions.output')},
-      { id: 'User_Interaction_Control', name: t('nodes.categories.userInteraction') || t('defaultCategories.userInteraction'), description: t('nodes.categories.userInteractionDescription') || t('defaultDescriptions.userInteraction') },
+      { id: 'input', name: t('contextMenu.categories.input') || t('nodes.categories.input'), description: t('nodes.categories.inputDescription') },
+      { id: 'AI_Task_Execution', name: t('contextMenu.categories.ai_task_execution') || t('nodes.categories.aiTaskExecution'), description: t('nodes.categories.aiTaskExecutionDescription') },
+      { id: 'Data_Manipulation_Utilities', name: t('contextMenu.categories.data_manipulation_utilities') || t('nodes.categories.dataManipulation'), description: t('nodes.categories.dataManipulationDescription') },
+      { id: 'Flow_Control_Logic', name: t('contextMenu.categories.flow_control_logic') || t('nodes.categories.flowControl'), description: t('nodes.categories.flowControlDescription') },
+      { id: 'Monitoring_Debugging', name: t('contextMenu.categories.monitoring_debugging') || t('nodes.categories.monitoring'), description: t('nodes.categories.monitoringDescription') },
+      { id: 'output', name: t('contextMenu.categories.output') || t('nodes.categories.output'), description: t('nodes.categories.outputDescription')},
+      { id: 'User_Interaction_Control', name: t('contextMenu.categories.user_interaction_control') || t('nodes.categories.userInteraction'), description: t('nodes.categories.userInteractionDescription') },
       { id: 'utility', name: t('nodes.categories.utility'), description: t('nodes.categories.utilityDescription') },
       { id: 'flow', name: t('nodes.categories.flow'), description: t('nodes.categories.flowDescription') },
-      { id: 'advanced', name: t('nodes.categories.advanced'), description: t('nodes.categories.advancedDescription') }
+      { id: 'advanced', name: t('contextMenu.categories.advanced') || t('nodes.categories.advanced'), description: t('nodes.categories.advancedDescription') }
     ];
-    
+
     // 添加所有存在节点的分类
     for (const categoryInfo of allCategories) {
       if (categoryMap.has(categoryInfo.id)) {
@@ -350,14 +350,15 @@ class NodeDiscoveryService {
         });
       }
     }
-    
+
     // 检查是否有未包含在预定义分类中的节点类别
-    for (const [categoryId, nodes] of categoryMap.entries()) {
+    // 将 Map 转换为数组以避免循环问题
+    Array.from(categoryMap.entries()).forEach(([categoryId, nodes]) => {
       if (!categories.some(cat => cat.id === categoryId)) {
         // 尝试获取此类别的国际化名称
         const categoryName = this.translateCategory(categoryId, t);
         const categoryDescription = this.translateCategoryDescription(categoryId, t);
-        
+
         categories.push({
           id: categoryId,
           name: categoryName,
@@ -365,8 +366,8 @@ class NodeDiscoveryService {
           nodes: nodes
         });
       }
-    }
-    
+    });
+
     this.nodeCategories = categories;
   }
 
@@ -379,25 +380,25 @@ class NodeDiscoveryService {
         return translated;
       }
     }
-    
+
     // 尝试使用默认的分类国际化路径
     const defaultKey = `nodes.categories.${categoryId.toLowerCase()}`;
     const translated = t(defaultKey);
     if (translated !== defaultKey) {
       return translated;
     }
-    
+
     // 尝试使用备用分类国际化路径
     const fallbackKey = `defaultCategories.${categoryId.toLowerCase()}`;
     const fallbackTranslated = t(fallbackKey);
     if (fallbackTranslated !== fallbackKey) {
       return fallbackTranslated;
     }
-    
+
     // 格式化分类ID作为后备
     return categoryId.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').trim();
   }
-  
+
   // 翻译分类描述
   private translateCategoryDescription(categoryId: string, t: (key: string) => string): string {
     // 尝试使用描述国际化路径
@@ -406,14 +407,14 @@ class NodeDiscoveryService {
     if (translated !== descriptionKey) {
       return translated;
     }
-    
+
     // 尝试使用备用描述国际化路径
     const fallbackKey = `defaultDescriptions.${categoryId.toLowerCase()}`;
     const fallbackTranslated = t(fallbackKey);
     if (fallbackTranslated !== fallbackKey) {
       return fallbackTranslated;
     }
-    
+
     // 格式化分类ID作为后备
     return `${this.translateCategory(categoryId, t)} 类型的节点`;
   }
@@ -429,24 +430,24 @@ class NodeDiscoveryService {
       // 添加新节点
       this.nodeDefinitions.push(node);
     }
-    
+
     // 如果有翻译函数，使用它更新节点名称和描述
     if (this.translateFunc) {
       const nodeType = node.type.toLowerCase().replace(/_/g, '');
       const nameKey = `nodes.${nodeType}.name`;
       const descKey = `nodes.${nodeType}.description`;
-      
+
       const translatedName = this.translateFunc(nameKey);
       if (translatedName !== nameKey) {
         node.name = translatedName;
       }
-      
+
       const translatedDesc = this.translateFunc(descKey);
       if (translatedDesc !== descKey) {
         node.description = translatedDesc;
       }
     }
-    
+
     // 重新组织节点分类
     if (this.translateFunc) {
       this.organizeNodesByCategory(this.translateFunc);

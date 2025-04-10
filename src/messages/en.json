@@ -379,7 +379,15 @@
       "basic": "Basic Nodes",
       "ai": "AI Nodes",
       "search": "Search Nodes",
-      "process": "Processing Nodes"
+      "process": "Processing Nodes",
+      "input": "Input",
+      "ai_task_execution": "AI Task Execution",
+      "data_manipulation_utilities": "Data Manipulation",
+      "flow_control_logic": "Flow Control Logic",
+      "monitoring_debugging": "Monitoring & Debugging",
+      "output": "Output",
+      "user_interaction_control": "User Interaction Control",
+      "advanced": "Advanced"
     },
     "nodes": {
       "textInput": "Text Input",

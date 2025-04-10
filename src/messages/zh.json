@@ -466,7 +466,15 @@
       "basic": "基础节点",
       "ai": "AI节点",
       "search": "搜索节点",
-      "process": "处理节点"
+      "process": "处理节点",
+      "input": "输入",
+      "ai_task_execution": "AI 任务执行",
+      "data_manipulation_utilities": "数据操作工具",
+      "flow_control_logic": "流程控制逻辑",
+      "monitoring_debugging": "监控与调试",
+      "output": "输出",
+      "user_interaction_control": "用户交互控制",
+      "advanced": "高级"
     },
     "nodes": {
       "textInput": "文本输入",
